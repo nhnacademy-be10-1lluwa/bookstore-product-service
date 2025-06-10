@@ -1,8 +1,6 @@
 package com.nhnacademy.illuwa.entity.book;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,29 +12,30 @@ import java.util.Date;
 public class Book {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 255)
-    private String Bookname;
+    @Column(length = 255, nullable = false)
+    private String bookName;
 
-    private String Contents;
+    private String contents;
 
-    private String Description;
-
-    @Column(length = 255)
-    private String Author;
+    private String description;
 
     @Column(length = 255)
-    private String Publisher;
+    private String author;
 
-    private Date published_datetime;
+    @Column(length = 255)
+    private String publisher;
+
+    private Date publishedDateTime;
 
     @Column(length = 17)
-    private String ISBN;
+    private String isbn;
 
-    private int regular_price;
+    private int regularPrice;
 
-    private int sale_price;
+    private int salePrice;
 
     private boolean isGiftWrap;
 
