@@ -1,6 +1,6 @@
-package com.nhnacademy.illuwa.review.entity;
+package com.nhnacademy.illuwa.d_review.review.entity;
 
-import com.nhnacademy.illuwa.book.entity.Book;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class Review {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bookId", nullable = false)
-    private Book book;
+    private com.nhnacademy.illuwa.d_book.entity.book.Book book;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "memberId", nullable = false)
