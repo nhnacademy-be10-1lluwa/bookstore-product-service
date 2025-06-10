@@ -41,5 +41,5 @@ public class Book {
 
     private boolean isGiftWrap;
 
-//    카테고리 Entity 추가 후 필드 생성
+
 }
