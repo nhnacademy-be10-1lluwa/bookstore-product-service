@@ -16,8 +16,7 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
-    @NotBlank
-    @Length(max = 500)
+
     @Column(length = 500, nullable = false)
     private String commentContent;
 

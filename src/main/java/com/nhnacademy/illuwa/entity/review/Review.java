@@ -21,24 +21,18 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
-    @NotBlank
-    @Length(max = 50)
     @Column(length = 50, nullable = false)
     private String reviewTitle;
 
-    @NotBlank
-    @Length(max = 5000)
     @Column(length = 5000, nullable = false)
     private String reviewContent;
 
     //파일 경로
     private String reviewImage;
 
-    @Size(min = 1, max = 5)
     @Column(nullable = false)
     private Integer reviewScore;
 
-    @NotNull
     @Column(nullable = false)
     private LocalDateTime reviewDate;
 
