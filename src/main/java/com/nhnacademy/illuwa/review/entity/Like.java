@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.entity.review;
+package com.nhnacademy.illuwa.review.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
