@@ -1,6 +1,6 @@
-package com.nhnacademy.illuwa.domain.review;
+package com.nhnacademy.illuwa.review.entity;
 
-import com.nhnacademy.illuwa.domain.book.Books;
+import com.nhnacademy.illuwa.book.entity.Book;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,15 +12,15 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reviews {
+public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
-    @Column(nullable = false)
+    @Column(length = 50, nullable = false)
     private String reviewTitle;
 
-    @Column(nullable = false)
+    @Column(length = 5000, nullable = false)
     private String reviewContent;
 
     //파일 경로
@@ -34,7 +34,7 @@ public class Reviews {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bookId", nullable = false)
-    private Books books;
+    private Book book;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "memberId", nullable = false)
