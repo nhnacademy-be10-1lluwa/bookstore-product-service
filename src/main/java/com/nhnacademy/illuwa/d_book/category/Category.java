@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.category;
+package com.nhnacademy.illuwa.d_book.entity.category;
 
 import jakarta.persistence.*;
 import lombok.Getter;
