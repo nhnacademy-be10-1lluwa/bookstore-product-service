@@ -1,5 +1,6 @@
-package com.nhnacademy.illuwa.book.entity;
+package com.nhnacademy.illuwa.d_book.entity.book;
 
+import com.nhnacademy.illuwa.d_book.entity.category.Category;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +17,11 @@ public class BookCategory {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id")
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
     private Category category;
 
 }
