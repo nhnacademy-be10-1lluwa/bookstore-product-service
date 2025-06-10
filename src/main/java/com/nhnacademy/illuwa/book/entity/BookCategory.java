@@ -5,19 +5,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
-public class Category {
+@Entity
+public class BookCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long parentId;
+    @ManyToOne
+    private Book book;
 
-    @Column(length = 255)
-    private String categoryName;
+    @ManyToOne
+    private Category category;
 
 }
