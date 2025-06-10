@@ -1,24 +1,29 @@
-package com.nhnacademy.illuwa.domain.review;
+package com.nhnacademy.illuwa.entity.review;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comments {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
+    @NotBlank
+    @Length(max = 500)
+    @Column(length = 500, nullable = false)
     private String commentContent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewId", nullable = false)
-    private Reviews reviews;
+    private Review review;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "memberId", nullable = false)

@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.entity;
+package com.nhnacademy.illuwa.entity.book;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
