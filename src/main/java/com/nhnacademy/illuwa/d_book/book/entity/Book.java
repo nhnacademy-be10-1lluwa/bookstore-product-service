@@ -1,10 +1,11 @@
-package com.nhnacademy.illuwa.d_book.entity.book;
+package com.nhnacademy.illuwa.d_book.book.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -30,7 +31,7 @@ public class Book {
     @Column(length = 255)
     private String publisher;
 
-    private Date publishedDateTime;
+    private LocalDateTime publishedDateTime;
 
     @Column(length = 17)
     private String isbn;
