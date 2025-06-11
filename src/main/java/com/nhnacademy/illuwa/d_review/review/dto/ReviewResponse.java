@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewResponse {
