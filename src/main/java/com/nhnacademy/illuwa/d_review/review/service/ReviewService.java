@@ -1,6 +1,8 @@
 package com.nhnacademy.illuwa.d_review.review.service;
 
+import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
+import com.nhnacademy.illuwa.d_review.review.dto.ReviewListResponse;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
@@ -10,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,59 +26,48 @@ public class ReviewService {
         // TODO: memberId 가져오는 방식 확정되면 변경
         Long memberId = null;
 
-        String imageUrl = null;
-        if (!request.getReviewImageUrl().isBlank()) {
-            imageUrl = request.getReviewImageUrl();
-        }
+        String imageUrl = (request.getReviewImageUrl() != null && !request.getReviewImageUrl().isBlank())
+                ? request.getReviewImageUrl()
+                : null;
 
-        Review review = Review.of(request.getReviewTitle(),
+        // TODO: BookNotFoundException 작성되면 변경
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+
+        Review review = Review.of(
+                request.getReviewTitle(),
                 request.getReviewContent(),
                 imageUrl,
                 request.getReviewRating(),
-                request.getReviewDate(),
-                bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("temp")/*BookNotFoundException(bookId)*/),
-                memberId);
+                LocalDateTime.now(),
+                book,
+                memberId
+        );
 
-        Review save = reviewRepository.save(review);
-        return new ReviewResponse(save.getReviewId(),
-                save.getReviewTitle(),
-                save.getReviewContent(),
-                save.getReviewImageUrl(),
-                save.getReviewRating(),
-                save.getReviewDate(),
-                save.getBook().getId(),
-                save.getMemberId());
+        Review saved = reviewRepository.save(review);
+        // TODO: 포인트 적립 로직 추후 추가
+        return ReviewResponse.from(saved);
     }
 
-    public List<ReviewResponse> getReviewList(Long bookId) {
-        List<Review> reviewList = reviewRepository.findReviewsByBook_Id(bookId);
-        List<ReviewResponse> reviewResponseList = new ArrayList<>();
-        for (Review review : reviewList) {
-            reviewResponseList.add(
-                    new ReviewResponse(review.getReviewId(),
-                            review.getReviewTitle(),
-                            review.getReviewContent(),
-                            review.getReviewImageUrl(),
-                            review.getReviewRating(),
-                            review.getReviewDate(),
-                            review.getBook().getId(),
-                            review.getMemberId()
-                    )
-            );
-        }
-
-        return reviewResponseList;
+    public ReviewListResponse getReviewList(Long bookId) {
+        List<Review> reviews = reviewRepository.findReviewsByBook_Id(bookId);
+        return new ReviewListResponse(reviews);
     }
 
     public ReviewResponse getReviewDetail(Long bookId, Long reviewId) {
         Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(ReviewNotFoundException::new);
-        return new ReviewResponse(review.getReviewId(),
-                review.getReviewTitle(),
-                review.getReviewContent(),
-                review.getReviewImageUrl(),
-                review.getReviewRating(),
-                review.getReviewDate(),
-                review.getBook().getId(),
-                review.getMemberId());
+        return ReviewResponse.from(review);
+    }
+
+    public ReviewResponse updateReview(Long bookId, Long reviewId, ReviewRequest request) {
+        Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(ReviewNotFoundException::new);
+
+        review.update(
+                request.getReviewTitle(),
+                request.getReviewContent(),
+                request.getReviewImageUrl(),
+                request.getReviewRating()
+        );
+
+        return ReviewResponse.from(review);
     }
 }
