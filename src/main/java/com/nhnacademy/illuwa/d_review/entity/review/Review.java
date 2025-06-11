@@ -1,6 +1,6 @@
-package com.nhnacademy.illuwa.review.entity;
+package com.nhnacademy.illuwa.d_review.entity.review;
 
-import com.nhnacademy.illuwa.book.entity.Book;
+import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
