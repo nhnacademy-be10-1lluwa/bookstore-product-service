@@ -19,7 +19,7 @@ public class Book {
     private Long id;
 
     @Column(length = 255, nullable = false)
-    private String bookName;
+    private String title;
 
     private String contents;
 

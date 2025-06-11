@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:mysql://your-prod-db:3306/bookstore
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: prod_user
+    password: prod_password
+  jpa:
+    hibernate:
+      ddl-auto: validate
