@@ -1,5 +1,6 @@
-package com.nhnacademy.illuwa.d_review.review.entity;
+package com.nhnacademy.illuwa.d_review.comment.entity;
 
+import com.nhnacademy.illuwa.d_review.review.entity.Review;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +14,6 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
-
 
     @Column(length = 500, nullable = false)
     private String commentContent;
