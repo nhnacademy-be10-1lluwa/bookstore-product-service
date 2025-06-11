@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -18,7 +19,7 @@ public class Book {
     private Long id;
 
     @Column(length = 255, nullable = false)
-    private String bookName;
+    private String title;
 
     private String contents;
 
@@ -30,7 +31,7 @@ public class Book {
     @Column(length = 255)
     private String publisher;
 
-    private Date publishedDateTime;
+    private LocalDateTime publishedDateTime;
 
     @Column(length = 17)
     private String isbn;
