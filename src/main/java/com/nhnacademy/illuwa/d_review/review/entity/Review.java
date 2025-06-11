@@ -1,6 +1,7 @@
 package com.nhnacademy.illuwa.d_review.review.entity;
 
 
+import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,21 +25,25 @@ public class Review {
     private String reviewContent;
 
     //파일 경로
-    private String reviewImage;
+    private String reviewImageUrl;
 
     @Column(nullable = false)
-    private Integer reviewScore;
+    private Integer reviewRating;
 
     @Column(nullable = false)
     private LocalDateTime reviewDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bookId", nullable = false)
-    private com.nhnacademy.illuwa.d_book.entity.book.Book book;
+    private Book book;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "memberId", nullable = false)
 //    private Members members;
     @Column(nullable = false)
     private Long memberId;
+
+    public static Review of(String title, String content, String imageUrl, Integer rating, LocalDateTime date, Book book, Long memberId) {
+        return new Review(null, title, content, imageUrl, rating, date, book, memberId);
+    }
 }
