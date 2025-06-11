@@ -1,6 +1,6 @@
-package com.nhnacademy.illuwa.d_book.tag.entity;
+package com.nhnacademy.illuwa.d_book.book.entity;
 
-import com.nhnacademy.illuwa.d_book.book.entity.Book;
+import com.nhnacademy.illuwa.d_book.tag.Tag;
 import jakarta.persistence.*;
 
 @Entity

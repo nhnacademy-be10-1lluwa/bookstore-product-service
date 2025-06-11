@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.tag.entity;
+package com.nhnacademy.illuwa.d_book.tag;
 
 import jakarta.persistence.*;
 import lombok.Getter;

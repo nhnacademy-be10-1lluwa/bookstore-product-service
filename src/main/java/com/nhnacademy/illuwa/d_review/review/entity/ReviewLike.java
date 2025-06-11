@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_review.entity.review;
+package com.nhnacademy.illuwa.d_review.review.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,14 +9,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class ReviewLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long commentId;
-
-
-    @Column(length = 500, nullable = false)
-    private String commentContent;
+    private Long likeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewId", nullable = false)
