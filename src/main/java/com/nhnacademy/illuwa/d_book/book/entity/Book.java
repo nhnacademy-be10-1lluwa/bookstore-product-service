@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.entity;
 
+import com.nhnacademy.illuwa.d_book.book.enums.orderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,6 @@ import java.util.Date;
 @Getter
 @NoArgsConstructor
 public class Book {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,5 +42,5 @@ public class Book {
 
     private boolean isGiftWrap;
 
-
+    private orderStatus status;
 }
