@@ -53,4 +53,5 @@ public class Review {
         if (rating != null) { this.reviewRating = rating; }
         this.reviewDate = LocalDateTime.now();
     }
+
 }
