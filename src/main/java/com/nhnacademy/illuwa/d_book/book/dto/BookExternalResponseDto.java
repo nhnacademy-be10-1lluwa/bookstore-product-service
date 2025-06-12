@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BookAPIResponseDto {
+public class BookExternalResponseDto {
     private String title;
     private String author;
     private String pubDate;
