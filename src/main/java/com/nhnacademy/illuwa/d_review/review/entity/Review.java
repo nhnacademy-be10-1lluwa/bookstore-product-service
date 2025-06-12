@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import com.nhnacademy.illuwa.d_book.book.entity.Book;
 
 import java.time.LocalDateTime;
 
