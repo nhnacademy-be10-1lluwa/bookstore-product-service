@@ -45,7 +45,7 @@ public class AladinBookApiService {
             JsonNode itemNode = root.get("item");
             List<BookExternalResponseDto> books = objectMapper.convertValue(
                     itemNode,
-                    new TypeReference<List<>>() {}
+                    new TypeReference<List<BookExternalResponseDto>>() {}
             );
             return books;
 
