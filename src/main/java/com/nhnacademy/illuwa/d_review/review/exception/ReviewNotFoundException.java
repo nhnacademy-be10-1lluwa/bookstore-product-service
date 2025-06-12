@@ -2,11 +2,20 @@ package com.nhnacademy.illuwa.d_review.review.exception;
 
 import org.springframework.http.HttpStatus;
 
-// TODO: 예외처리 방식 결정되면 해당 클래스로 extends 변경
-
 public class ReviewNotFoundException extends RuntimeException {
-//    private static final String MESSAGE = "리뷰를 찾을 수 없습니다. ";
-//    public ReviewNotFoundException(Long reviewId) {
-//        super(HttpStatus.NOT_FOUND.value(), MESSAGE + "Review ID: " + reviewId);
-//    }
+    private static final int statusCode = HttpStatus.NOT_FOUND.value();
+
+    public ReviewNotFoundException(Long reviewId) {
+        super(makeMessage(reviewId));
+    }
+
+    public static String makeMessage(Long reviewId){
+        return "StatusCode: " + statusCode
+                + " 리뷰를 찾을 수 없습니다. Review ID: " + reviewId;
+    }
+
+    // static 이라 @Getter 안되서 만듬, 경고 무시하려고 o -> 0
+    public static int getStatusC0de(){
+        return statusCode;
+    }
 }
