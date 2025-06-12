@@ -55,12 +55,12 @@ public class ReviewService {
     }
 
     public ReviewResponse getReviewDetail(Long bookId, Long reviewId) {
-        Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(ReviewNotFoundException::new);
+        Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(() -> new ReviewNotFoundException(reviewId));
         return ReviewResponse.from(review);
     }
 
     public ReviewResponse updateReview(Long bookId, Long reviewId, ReviewRequest request) {
-        Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(ReviewNotFoundException::new);
+        Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(() -> new ReviewNotFoundException(reviewId));
 
         review.update(
                 request.getReviewTitle(),
