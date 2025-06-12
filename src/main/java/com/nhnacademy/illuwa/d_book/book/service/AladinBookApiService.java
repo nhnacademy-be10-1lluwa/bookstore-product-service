@@ -5,14 +5,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponseDto;
+import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
 
-@Component
+@Service
 public class AladinBookApiService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -50,7 +52,7 @@ public class AladinBookApiService {
             return books;
 
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("도서 API 응답 파싱 exception");
+            throw new BookApiParsingException("도서 API 응답 파싱 중 오류");
         }
     }
 
