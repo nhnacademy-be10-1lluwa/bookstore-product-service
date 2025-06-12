@@ -45,4 +45,12 @@ public class Review {
     public static Review of(String title, String content, String imageUrl, Integer rating, LocalDateTime date, Book book, Long memberId) {
         return new Review(null, title, content, imageUrl, rating, date, book, memberId);
     }
+
+    public void update(String title, String content, String imageUrl, Integer rating) {
+        if (title != null) { this.reviewTitle = title; }
+        if (content != null) { this.reviewContent = content; }
+        if (imageUrl != null && !imageUrl.isBlank()) { this.reviewImageUrl = imageUrl; }
+        if (rating != null) { this.reviewRating = rating; }
+        this.reviewDate = LocalDateTime.now();
+    }
 }
