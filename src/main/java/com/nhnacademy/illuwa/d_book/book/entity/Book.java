@@ -1,6 +1,5 @@
 package com.nhnacademy.illuwa.d_book.book.entity;
 
-import com.nhnacademy.illuwa.d_book.book.enums.orderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,5 +41,4 @@ public class Book {
 
     private boolean isGiftWrap;
 
-    private orderStatus status;
 }
