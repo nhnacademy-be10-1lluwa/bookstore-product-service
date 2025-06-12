@@ -26,10 +26,6 @@ public class AdminBookController {
 
         List<BookExternalResponse> bookExternalResponses = bookService.searchBookFromExternalApi(req.getTitle());
 
-        if(bookExternalResponses == null){
-            throw new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다.");
-        }
-
         return ResponseEntity.ok(bookExternalResponses);
     }
 }
