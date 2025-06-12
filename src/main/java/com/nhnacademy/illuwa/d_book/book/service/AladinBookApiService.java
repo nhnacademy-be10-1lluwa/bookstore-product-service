@@ -39,17 +39,19 @@ public class AladinBookApiService {
                 .toUri();
 
         String response = restTemplate.getForObject(uri,String.class);
-        JsonNode root = objectMapper.readTree(response);
 
-        JsonNode itemNode = root.get("item");
+        try{
+            JsonNode root = objectMapper.readTree(response);
+            JsonNode itemNode = root.get("item");
+            List<BookExternalResponseDto> books = objectMapper.convertValue(
+                    itemNode,
+                    new TypeReference<List<>>() {}
+            );
+            return books;
 
-        List<BookExternalResponseDto> books = objectMapper.readValue(
-                itemNode.toString(),
-                new TypeReference<List<>>() {}
-        );
-
-
-        return books;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("도서 API 응답 파싱 exception");
+        }
     }
 
 }
