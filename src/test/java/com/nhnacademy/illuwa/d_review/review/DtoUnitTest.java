@@ -18,7 +18,14 @@ public class DtoUnitTest {
         Book book = new Book();
         book.setId(10L);
         LocalDateTime now = LocalDateTime.now();
-        Review review = Review.of( "title", "content", "img.jpg", 5, now, book, 99L);
+        Review review = Review.of( "title",
+                "content",
+                "img.jpg",
+                5,
+                now,
+                book,
+                99L
+        );
 
         // when
         ReviewResponse response = ReviewResponse.from(review);

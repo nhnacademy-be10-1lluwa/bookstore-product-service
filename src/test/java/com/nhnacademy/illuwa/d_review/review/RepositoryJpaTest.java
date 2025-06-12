@@ -29,7 +29,7 @@ public class RepositoryJpaTest {
     void findReviewsByBookIdTest(){
         //given
         Book book = new Book(
-                null,
+                10L,
                 "이상한 책",
                 "목차",
                 "아무 설명",
@@ -74,7 +74,7 @@ public class RepositoryJpaTest {
             assertThat(review.getReviewImageUrl()).isEqualTo("img"+(i+1)+".jpg");
             assertThat(review.getReviewRating()).isEqualTo(i+1);
             assertThat(review.getReviewDate()).isEqualTo(now.get(i));
-            assertThat(review.getBook().getId()).isEqualTo(book.getId());
+            assertThat(review.getBook().getId()).isEqualTo(10L);
             assertThat(review.getReviewId()).isEqualTo((long)i+1);
         }
     }
@@ -84,7 +84,7 @@ public class RepositoryJpaTest {
     void findByBookIdAndReviewIdTest() {
         //given
         Book book = new Book(
-                null,
+                10L,
                 "이상한 책",
                 "목차",
                 "아무 설명",
@@ -125,7 +125,7 @@ public class RepositoryJpaTest {
             assertThat(found.getReviewContent()).isEqualTo("종이가 아깝습니다");
             assertThat(found.getReviewImageUrl()).isEqualTo("book.jpg");
             assertThat(found.getReviewRating()).isEqualTo(1);
-            assertThat(found.getBook().getId()).isEqualTo(book.getId());
+            assertThat(found.getBook().getId()).isEqualTo(10L);
             assertThat(found.getMemberId()).isEqualTo(99L);
         }
     }
