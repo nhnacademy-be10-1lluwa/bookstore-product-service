@@ -22,7 +22,7 @@ public class AladinBookApiService {
         this.objectMapper = objectMapper;
     }
 
-    public List<BookExternalResponseDto> searchBooksByTitle(String title) throws JsonProcessingException {
+    public List<BookExternalResponseDto> searchBooksByTitle(String title) {
 
 
         String apiKey = "ttbchlgur13m0908001";
