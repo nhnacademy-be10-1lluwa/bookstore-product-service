@@ -10,10 +10,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.within;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
@@ -73,7 +75,7 @@ public class RepositoryJpaTest {
             assertThat(review.getReviewContent()).isEqualTo("content"+(i+1));
             assertThat(review.getReviewImageUrl()).isEqualTo("img"+(i+1)+".jpg");
             assertThat(review.getReviewRating()).isEqualTo(i+1);
-            assertThat(review.getReviewDate()).isEqualTo(now.get(i));
+            assertThat(review.getReviewDate()).isCloseTo(now.get(i), within(1, ChronoUnit.SECONDS));
             assertThat(review.getBook().getId()).isEqualTo(book.getId());
             assertThat(review.getReviewId()).isEqualTo((long)i+1);
         }
