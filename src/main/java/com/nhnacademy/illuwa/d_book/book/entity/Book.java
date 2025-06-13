@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Setter
@@ -31,7 +31,7 @@ public class Book {
     @Column(length = 255)
     private String publisher;
 
-    private LocalDateTime publishedDateTime;
+    private LocalDate publishedDate;
 
     @Column(length = 17)
     private String isbn;
@@ -41,4 +41,8 @@ public class Book {
     private int salePrice;
 
     private boolean isGiftWrap;
+
+    private String imgUrl;
+
+    private String category;
 }

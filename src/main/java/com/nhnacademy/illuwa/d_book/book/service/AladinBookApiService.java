@@ -55,4 +55,32 @@ public class AladinBookApiService {
         }
     }
 
+    public BookExternalResponse findBookByIsbn(String isbn) {
+        String apiKey = "ttbchlgur13m0908001";
+
+
+        URI uri = UriComponentsBuilder
+                .fromHttpUrl("http://www.aladin.co.kr/ttb/api/ItemSearch.aspx")
+                .queryParam("ttbkey", apiKey)
+                .queryParam("Query", isbn)
+                .queryParam("QueryType", "ISBN")
+                .queryParam("output", "JS")  // 대소문자 주의
+                .build()
+                .encode()
+                .toUri();
+        try{
+        String response = restTemplate.getForObject(uri, String.class);
+            JsonNode root = objectMapper.readTree(response);
+            JsonNode itemNode = root.get("item");
+            BookExternalResponse book = objectMapper.convertValue(
+                    itemNode,
+                    new TypeReference<BookExternalResponse>() {}
+            );
+            return book;
+
+        } catch (JsonProcessingException e) {
+            throw new BookApiParsingException("도서 API 요청 또는 파싱 중 오류");
+        }
+
+    }
 }

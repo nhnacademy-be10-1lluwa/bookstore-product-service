@@ -1,14 +1,22 @@
 package com.nhnacademy.illuwa.d_book.book.dto;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
+@AllArgsConstructor
 public class BookExternalResponse {
+
+    @JsonValue
     private String title;
+    @JsonValue
     private String author;
-    private String pubDate;
+    private LocalDate pubDate;
     private String description;
     private String isbn;
     private Integer priceSales;
