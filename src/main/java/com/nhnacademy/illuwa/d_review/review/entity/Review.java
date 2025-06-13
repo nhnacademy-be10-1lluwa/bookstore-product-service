@@ -36,9 +36,6 @@ public class Review {
     @JoinColumn(name = "bookId", nullable = false)
     private Book book;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "memberId", nullable = false)
-//    private Members members;
     @Column(nullable = false)
     private Long memberId;
 

@@ -46,8 +46,7 @@ public class AladinBookApiService {
             JsonNode itemNode = root.get("item");
             return objectMapper.convertValue(
                     itemNode,
-                    new TypeReference<>() {
-                    }
+                    new TypeReference<List<BookExternalResponse>>() {}
             );
 
         } catch (JsonProcessingException e) {
@@ -74,8 +73,7 @@ public class AladinBookApiService {
             JsonNode itemNode = root.get("item");
             return objectMapper.convertValue(
                     itemNode,
-                    new TypeReference<>() {
-                    }
+                    new TypeReference<BookExternalResponse>() {}
             );
 
         } catch (JsonProcessingException e) {
