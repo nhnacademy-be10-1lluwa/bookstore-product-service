@@ -1,9 +1,8 @@
 package com.nhnacademy.illuwa.d_book.book.mapper;
 
-import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponseDto;
+import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
-import com.nhnacademy.illuwa.d_book.category.repository.CustomizedBookCategoryRepository;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -46,8 +45,8 @@ public class BookMapper {
         return book;
     }
 
-    public BookDetailResponseDto toDetailResponse(Book book){
-        return new BookDetailResponseDto(
+    public BookDetailResponse toDetailResponse(Book book){
+        return new BookDetailResponse(
                 book.getId(),
                 book.getTitle(),
                 book.getContents(),
