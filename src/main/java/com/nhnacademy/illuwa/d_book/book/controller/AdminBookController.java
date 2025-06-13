@@ -1,11 +1,9 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
-import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponseDto;
+import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.BookSearchRequest;
-import com.nhnacademy.illuwa.d_book.book.entity.Book;
-import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,9 +31,9 @@ public class AdminBookController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<BookDetailResponseDto> registerBook(@RequestBody BookRegisterRequest req){
+    public ResponseEntity<BookDetailResponse> registerBook(@RequestBody BookRegisterRequest req){
 
-        BookDetailResponseDto detailResponse = bookService.registerBook(req.getISBN());
+        BookDetailResponse detailResponse = bookService.registerBook(req.getISBN());
 
         return ResponseEntity.ok(detailResponse);
     }

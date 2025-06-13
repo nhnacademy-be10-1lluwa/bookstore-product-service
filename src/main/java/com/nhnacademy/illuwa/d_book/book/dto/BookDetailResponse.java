@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Setter
 @Getter
-public class BookDetailResponseDto {
+public class BookDetailResponse {
     private final Long id;
     private final String title;
     private final String contents;
@@ -22,7 +22,7 @@ public class BookDetailResponseDto {
     private final String imgUrl;
     private final String category;
 
-    public BookDetailResponseDto(Long id, String title, String contents, String description, String author, String publisher, LocalDate publishedDate, String isbn, int regularPrice, int salePrice, boolean isGiftWrap, String imgUrl, String category) {
+    public BookDetailResponse(Long id, String title, String contents, String description, String author, String publisher, LocalDate publishedDate, String isbn, int regularPrice, int salePrice, boolean isGiftWrap, String imgUrl, String category) {
         this.id = id;
         this.title = title;
         this.contents = contents;
