@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.mapper;
 
+import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponseDto;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.category.repository.CustomizedBookCategoryRepository;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BookMapper {
 
-    // Entity → DTO
+    // Entity → DTO(Aladin API)
     public BookExternalResponse toResponse(Book book) {
 
         return new BookExternalResponse(
@@ -25,7 +26,7 @@ public class BookMapper {
         );
     }
 
-    // DTO → Entity
+    // DTO(Aladin API) → Entity
     public Book toEntity(BookExternalResponse dto) {
 
         Book book = new Book();
@@ -43,5 +44,23 @@ public class BookMapper {
         book.setCategory(dto.getCategoryName());
 
         return book;
+    }
+
+    public BookDetailResponseDto toDetailResponse(Book book){
+        return new BookDetailResponseDto(
+                book.getId(),
+                book.getTitle(),
+                book.getContents(),
+                book.getDescription(),
+                book.getAuthor(),
+                book.getPublisher(),
+                book.getPublishedDate(),
+                book.getIsbn(),
+                book.getRegularPrice(),
+                book.getSalePrice(),
+                book.isGiftWrap(),
+                book.getImgUrl(),
+                book.getCategory()
+        );
     }
 }
