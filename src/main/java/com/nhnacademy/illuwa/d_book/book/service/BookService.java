@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
+import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
@@ -37,7 +38,7 @@ public class BookService {
 
 
     // 피드백 -> fetch 부분 메서드 분리 예정
-    public Book registerBook(String isbn) {
+    public BookDetailResponse registerBook(String isbn) {
         //이미 등록된 도서인 경우
         log.info("도서 등록 시작: ISBN={}", isbn);
         if (bookRepository.existsByIsbn(isbn)) {
@@ -52,10 +53,13 @@ public class BookService {
         }
 
         Book savedBook = bookMapper.toEntity(bookByIsbn);
+        bookRepository.save(savedBook);
         log.info("도서 등록 완료 : ID={}, ISBN={}", savedBook.getId(),isbn);
 
         // mapper 필요
-        return bookRepository.save(savedBook);
+        BookDetailResponse detailResponse = bookMapper.toDetailResponse(savedBook);
+
+        return detailResponse;
     }
 
 }
