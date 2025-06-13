@@ -44,11 +44,11 @@ public class AladinBookApiService {
         try{
             JsonNode root = objectMapper.readTree(response);
             JsonNode itemNode = root.get("item");
-            List<BookExternalResponse> books = objectMapper.convertValue(
+            return objectMapper.convertValue(
                     itemNode,
-                    new TypeReference<List<BookExternalResponse>>() {}
+                    new TypeReference<>() {
+                    }
             );
-            return books;
 
         } catch (JsonProcessingException e) {
             throw new BookApiParsingException("도서 API 응답 파싱 중 오류");
@@ -72,11 +72,11 @@ public class AladinBookApiService {
         String response = restTemplate.getForObject(uri, String.class);
             JsonNode root = objectMapper.readTree(response);
             JsonNode itemNode = root.get("item");
-            BookExternalResponse book = objectMapper.convertValue(
+            return objectMapper.convertValue(
                     itemNode,
-                    new TypeReference<BookExternalResponse>() {}
+                    new TypeReference<>() {
+                    }
             );
-            return book;
 
         } catch (JsonProcessingException e) {
             throw new BookApiParsingException("도서 API 요청 또는 파싱 중 오류");

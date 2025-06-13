@@ -57,9 +57,7 @@ public class BookService {
         log.info("도서 등록 완료 : ID={}, ISBN={}", savedBook.getId(),isbn);
 
         // mapper 필요
-        BookDetailResponse detailResponse = bookMapper.toDetailResponse(savedBook);
-
-        return detailResponse;
+        return bookMapper.toDetailResponse(savedBook);
     }
 
 }

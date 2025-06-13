@@ -1,7 +1,7 @@
 package com.nhnacademy.illuwa.d_book.category.repository;
 
-import com.nhnacademy.illuwa.d_book.category.QCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.QBookCategory;
+import com.nhnacademy.illuwa.d_book.category.entity.QCategory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -23,7 +23,7 @@ public class CustomizedBookCategoryRepositoryImpl implements CustomizedBookCateg
         return queryFactory
                 .select(category.categoryName)
                 .from(bookCategory)
-                .join(bookCategory.category,category)
+                .join(bookCategory.category)
                 .where(bookCategory.book.id.eq(bookId))
                 .fetch();
     }
