@@ -19,9 +19,6 @@ public class ReviewLike {
     @JoinColumn(name = "reviewId", nullable = false)
     private Review review;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "memberId", nullable = false)
-//    private Members members;
     @Column(nullable = false)
     private Long memberId;
 }

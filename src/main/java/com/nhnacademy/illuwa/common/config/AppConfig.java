@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.book.config;
+package com.nhnacademy.illuwa.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
@@ -7,7 +7,6 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class AppConfig {
-
     @Bean
     public RestTemplate restTemplate(){
         return new RestTemplate();
@@ -15,8 +14,6 @@ public class AppConfig {
 
     @Bean
     public ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper;
+        return new ObjectMapper();
     }
-
 }

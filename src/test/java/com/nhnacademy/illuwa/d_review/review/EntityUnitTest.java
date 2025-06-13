@@ -2,38 +2,49 @@ package com.nhnacademy.illuwa.d_review.review;
 
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class EntityUnitTest {
-    @Test
-    @DisplayName("Review Entity of 메서드 테스트")
-    void entityOfMethodTest() {
-        // given
-        String title = "인생을 뒤바꾼 책";
-        String content = "대가리가 깨져도 추천";
-        String imageUrl = "book.jpg";
-        Integer rating = 5;
-        LocalDateTime created = LocalDateTime.now();
-        Book book = new Book(
+    private Book book;
+
+    @BeforeEach
+    void setUp() {
+        book = new Book(
                 10L,
                 "이상한 책",
                 "목차",
                 "아무 설명",
                 "이상한 사람",
                 "무명출판",
-                LocalDateTime.now().minusYears(1L),
+                LocalDate.now().minusYears(1L),
                 "11111111111111111",
                 100,
                 100,
-                false
+                false,
+                "book.jpg",
+                "카테고리없음"
         );
+    }
+
+    @Test
+    @DisplayName("Review Entity of 메서드 테스트")
+    void entityOfMethodTest() {
+        // given
         Long memberId = 99L;
+
+        String title = "인생을 뒤바꾼 책";
+        String content = "대가리가 깨져도 추천";
+        String imageUrl = "book.jpg";
+        Integer rating = 5;
+        LocalDateTime created = LocalDateTime.now();
 
         // when
         Review review = Review.of(title, content, imageUrl, rating, created, book, memberId);
@@ -52,20 +63,6 @@ public class EntityUnitTest {
     @DisplayName("Review Entity update 메서드 테스트")
     void entityUpdateMethodTest(){
         // given
-        Book book = new Book(
-                10L,
-                "이상한 책",
-                "목차",
-                "아무 설명",
-                "이상한 사람",
-                "무명출판",
-                LocalDateTime.now().minusYears(1L),
-                "11111111111111111",
-                100,
-                100,
-                false
-        );
-
         Review review = Review.of(
                 "낫배드",
                 "하지만 그 뿐",
@@ -94,20 +91,6 @@ public class EntityUnitTest {
     @DisplayName("Review Entity update 메서드 테스트 - Null or Blank")
     void entityUpdateWithNullTest(){
         // given
-        Book book = new Book(
-                10L,
-                "이상한 책",
-                "목차",
-                "아무 설명",
-                "이상한 사람",
-                "무명출판",
-                LocalDateTime.now().minusYears(1L),
-                "11111111111111111",
-                100,
-                100,
-                false
-        );
-
         Review review = Review.of(
                 "낫배드",
                 "하지만 그 뿐",

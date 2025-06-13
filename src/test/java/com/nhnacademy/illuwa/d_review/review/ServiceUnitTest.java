@@ -8,6 +8,7 @@ import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewRepository;
 import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,24 +36,31 @@ public class ServiceUnitTest {
     @Mock
     private BookRepository bookRepository;
 
-    @Test
-    @DisplayName("이미지 있는 리뷰 생성")
-    void createReviewTest() {
-        // given
-        Book book = new Book(
+    private Book book;
+
+    @BeforeEach
+    void setUp() {
+        book = new Book(
                 10L,
                 "이상한 책",
                 "목차",
                 "아무 설명",
                 "이상한 사람",
                 "무명출판",
-                LocalDateTime.now().minusYears(1L),
+                LocalDate.now().minusYears(1L),
                 "11111111111111111",
                 100,
                 100,
-                false
+                false,
+                "book.jpg",
+                "카테고리없음"
         );
+    }
 
+    @Test
+    @DisplayName("이미지 있는 리뷰 생성")
+    void createReviewTest() {
+        // given
         Long memberId = 99L;
 
         ReviewRequest request = new ReviewRequest("리뷰리뷰리뷰", "포인트 냠냠", "blank.png", 5);
@@ -90,20 +99,6 @@ public class ServiceUnitTest {
     @DisplayName("이미지 없는 리뷰 생성 (Null)")
     void createReviewImageNullTest() {
         // given
-        Book book = new Book(
-                10L,
-                "이상한 책",
-                "목차",
-                "아무 설명",
-                "이상한 사람",
-                "무명출판",
-                LocalDateTime.now().minusYears(1L),
-                "11111111111111111",
-                100,
-                100,
-                false
-        );
-
         Long memberId = 99L;
 
         ReviewRequest request = new ReviewRequest("리뷰리뷰리뷰", "포인트 냠냠", null, 5);
@@ -142,20 +137,6 @@ public class ServiceUnitTest {
     @DisplayName("이미지 없는 리뷰 생성 (Blank)")
     void createReviewImageBlankTest() {
         // given
-        Book book = new Book(
-                10L,
-                "이상한 책",
-                "목차",
-                "아무 설명",
-                "이상한 사람",
-                "무명출판",
-                LocalDateTime.now().minusYears(1L),
-                "11111111111111111",
-                100,
-                100,
-                false
-        );
-
         Long memberId = 99L;
 
         ReviewRequest request = new ReviewRequest("리뷰리뷰리뷰", "포인트 냠냠", " ", 5);
@@ -194,20 +175,6 @@ public class ServiceUnitTest {
     @DisplayName("리뷰 목록 가져오기")
     void getReviewListTest(){
         // given
-        Book book = new Book(
-                10L,
-                "이상한 책",
-                "목차",
-                "아무 설명",
-                "이상한 사람",
-                "무명출판",
-                LocalDateTime.now().minusYears(1L),
-                "11111111111111111",
-                100,
-                100,
-                false
-        );
-
         List<LocalDateTime> now = new ArrayList<>();
         List<Review> savedReviews = new ArrayList<>();
         for(int i=0; i<5; i++) {
@@ -249,20 +216,6 @@ public class ServiceUnitTest {
     @DisplayName("리뷰 상세 페이지 가져오기")
     void getReviewDetailTest(){
         // given
-        Book book = new Book(
-                10L,
-                "이상한 책",
-                "목차",
-                "아무 설명",
-                "이상한 사람",
-                "무명출판",
-                LocalDateTime.now().minusYears(1L),
-                "11111111111111111",
-                100,
-                100,
-                false
-        );
-
         Long memberId = 999L;
         
         LocalDateTime now = LocalDateTime.now();
@@ -299,20 +252,6 @@ public class ServiceUnitTest {
     @DisplayName("리뷰 업데이트")
     void updateReview() {
         // given
-        Book book = new Book(
-                10L,
-                "이상한 책",
-                "목차",
-                "아무 설명",
-                "이상한 사람",
-                "무명출판",
-                LocalDateTime.now().minusYears(1L),
-                "11111111111111111",
-                100,
-                100,
-                false
-        );
-
         Long memberId = 999L;
 
         Review review = Review.of(
