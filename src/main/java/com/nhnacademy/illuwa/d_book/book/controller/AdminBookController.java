@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
+import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponseDto;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.BookSearchRequest;
@@ -32,10 +33,10 @@ public class AdminBookController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Book> registerBook(@RequestBody BookRegisterRequest req){
+    public ResponseEntity<BookDetailResponseDto> registerBook(@RequestBody BookRegisterRequest req){
 
-        Book book = bookService.registerBook(req.getISBN());
+        BookDetailResponseDto detailResponse = bookService.registerBook(req.getISBN());
 
-        return ResponseEntity.ok(book);
+        return ResponseEntity.ok(detailResponse);
     }
 }
