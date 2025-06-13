@@ -3,12 +3,14 @@ package com.nhnacademy.illuwa.d_review.review;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -26,25 +28,31 @@ public class RepositoryJpaTest {
     @Autowired
     private TestEntityManager testEntityManager;
 
-    @Test
-    @DisplayName("리뷰 목록 가져오기 테스트")
-    void findReviewsByBookIdTest(){
-        //given
-        Book book = new Book(
+    private Book book;
+    @BeforeEach
+    void setUp() {
+        book = new Book(
                 null,
                 "이상한 책",
                 "목차",
                 "아무 설명",
                 "이상한 사람",
                 "무명출판",
-                LocalDateTime.now().minusYears(1L),
+                LocalDate.now().minusYears(1L),
                 "11111111111111111",
                 100,
                 100,
-                false
+                false,
+                "book.jpg",
+                "카테고리없음"
         );
         testEntityManager.persist(book);
+    }
 
+    @Test
+    @DisplayName("리뷰 목록 가져오기 테스트")
+    void findReviewsByBookIdTest(){
+        //given
         List<LocalDateTime> now = new ArrayList<>();
         List<Review> savedReviews = new ArrayList<>();
         for(int i=0; i<5; i++){
@@ -84,22 +92,6 @@ public class RepositoryJpaTest {
     @Test
     @DisplayName("리뷰 상세보기 테스트")
     void findByBookIdAndReviewIdTest() {
-        //given
-        Book book = new Book(
-                null,
-                "이상한 책",
-                "목차",
-                "아무 설명",
-                "이상한 사람",
-                "무명출판",
-                LocalDateTime.now().minusYears(1L),
-                "11111111111111111",
-                100,
-                100,
-                false
-        );
-        testEntityManager.persist(book);
-
         Review review = Review.of(
                 "책이 재미 없어요",
                 "종이가 아깝습니다",
