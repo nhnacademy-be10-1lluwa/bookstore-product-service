@@ -25,7 +25,7 @@ public class Category {
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
     private List<Category> childrenCategory = new ArrayList<>();
 
-    @Column(length = 255)
+    @Column(nullable = false)
     private String categoryName;
 
 }
