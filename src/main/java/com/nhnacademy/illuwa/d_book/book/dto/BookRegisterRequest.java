@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
@@ -7,5 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookRegisterRequest {
+    @NotBlank
     private String ISBN;
 }
