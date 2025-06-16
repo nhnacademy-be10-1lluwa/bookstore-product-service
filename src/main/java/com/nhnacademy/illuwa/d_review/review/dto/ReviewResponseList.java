@@ -9,6 +9,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewListResponse {
+public class ReviewResponseList {
     List<ReviewResponse> reviews;
 }

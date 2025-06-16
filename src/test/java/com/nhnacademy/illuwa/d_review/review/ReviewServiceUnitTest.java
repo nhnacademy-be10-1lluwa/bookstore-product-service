@@ -3,7 +3,7 @@ package com.nhnacademy.illuwa.d_review.review;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
-import com.nhnacademy.illuwa.d_review.review.dto.ReviewListResponse;
+import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponseList;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
@@ -213,7 +213,7 @@ public class ReviewServiceUnitTest {
         Mockito.when(reviewRepository.findReviewsByBook_Id(book.getId())).thenReturn(savedReviews);
 
         // when
-        ReviewListResponse response = reviewService.getReviewList(book.getId());
+        ReviewResponseList response = reviewService.getReviewList(book.getId());
 
         // then
         assertThat(response.getReviews().size()).isEqualTo(5);

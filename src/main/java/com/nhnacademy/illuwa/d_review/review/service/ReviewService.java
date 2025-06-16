@@ -3,7 +3,7 @@ package com.nhnacademy.illuwa.d_review.review.service;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
-import com.nhnacademy.illuwa.d_review.review.dto.ReviewListResponse;
+import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponseList;
 
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -52,10 +50,10 @@ public class ReviewService {
         return ReviewResponse.from(saved);
     }
 
-    public ReviewListResponse getReviewList(Long bookId) {
+    public ReviewResponseList getReviewList(Long bookId) {
         List<Review> reviews = reviewRepository.findReviewsByBook_Id(bookId);
         List<ReviewResponse> reviewResponseList = reviews.stream().map(ReviewResponse::from).toList();
-        return new ReviewListResponse(reviewResponseList);
+        return new ReviewResponseList(reviewResponseList);
     }
 
     public ReviewResponse getReviewDetail(Long bookId, Long reviewId) {

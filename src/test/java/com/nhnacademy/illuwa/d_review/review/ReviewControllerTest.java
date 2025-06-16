@@ -2,7 +2,7 @@ package com.nhnacademy.illuwa.d_review.review;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.illuwa.d_review.review.controller.ReviewController;
-import com.nhnacademy.illuwa.d_review.review.dto.ReviewListResponse;
+import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponseList;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
@@ -85,7 +85,7 @@ public class ReviewControllerTest {
         List<ReviewResponse> reviewResponseList = new ArrayList<>();
         reviewResponseList.add(response);
         reviewResponseList.add(response2);
-        ReviewListResponse reviewListResponse = new ReviewListResponse(reviewResponseList);
+        ReviewResponseList reviewListResponse = new ReviewResponseList(reviewResponseList);
 
         // given
         given(reviewService.getReviewList(eq(bookId))).willReturn(reviewListResponse);
