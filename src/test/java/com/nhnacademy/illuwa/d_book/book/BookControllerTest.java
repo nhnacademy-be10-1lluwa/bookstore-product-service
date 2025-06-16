@@ -54,15 +54,15 @@ public class BookControllerTest {
         BookSearchRequest searchRequestDto = new BookSearchRequest("어린 왕자");
         BookExternalResponse responseDto = new BookExternalResponse(
                 "어린 왕자",
-                "author",
-                LocalDate.of(2024, 6, 13),
                 "description",
+                "author",
+                "출판사",
+                LocalDate.of(2024, 6, 13),
                 "010000",
                 10000,
                 90000,
                 "img/path.jpg",
-                "category1",
-                "출판사"
+                "category1"
         );
 
         String json = objectMapper.writeValueAsString(searchRequestDto);
@@ -123,7 +123,7 @@ public class BookControllerTest {
         );
 
         String json = objectMapper.writeValueAsString(registerRequest);
-        given(bookService.registerBook(registerRequest.getISBN())).willReturn(responseDto);
+        given(bookService.registerBook(registerRequest.getIsbn())).willReturn(responseDto);
 
 
         //when & then
@@ -146,7 +146,7 @@ public class BookControllerTest {
 
         String json = objectMapper.writeValueAsString(registerRequest);
 
-        given(bookService.registerBook(registerRequest.getISBN())).willThrow(new BookAlreadyExistsException("이미 등록된 도서"));
+        given(bookService.registerBook(registerRequest.getIsbn())).willThrow(new BookAlreadyExistsException("이미 등록된 도서"));
 
 
         //when & then
