@@ -1,6 +1,6 @@
 package com.nhnacademy.illuwa.d_review.review.controller;
 
-import com.nhnacademy.illuwa.d_review.review.dto.ReviewListResponse;
+import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponseList;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
@@ -20,7 +20,7 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<ReviewListResponse> getReviewList(@PathVariable Long bookId) {
+    public ResponseEntity<ReviewResponseList> getReviewList(@PathVariable Long bookId) {
         return ResponseEntity.ok(reviewService.getReviewList(bookId));
     }
 

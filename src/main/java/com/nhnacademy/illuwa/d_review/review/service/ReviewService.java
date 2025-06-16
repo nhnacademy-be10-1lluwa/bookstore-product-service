@@ -1,8 +1,9 @@
 package com.nhnacademy.illuwa.d_review.review.service;
 
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
+import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
-import com.nhnacademy.illuwa.d_review.review.dto.ReviewListResponse;
+import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponseList;
 
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
@@ -32,7 +33,7 @@ public class ReviewService {
                 : null;
 
         // TODO: BookNotFoundException 작성되면 변경
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new NotFoundBookException("도서를 찾을 수 없습니다."));
 
         Review review = Review.of(
                 request.getReviewTitle(),
@@ -49,9 +50,10 @@ public class ReviewService {
         return ReviewResponse.from(saved);
     }
 
-    public ReviewListResponse getReviewList(Long bookId) {
+    public ReviewResponseList getReviewList(Long bookId) {
         List<Review> reviews = reviewRepository.findReviewsByBook_Id(bookId);
-        return new ReviewListResponse(reviews);
+        List<ReviewResponse> reviewResponseList = reviews.stream().map(ReviewResponse::from).toList();
+        return new ReviewResponseList(reviewResponseList);
     }
 
     public ReviewResponse getReviewDetail(Long bookId, Long reviewId) {

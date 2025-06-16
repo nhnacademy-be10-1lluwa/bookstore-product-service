@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.within;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-public class RepositoryJpaTest {
+public class ReviewRepositoryJpaTest {
     @Autowired
     private ReviewRepository reviewRepository;
 
