@@ -9,5 +9,5 @@ import lombok.*;
 @AllArgsConstructor
 public class BookRegisterRequest {
     @NotBlank
-    private String ISBN;
+    private String isbn;
 }
