@@ -18,30 +18,34 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 255, nullable = false)
+    @Column(nullable = false)
     private String title;
 
     private String contents;
 
     private String description;
 
-    @Column(length = 255)
+    @Column(nullable = false)
     private String author;
 
-    @Column(length = 255)
+    @Column(nullable = false)
     private String publisher;
 
+    @Column(nullable = false)
     private LocalDate publishedDate;
 
-    @Column(length = 17)
+    @Column(length = 17, nullable = false)
     private String isbn;
 
+    @Column(nullable = false)
     private int regularPrice;
 
+    @Column(nullable = false)
     private int salePrice;
 
     private boolean isGiftWrap;
 
+    @Column(nullable = false)
     private String imgUrl;
 
     private String category;

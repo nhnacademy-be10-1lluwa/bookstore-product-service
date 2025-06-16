@@ -5,6 +5,7 @@ import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.BookSearchRequest;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +24,7 @@ public class AdminBookController {
     }
 
     @PostMapping
-    public ResponseEntity<List<BookExternalResponse>> searchBook(@RequestBody BookSearchRequest req){
+    public ResponseEntity<List<BookExternalResponse>> searchBook(@RequestBody @Valid BookSearchRequest req){
 
         List<BookExternalResponse> bookExternalResponses = bookService.searchBookFromExternalApi(req.getTitle());
 
@@ -31,7 +32,7 @@ public class AdminBookController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<BookDetailResponse> registerBook(@RequestBody BookRegisterRequest req){
+    public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest req){
 
         BookDetailResponse detailResponse = bookService.registerBook(req.getISBN());
 
