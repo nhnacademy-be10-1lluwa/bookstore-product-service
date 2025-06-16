@@ -11,9 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class BookExternalResponse {
 
-    @JsonValue
     private String title;
-    @JsonValue
     private String author;
     private LocalDate pubDate;
     private String description;
