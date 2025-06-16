@@ -69,6 +69,7 @@
             <version>${querydsl.version}</version>
             <classifier>jakarta</classifier>
         </dependency>
+
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-apt</artifactId>
@@ -77,6 +78,10 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
 
     </dependencies>
 

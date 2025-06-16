@@ -43,7 +43,7 @@ public class BookService {
         log.info("도서 등록 시작: ISBN={}", isbn);
         if (bookRepository.existsByIsbn(isbn)) {
             log.warn("이미 등록된 도서: ISBN={}", isbn);
-            throw new BookAlreadyExistsException("이미 도서가 등록되어 있습니다.");
+            throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
         BookExternalResponse bookByIsbn = aladinBookApiService.findBookByIsbn(isbn);
