@@ -18,11 +18,15 @@ import java.util.List;
 public class BookService {
     private final AladinBookApiService aladinBookApiService;
     private final BookRepository bookRepository;
+    private final BookExternalMapper bookExternalMapper;
+    private final BookResponseMapper bookResponseMapper;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookExternalMapper bookExternalMapper, BookResponseMapper bookResponseMapper) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
+        this.bookExternalMapper = bookExternalMapper;
+        this.bookResponseMapper = bookResponseMapper;
     }
 
     //도서 등록 전 도서 검색
@@ -39,9 +43,9 @@ public class BookService {
     // 피드백 -> fetch 부분 메서드 분리 예정
     public BookDetailResponse registerBook(String isbn) {
         //이미 등록된 도서인 경우
-//        log.info("도서 등록 시작: ISBN={}", isbn);
+        log.info("도서 등록 시작: ISBN={}", isbn);
         if (bookRepository.existsByIsbn(isbn)) {
-//            log.warn("이미 등록된 도서: ISBN={}", isbn);
+            log.warn("이미 등록된 도서: ISBN={}", isbn);
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
@@ -51,12 +55,13 @@ public class BookService {
             throw new NotFoundBookException("ISBN과 일치하는 도서가 없습니다.");
         }
 
-        Book bookEntity = BookExternalMapper.INSTANCE.toBookEntity(bookByIsbn);
+        Book bookEntity = bookExternalMapper.toBookEntity(bookByIsbn);
         bookRepository.save(bookEntity);
-//        log.info("도서 등록 완료 : ID={}, ISBN={}", bookEntity.getId(),isbn);
+        log.info("도서 등록 완료 : ID={}, ISBN={}", bookEntity.getId(),isbn);
 
         // mapper 필요
-        return BookResponseMapper.INSTANCE.toBookDetailResponse(bookEntity);
+
+        return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
 }

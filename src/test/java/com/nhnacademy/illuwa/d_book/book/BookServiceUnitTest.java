@@ -32,6 +32,12 @@ public class BookServiceUnitTest {
     @Mock
     BookRepository bookRepository;
 
+    @Mock
+    BookExternalMapper bookExternalMapper;
+
+    @Mock
+    BookResponseMapper bookResponseMapper;
+
 
 
     @InjectMocks
@@ -98,7 +104,7 @@ public class BookServiceUnitTest {
                 "author",
                 "B출판사",
                 LocalDate.of(2024, 6, 13),
-                "isbn",
+                "012345",
                 20000,
                 10000,
                 "imgUrl",
@@ -113,7 +119,7 @@ public class BookServiceUnitTest {
                 "author",
                 "publisher",
                 LocalDate.of(2012,10,12),
-                "isbn",
+                "012345",
                 10000,
                 9000,
                 true,
@@ -129,7 +135,7 @@ public class BookServiceUnitTest {
                 "author",
                 "출판사A",
                 LocalDate.of(2012,12,21),
-                "isbn",
+                "012345",
                 10000,
                 9000,
                 true,
@@ -139,9 +145,8 @@ public class BookServiceUnitTest {
 
         when(aladinBookApiService.findBookByIsbn("012345")).thenReturn(mockResponse);
         when(bookRepository.existsByIsbn("012345")).thenReturn(false);
-        when(BookExternalMapper.INSTANCE.toBookEntity(mockResponse)).thenReturn(mockBook);
-        when(bookRepository.save(mockBook)).thenReturn(mockBook);
-        when(BookResponseMapper.INSTANCE.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
+        when(bookExternalMapper.toBookEntity(mockResponse)).thenReturn(mockBook);
+        when(bookResponseMapper.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
 
         //when
         BookDetailResponse result = bookService.registerBook(isbn);
