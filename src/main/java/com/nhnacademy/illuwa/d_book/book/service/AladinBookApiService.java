@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -23,10 +24,13 @@ public class AladinBookApiService {
         this.objectMapper = objectMapper;
     }
 
+    @Value("${external.aladin.api-key}")
+    private String apiKey;
+
     public List<BookExternalResponse> searchBooksByTitle(String title) {
 
 
-        String apiKey = "ttbchlgur13m0908001";
+
 
         URI uri = UriComponentsBuilder
                 .fromHttpUrl("https://www.aladin.co.kr/ttb/api/ItemSearch.aspx")

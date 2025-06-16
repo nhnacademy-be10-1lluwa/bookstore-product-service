@@ -5,7 +5,8 @@ import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
-import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
+import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
+import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,15 @@ import java.util.List;
 public class BookService {
     private final AladinBookApiService aladinBookApiService;
     private final BookRepository bookRepository;
-    private final BookMapper bookMapper;
+    private final BookExternalMapper bookExternalMapper;
+    private final BookResponseMapper bookResponseMapper;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookMapper bookMapper) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookExternalMapper bookExternalMapper, BookResponseMapper bookResponseMapper) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
-        this.bookMapper = bookMapper;
+        this.bookExternalMapper = bookExternalMapper;
+        this.bookResponseMapper = bookResponseMapper;
     }
 
     //도서 등록 전 도서 검색
@@ -52,12 +55,13 @@ public class BookService {
             throw new NotFoundBookException("ISBN과 일치하는 도서가 없습니다.");
         }
 
-        Book savedBook = bookMapper.toEntity(bookByIsbn);
-        bookRepository.save(savedBook);
-        log.info("도서 등록 완료 : ID={}, ISBN={}", savedBook.getId(),isbn);
+        Book bookEntity = bookExternalMapper.toBookEntity(bookByIsbn);
+        bookRepository.save(bookEntity);
+        log.info("도서 등록 완료 : ID={}, ISBN={}", bookEntity.getId(),isbn);
 
         // mapper 필요
-        return bookMapper.toDetailResponse(savedBook);
+
+        return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
 }
