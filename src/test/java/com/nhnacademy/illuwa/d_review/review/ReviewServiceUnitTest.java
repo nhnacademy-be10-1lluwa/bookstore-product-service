@@ -1,11 +1,13 @@
 package com.nhnacademy.illuwa.d_review.review;
 
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
+import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewListResponse;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
+import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewRepository;
 import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 public class ReviewServiceUnitTest {
@@ -172,6 +175,21 @@ public class ReviewServiceUnitTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 책의 리뷰 작성")
+    void createReviewWithInvalidBookTest() {
+        // given
+        ReviewRequest request = new ReviewRequest("리뷰리뷰리뷰", "포인트 냠냠", null, 5);
+
+        // mock
+        Mockito.when(bookRepository.findById(book.getId())).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> reviewService.createReview(book.getId(), request))
+                .isInstanceOf(NotFoundBookException.class)
+                .hasMessage("도서를 찾을 수 없습니다.");
+    }
+
+    @Test
     @DisplayName("리뷰 목록 가져오기")
     void getReviewListTest(){
         // given
@@ -251,6 +269,22 @@ public class ReviewServiceUnitTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 리뷰 조회")
+    void getReviewDetailNotFoundTest(){
+        // given
+        Long reviewId = 99999L;
+
+        // mock
+        Mockito.when(reviewRepository.findByBook_IdAndReviewId(book.getId(), reviewId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> reviewService.getReviewDetail(book.getId(), reviewId))
+                .isInstanceOf(ReviewNotFoundException.class)
+                .hasMessageContaining("StatusCode: " + ReviewNotFoundException.getStatusC0de() + " 리뷰를 찾을 수 없습니다. Review ID: " + reviewId);
+    }
+
+
+    @Test
     @DisplayName("리뷰 업데이트")
     void updateReview() {
         // given
@@ -280,5 +314,21 @@ public class ReviewServiceUnitTest {
         assertThat(response.getReviewContent()).isEqualTo("갱신된 내용");
         assertThat(response.getReviewImageUrl()).isEqualTo("new.jpg");
         assertThat(response.getReviewRating()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 리뷰 수정")
+    void updateReviewNotFoundTest(){
+        // given
+        Long reviewId = 99999L;
+        ReviewRequest updateRequest = new ReviewRequest("제목", "내용", null, 5);
+
+        // mock
+        Mockito.when(reviewRepository.findByBook_IdAndReviewId(book.getId(), reviewId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> reviewService.updateReview(book.getId(), reviewId, updateRequest))
+                .isInstanceOf(ReviewNotFoundException.class)
+                .hasMessageContaining("StatusCode: " + ReviewNotFoundException.getStatusC0de() + " 리뷰를 찾을 수 없습니다. Review ID: " + reviewId);
     }
 }
