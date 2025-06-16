@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -51,7 +53,8 @@ public class ReviewService {
 
     public ReviewListResponse getReviewList(Long bookId) {
         List<Review> reviews = reviewRepository.findReviewsByBook_Id(bookId);
-        return new ReviewListResponse(reviews);
+        List<ReviewResponse> reviewResponseList = reviews.stream().map(ReviewResponse::from).toList();
+        return new ReviewListResponse(reviewResponseList);
     }
 
     public ReviewResponse getReviewDetail(Long bookId, Long reviewId) {
