@@ -26,7 +26,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class ServiceUnitTest {
+public class ReviewServiceUnitTest {
     @InjectMocks
     private ReviewService reviewService;
 
@@ -200,15 +200,17 @@ public class ServiceUnitTest {
         // then
         assertThat(response.getReviews().size()).isEqualTo(5);
         for(int i=0; i<5; i++){
-            Review review = response.getReviews().get(i);
-            assertThat(review.getReviewId()).isEqualTo(savedReviews.get(i).getReviewId());
-            assertThat(review.getReviewTitle()).isEqualTo("title"+(i+1));
-            assertThat(review.getReviewContent()).isEqualTo("content"+(i+1));
-            assertThat(review.getReviewImageUrl()).isEqualTo("img"+(i+1)+".jpg");
-            assertThat(review.getReviewRating()).isEqualTo(i+1);
-            assertThat(review.getReviewDate()).isEqualTo(now.get(i));
-            assertThat(review.getBook().getId()).isEqualTo(book.getId());
-            assertThat(review.getMemberId()).isEqualTo((long)i+1);
+            Review review = savedReviews.get(i);
+            ReviewResponse reviewResponse = response.getReviews().get(i);
+
+            assertThat(reviewResponse.getReviewId()).isEqualTo(review.getReviewId());
+            assertThat(reviewResponse.getReviewTitle()).isEqualTo(review.getReviewTitle());
+            assertThat(reviewResponse.getReviewContent()).isEqualTo(review.getReviewContent());
+            assertThat(reviewResponse.getReviewImageUrl()).isEqualTo(review.getReviewImageUrl());
+            assertThat(reviewResponse.getReviewRating()).isEqualTo(review.getReviewRating());
+            assertThat(reviewResponse.getReviewDate()).isEqualTo(review.getReviewDate());
+            assertThat(reviewResponse.getBookId()).isEqualTo(review.getBook().getId());
+            assertThat(reviewResponse.getMemberId()).isEqualTo(review.getMemberId());
         }
     }
 
