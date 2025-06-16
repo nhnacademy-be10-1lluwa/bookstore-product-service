@@ -43,7 +43,7 @@ public class Book {
     @Column(nullable = false)
     private int salePrice;
 
-    private boolean isGiftWrap;
+    private boolean giftWrap;
 
     @Column(nullable = false)
     private String imgUrl;

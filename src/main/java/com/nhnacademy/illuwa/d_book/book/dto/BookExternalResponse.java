@@ -12,14 +12,15 @@ import java.time.LocalDate;
 public class BookExternalResponse {
 
     private String title;
-    private String author;
-    private LocalDate pubDate;
     private String description;
+    private String author;
+    private String publisher;
+    private LocalDate pubDate;
     private String isbn;
-    private Integer priceSales;
     private Integer priceStandard;
+    private Integer priceSales;
     //이미지 url
     private String cover;
     private String categoryName;
-    private String publisher;
+
 }

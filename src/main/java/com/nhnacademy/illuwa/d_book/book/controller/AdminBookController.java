@@ -34,7 +34,7 @@ public class AdminBookController {
     @PostMapping("/register")
     public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest req){
 
-        BookDetailResponse detailResponse = bookService.registerBook(req.getISBN());
+        BookDetailResponse detailResponse = bookService.registerBook(req.getIsbn());
 
         return ResponseEntity.ok(detailResponse);
     }
