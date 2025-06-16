@@ -5,7 +5,8 @@ import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
-import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
+import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
+import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,11 @@ import java.util.List;
 public class BookService {
     private final AladinBookApiService aladinBookApiService;
     private final BookRepository bookRepository;
-    private final BookMapper bookMapper;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookMapper bookMapper) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
-        this.bookMapper = bookMapper;
     }
 
     //도서 등록 전 도서 검색
@@ -40,9 +39,9 @@ public class BookService {
     // 피드백 -> fetch 부분 메서드 분리 예정
     public BookDetailResponse registerBook(String isbn) {
         //이미 등록된 도서인 경우
-        log.info("도서 등록 시작: ISBN={}", isbn);
+//        log.info("도서 등록 시작: ISBN={}", isbn);
         if (bookRepository.existsByIsbn(isbn)) {
-            log.warn("이미 등록된 도서: ISBN={}", isbn);
+//            log.warn("이미 등록된 도서: ISBN={}", isbn);
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
@@ -52,12 +51,12 @@ public class BookService {
             throw new NotFoundBookException("ISBN과 일치하는 도서가 없습니다.");
         }
 
-        Book savedBook = bookMapper.toEntity(bookByIsbn);
-        bookRepository.save(savedBook);
-        log.info("도서 등록 완료 : ID={}, ISBN={}", savedBook.getId(),isbn);
+        Book bookEntity = BookExternalMapper.INSTANCE.toBookEntity(bookByIsbn);
+        bookRepository.save(bookEntity);
+//        log.info("도서 등록 완료 : ID={}, ISBN={}", bookEntity.getId(),isbn);
 
         // mapper 필요
-        return bookMapper.toDetailResponse(savedBook);
+        return BookResponseMapper.INSTANCE.toBookDetailResponse(bookEntity);
     }
 
 }
