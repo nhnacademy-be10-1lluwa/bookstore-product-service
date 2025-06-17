@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.book;
+package com.nhnacademy.illuwa.d_book.book.book.service;
 
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
@@ -86,7 +86,7 @@ public class BookServiceUnitTest {
         //when & then
         assertThatThrownBy(() -> bookService.searchBookFromExternalApi(title))
                 .isInstanceOf(NotFoundBookException.class)
-                        .hasMessage("제목과 일치하는 도서가 존재하지 않습니다.");
+                .hasMessage("제목과 일치하는 도서가 존재하지 않습니다.");
 
         verify(aladinBookApiService, times(1)).searchBooksByTitle(title);
 
