@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.book.book.service;
+package com.nhnacademy.illuwa.d_book.book.service;
 
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;

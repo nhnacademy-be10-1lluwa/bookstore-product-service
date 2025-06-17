@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.book.book.controller;
+package com.nhnacademy.illuwa.d_book.book.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.illuwa.d_book.book.controller.AdminBookController;
@@ -17,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
 import java.util.Collections;
