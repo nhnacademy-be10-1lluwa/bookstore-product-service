@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class DtoUnitTest {
+public class ReviewDtoUnitTest {
     private Book book;
 
     @BeforeEach

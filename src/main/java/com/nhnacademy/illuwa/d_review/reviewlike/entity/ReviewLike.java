@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "review_like", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"reviewId", "memberId"})
+})
 public class ReviewLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

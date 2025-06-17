@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class EntityUnitTest {
+public class ReviewEntityUnitTest {
     private Book book;
 
     @BeforeEach
