@@ -5,9 +5,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
+import com.nhnacademy.illuwa.d_book.book.exception.BookApiException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -15,6 +19,7 @@ import java.net.URI;
 import java.util.List;
 
 @Service
+@Slf4j
 public class AladinBookApiService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -29,9 +34,6 @@ public class AladinBookApiService {
 
     public List<BookExternalResponse> searchBooksByTitle(String title) {
 
-
-
-
         URI uri = UriComponentsBuilder
                 .fromHttpUrl("https://www.aladin.co.kr/ttb/api/ItemSearch.aspx")
                 .queryParam("ttbkey", apiKey)
@@ -43,9 +45,9 @@ public class AladinBookApiService {
                 .encode()
                 .toUri();
 
-        String response = restTemplate.getForObject(uri,String.class);
-
         try{
+            String response = restTemplate.getForObject(uri,String.class);
+
             JsonNode root = objectMapper.readTree(response);
             JsonNode itemNode = root.get("item");
             return objectMapper.convertValue(
@@ -53,13 +55,21 @@ public class AladinBookApiService {
                     new TypeReference<List<BookExternalResponse>>() {}
             );
 
-        } catch (JsonProcessingException e) {
-            throw new BookApiParsingException("도서 API 응답 파싱 중 오류");
+        }
+        catch (RestClientException e) {
+            log.error("알라딘 api 호출 실패 : {}" ,title, e);
+            throw new BookApiException("알라딘 도서 api 호출 실패", HttpStatus.BAD_GATEWAY);
+        }
+        catch (JsonProcessingException e) {
+            log.error("알라딘 api 응답값의 파싱 실패 : {}" ,title,e);
+            throw new BookApiParsingException("알라딘 API 응답값을 바탕으로 파싱 도중 에러 발생");
         }
     }
 
+
+
+
     public BookExternalResponse findBookByIsbn(String isbn) {
-        String apiKey = "ttbchlgur13m0908001";
 
 
         URI uri = UriComponentsBuilder
@@ -80,9 +90,13 @@ public class AladinBookApiService {
                     new TypeReference<BookExternalResponse>() {}
             );
 
-        } catch (JsonProcessingException e) {
-            throw new BookApiParsingException("도서 API 요청 또는 파싱 중 오류");
+        }  catch (RestClientException e) {
+            log.error("알라딘 api 호출 실패 - 해당 도서의 ISBN : {}" ,isbn, e);
+            throw new BookApiException("알라딘 도서 api 호출 실패", HttpStatus.BAD_GATEWAY);
         }
-
+        catch (JsonProcessingException e) {
+            log.error("알라딘 api 응답값의 파싱 실패 - 해당 도서의 ISBN : {}" ,isbn,e);
+            throw new BookApiParsingException("알라딘 API 응답의 파싱 실패");
+        }
     }
 }
