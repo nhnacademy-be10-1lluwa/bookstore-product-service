@@ -37,7 +37,7 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
 
     @Override
     @Transactional
-    public ReviewLikeResponse cancelLike(Long bookId, Long reviewId, Long memberId) {
+    public ReviewLikeResponse cancelLike(Long reviewId, Long memberId) {
         if(!isLikedByMe(reviewId, memberId)) {
             // TODO: 여기서 예외가 진짜 필요할까??
             throw new CannotCancelLikeException();
@@ -50,7 +50,7 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
 
     @Override
     @Transactional(readOnly = true)
-    public ReviewLikeResponse getLikeInfo(Long bookId, Long reviewId, Long memberId) {
+    public ReviewLikeResponse getLikeInfo(Long reviewId, Long memberId) {
         return new ReviewLikeResponse(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
     }
 

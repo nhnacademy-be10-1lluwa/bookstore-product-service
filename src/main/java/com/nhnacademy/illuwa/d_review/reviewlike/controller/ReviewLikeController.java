@@ -25,13 +25,13 @@ public class ReviewLikeController {
     public ResponseEntity<ReviewLikeResponse> cancelLike(@PathVariable Long bookId, @PathVariable Long reviewId) {
         Long memberId = null;
 
-        return ResponseEntity.ok(reviewLikeService.cancelLike(bookId, reviewId, memberId));
+        return ResponseEntity.ok(reviewLikeService.cancelLike(reviewId, memberId));
     }
 
     @GetMapping
     public ResponseEntity<ReviewLikeResponse> getLikeInfo(@PathVariable Long bookId, @PathVariable Long reviewId) {
         Long memberId = null;
 
-        return ResponseEntity.ok(reviewLikeService.getLikeInfo(bookId, reviewId, memberId));
+        return ResponseEntity.ok(reviewLikeService.getLikeInfo(reviewId, memberId));
     }
 }
