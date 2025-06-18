@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_review.review;
 
+import com.nhnacademy.illuwa.common.config.QuerydslConfig;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewRepository;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +23,7 @@ import static org.assertj.core.api.Assertions.within;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
+@Import(QuerydslConfig.class)
 public class ReviewRepositoryJpaTest {
     @Autowired
     private ReviewRepository reviewRepository;

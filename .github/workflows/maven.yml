@@ -46,7 +46,7 @@ jobs:
       run: |
         mvn sonar:sonar \
           -Dsonar.projectKey=1lluwa-product-service \
-          -Dsonar.projectName="1lluwa Product Service" \
+          -Dsonar.projectName="1lluwa-Product-Service" \
           -Dsonar.host.url=$SONAR_HOST_URL \
           -Dsonar.login=$SONAR_TOKEN
 

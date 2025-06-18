@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.book;
+package com.nhnacademy.illuwa.d_book.book.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
