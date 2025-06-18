@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -37,6 +38,17 @@ public class BookService {
             throw new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다.");
         }
         return bookExternalResponseDtos;
+    }
+
+    //등록된 도서 삭제 전 검색
+    public void deleteBookByIsbn(String isbn){
+        Optional<Book> byIsbn = bookRepository.findByIsbn(isbn);
+
+        if(byIsbn.isEmpty()){
+            log.info("도서를 찾을 수 없습니다. isbn : {}",isbn);
+            throw new NotFoundBookException("isbn : " + isbn + "의 도서를 찾을 수 없습니다.");
+        }
+        bookRepository.deleteByIsbn(isbn);
     }
 
 
