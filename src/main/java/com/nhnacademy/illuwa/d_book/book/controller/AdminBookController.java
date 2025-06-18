@@ -3,7 +3,6 @@ package com.nhnacademy.illuwa.d_book.book.controller;
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
-import com.nhnacademy.illuwa.d_book.book.dto.BookSearchRequest;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
