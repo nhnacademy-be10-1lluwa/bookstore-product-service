@@ -52,7 +52,7 @@ public class BookService {
     }
 
 
-    // 피드백 -> fetch 부분 메서드 분리 예정
+
     public BookDetailResponse registerBook(String isbn) {
         //이미 등록된 도서인 경우
         log.info("도서 등록 시작: ISBN={}", isbn);
@@ -71,7 +71,6 @@ public class BookService {
         bookRepository.save(bookEntity);
         log.info("도서 등록 완료 : ID={}, ISBN={}", bookEntity.getId(),isbn);
 
-        // mapper 필요
 
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
