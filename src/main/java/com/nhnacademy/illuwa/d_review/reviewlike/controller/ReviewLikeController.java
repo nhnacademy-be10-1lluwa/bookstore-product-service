@@ -16,21 +16,20 @@ public class ReviewLikeController {
 
     @PostMapping
     public ResponseEntity<ReviewLikeResponse> addLike(@PathVariable Long bookId, @PathVariable Long reviewId) {
-        Long memberId = null;
+        Long memberId = 7777L;
 
         return ResponseEntity.ok(reviewLikeService.addLike(bookId, reviewId, memberId));
     }
 
     @DeleteMapping
     public ResponseEntity<ReviewLikeResponse> cancelLike(@PathVariable Long bookId, @PathVariable Long reviewId) {
-        Long memberId = null;
-
+        Long memberId = 7777L;
         return ResponseEntity.ok(reviewLikeService.cancelLike(reviewId, memberId));
     }
 
     @GetMapping
     public ResponseEntity<ReviewLikeResponse> getLikeInfo(@PathVariable Long bookId, @PathVariable Long reviewId) {
-        Long memberId = null;
+        Long memberId = 7777L;
 
         return ResponseEntity.ok(reviewLikeService.getLikeInfo(reviewId, memberId));
     }
