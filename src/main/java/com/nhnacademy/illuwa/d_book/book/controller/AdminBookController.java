@@ -47,7 +47,7 @@ public class AdminBookController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping
+    @PatchMapping("/{isbn}")
     public ResponseEntity<Void> updateBook(@PathVariable String isbn, @RequestBody BookUpdateRequest requestDto){
 
         bookService.updateBook(isbn,requestDto);

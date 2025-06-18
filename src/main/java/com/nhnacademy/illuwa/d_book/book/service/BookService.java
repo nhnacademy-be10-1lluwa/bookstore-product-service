@@ -12,7 +12,6 @@ import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,7 +61,7 @@ public class BookService {
             throw new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다.");
         }
 
-        List<BookDetailResponse> bookDetailList = books.stream().map(book -> bookResponseMapper.toBookDetailResponse(book)).toList();
+        List<BookDetailResponse> bookDetailList = books.stream().map(bookResponseMapper::toBookDetailResponse).toList();
         log.info("검색된 도서의 수 : {}", bookDetailList.size());
 
         return bookDetailList;
