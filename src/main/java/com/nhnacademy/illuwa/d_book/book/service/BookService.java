@@ -9,6 +9,10 @@ import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
+import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
+import com.nhnacademy.illuwa.d_book.category.entity.Category;
+import com.nhnacademy.illuwa.d_book.category.repository.BookCategoryRepository;
+import com.nhnacademy.illuwa.d_book.category.repository.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +26,17 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookExternalMapper bookExternalMapper;
     private final BookResponseMapper bookResponseMapper;
+    private final CategoryRepository categoryRepository;
+    private final BookCategoryRepository bookCategoryRepository;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookExternalMapper bookExternalMapper, BookResponseMapper bookResponseMapper) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookExternalMapper bookExternalMapper, BookResponseMapper bookResponseMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
         this.bookExternalMapper = bookExternalMapper;
         this.bookResponseMapper = bookResponseMapper;
+        this.categoryRepository = categoryRepository;
+        this.bookCategoryRepository = bookCategoryRepository;
     }
 
     //도서 등록 전 도서 검색
@@ -83,9 +91,34 @@ public class BookService {
             throw new NotFoundBookException("ISBN과 일치하는 도서가 없습니다.");
         }
 
+        // 카테고리 파싱
+        String[] categoryNames = bookByIsbn.getCategoryName().split("<");
+        Category parentCategory = null;
+        Category currentCategory;
+
+        for(String categoryName : categoryNames){
+            Category tempParentCategory = parentCategory;
+            String trimmedCategoryName = categoryName.trim();
+            currentCategory = categoryRepository.findByCategoryNameAndParentCategory(trimmedCategoryName,parentCategory)
+                    .orElseGet(() -> {
+                        Category newCategory = new Category();
+                        newCategory.setCategoryName(trimmedCategoryName);
+                        newCategory.setParentCategory(tempParentCategory);
+                        return categoryRepository.save(newCategory);
+                    });
+            parentCategory = currentCategory;
+
+        }
+
         Book bookEntity = bookExternalMapper.toBookEntity(bookByIsbn);
         bookRepository.save(bookEntity);
         log.info("도서 등록 완료 : ID={}, ISBN={}", bookEntity.getId(),isbn);
+
+
+        BookCategory bookCategory = new BookCategory(bookEntity,parentCategory);
+        bookCategoryRepository.save(bookCategory);
+        log.info("도서-카테고리 등록 완료 - 도서 이름 : {}, 카테고리(하위) 이름 : {}", bookCategory.getBook().getTitle(),bookCategory.getCategory().getCategoryName());
+
 
 
         return bookResponseMapper.toBookDetailResponse(bookEntity);
