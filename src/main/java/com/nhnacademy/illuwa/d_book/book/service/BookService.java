@@ -2,6 +2,7 @@ package com.nhnacademy.illuwa.d_book.book.service;
 
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
@@ -11,6 +12,7 @@ import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,10 +47,25 @@ public class BookService {
         Optional<Book> byIsbn = bookRepository.findByIsbn(isbn);
 
         if(byIsbn.isEmpty()){
-            log.info("도서를 찾을 수 없습니다. isbn : {}",isbn);
-            throw new NotFoundBookException("isbn : " + isbn + "의 도서를 찾을 수 없습니다.");
+            log.warn("도서를 찾을 수 없습니다. isbn : {}",isbn);
+            throw new NotFoundBookException("isbn : " + isbn + "에 해당하는 도서를 찾을 수 없습니다.");
         }
+
         bookRepository.deleteByIsbn(isbn);
+    }
+
+    //도서 수정 전 도서 검색
+    public List<BookDetailResponse> searchBookByTitle(String title) {
+        List<Book> books = bookRepository.findByTitleContaining(title);
+
+        if (books.isEmpty()) {
+            throw new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다.");
+        }
+
+        List<BookDetailResponse> bookDetailList = books.stream().map(book -> bookResponseMapper.toBookDetailResponse(book)).toList();
+        log.info("검색된 도서의 수 : {}", bookDetailList.size());
+
+        return bookDetailList;
     }
 
 
@@ -75,4 +92,34 @@ public class BookService {
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
+
+    public void updateBook(String isbn, BookUpdateRequest requestDto) {
+        Optional<Book> byIsbn = bookRepository.findByIsbn(isbn);
+
+        if(byIsbn.isEmpty()){
+            log.info("해당 도서를 찾을 수 없습니다. isbn : {}",isbn);
+            throw new NotFoundBookException("isbn : " + isbn + "에 해당하는 도서를 찾을 수 없습니다.");
+        }
+
+        Book book = byIsbn.get();
+        String description = requestDto.getDescription();
+        String contents = requestDto.getContents();
+        Integer price = requestDto.getPrice();
+        Boolean giftWrap = requestDto.getGiftWrap();
+
+        if(description != null){
+            book.setDescription(description);
+        }
+        if(contents != null) {
+            book.setContents(contents);
+        }
+        if(price != null){
+            book.setRegularPrice(price);
+        }
+        if(giftWrap != null){
+            book.setGiftWrap(giftWrap);
+        }
+
+        bookRepository.save(book);
+    }
 }
