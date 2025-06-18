@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewLikeResponse {
-    Long likeId;
     boolean likedByMe;
     Long likeCount;
+
+    public static ReviewLikeResponse from(boolean likedByMe, long likeCount) {
+        return new ReviewLikeResponse(likedByMe, likeCount);
+    }
 }
