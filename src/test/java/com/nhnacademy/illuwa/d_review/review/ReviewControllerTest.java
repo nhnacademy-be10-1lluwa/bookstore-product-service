@@ -39,7 +39,7 @@ public class ReviewControllerTest {
     private final Long bookId = 10L;
     private final Long reviewId = 1L;
     private final Long memberId = 99L;
-    private final LocalDateTime fixedDate = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private final LocalDateTime fixedDate = LocalDateTime.of(2024, 2, 19, 21, 32, 11);
 
     private ReviewRequest request;
     private ReviewResponse response;
@@ -138,7 +138,7 @@ public class ReviewControllerTest {
     @Test
     @DisplayName("리뷰 수정 테스트")
     public void reviewUpdateTest() throws Exception {
-        LocalDateTime fixedDate2 = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        LocalDateTime fixedDate2 = LocalDateTime.of(2024, 3, 16, 12, 28, 43);
         ReviewRequest request2 = new ReviewRequest("대충 리뷰 수정함", "대충 내용 수정함", "/img/test2.png", 5);
         ReviewResponse response2 = new ReviewResponse(reviewId, "대충 리뷰 수정함", "대충 내용 수정함", "/img/test2.png", 5, fixedDate2, bookId, memberId);
 

@@ -24,4 +24,8 @@ public class ReviewLike {
 
     @Column(nullable = false)
     private Long memberId;
+
+    public static ReviewLike of(Review review, Long memberId) {
+        return new ReviewLike(null, review, memberId);
+    }
 }
