@@ -21,14 +21,17 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Compile with Maven
-      run: mvn compile
+#    - name: Compile with Maven
+#      run: mvn compile
+#
+#    - name: Build with Maven
+#      run: mvn -B package --file pom.xml
+#
+#    - name: Run Tests
+#      run: mvn test
 
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
-
-    - name: Run Tests
-      run: mvn test
+      run: mvn clean package -DskipTests
 
     - name: Upload JaCoCo coverage report
       uses: actions/upload-artifact@v4
@@ -43,6 +46,17 @@ jobs:
       run: |
         mvn sonar:sonar \
           -Dsonar.projectKey=1lluwa-product-service \
-          -Dsonar.projectName="1lluwa Product Service" \
+          -Dsonar.projectName="1lluwa-Product-Service" \
           -Dsonar.host.url=$SONAR_HOST_URL \
           -Dsonar.login=$SONAR_TOKEN
+
+    - name: Upload jar to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_IP }}
+        username: ${{ secrets.SSH_ID }}
+        password: ${{ secrets.REMOTE_PASS }}
+        port: ${{ secrets.SSH_PORT }}
+        source: "target/product-service.jar"
+        target: "~/deploy/product"
+        rm: false

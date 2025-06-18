@@ -25,7 +25,17 @@ public class Category {
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
     private List<Category> childrenCategory = new ArrayList<>();
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String categoryName;
+
+    public Category(String categoryName){
+        this.categoryName = categoryName;
+    }
+
+    public void addChildCategory(Category childCategory){
+        childrenCategory.add(childCategory);
+        childCategory.setParentCategory(this);
+    }
+
 
 }

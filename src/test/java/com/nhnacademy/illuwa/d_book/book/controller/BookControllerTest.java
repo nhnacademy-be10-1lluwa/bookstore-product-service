@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.book;
+package com.nhnacademy.illuwa.d_book.book.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.illuwa.d_book.book.controller.AdminBookController;
@@ -17,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -71,8 +70,8 @@ public class BookControllerTest {
 
         //when & then
         mockMvc.perform(post("/admin/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(jsonPath("$[0].isbn").value("010000"))
                 .andExpect(status().isOk());
 
@@ -89,9 +88,9 @@ public class BookControllerTest {
                 .willThrow(new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다."));
 
         // when
-     mockMvc.perform(post("/admin/books")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDto)))
+        mockMvc.perform(post("/admin/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isNotFound())
                 .andDo(print());
 
