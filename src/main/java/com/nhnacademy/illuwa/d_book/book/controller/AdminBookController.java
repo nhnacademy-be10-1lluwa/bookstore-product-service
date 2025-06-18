@@ -36,7 +36,7 @@ public class AdminBookController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteBook(String isbn){
+    public ResponseEntity<Void> deleteBook(@RequestParam String isbn){
 
         bookService.deleteBookByIsbn(isbn);
 
