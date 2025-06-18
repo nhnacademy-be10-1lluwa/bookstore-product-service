@@ -35,4 +35,12 @@ public class AdminBookController {
 
         return ResponseEntity.ok(detailResponse);
     }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteBook(String isbn){
+
+        bookService.deleteBookByIsbn(isbn);
+
+        return ResponseEntity.noContent().build();
+    }
 }
