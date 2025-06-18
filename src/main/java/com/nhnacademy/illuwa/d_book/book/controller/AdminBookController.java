@@ -3,14 +3,10 @@ package com.nhnacademy.illuwa.d_book.book.controller;
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
-import com.nhnacademy.illuwa.d_book.book.dto.BookSearchRequest;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,19 +19,27 @@ public class AdminBookController {
         this.bookService = bookService;
     }
 
-    @PostMapping
-    public ResponseEntity<List<BookExternalResponse>> searchBook(@RequestBody @Valid BookSearchRequest req){
+    @GetMapping
+    public ResponseEntity<List<BookExternalResponse>> searchBook(@RequestParam String title){
 
-        List<BookExternalResponse> bookExternalResponses = bookService.searchBookFromExternalApi(req.getTitle());
+        List<BookExternalResponse> bookExternalResponses = bookService.searchBookFromExternalApi(title);
 
         return ResponseEntity.ok(bookExternalResponses);
     }
 
-    @PostMapping("/register")
+    @PostMapping()
     public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest req){
 
         BookDetailResponse detailResponse = bookService.registerBook(req.getIsbn());
 
         return ResponseEntity.ok(detailResponse);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteBook(@RequestParam String isbn){
+
+        bookService.deleteBookByIsbn(isbn);
+
+        return ResponseEntity.noContent().build();
     }
 }
