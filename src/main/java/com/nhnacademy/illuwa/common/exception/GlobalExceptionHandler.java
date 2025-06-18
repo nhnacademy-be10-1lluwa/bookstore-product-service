@@ -5,23 +5,23 @@ import com.nhnacademy.illuwa.d_book.book.exception.BookApiException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
+import com.nhnacademy.illuwa.d_review.reviewlike.exception.AlreadyLikedException;
+import com.nhnacademy.illuwa.d_review.reviewlike.exception.CannotCancelLikeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    // TODO: 예외 추가될 떄마다 추가
-    @ExceptionHandler(ReviewNotFoundException.class)
-    public ResponseEntity<String> handleReviewNotFoundException(ReviewNotFoundException e) {
-        log.error("{}", e.getMessage(), e);
-        return ResponseEntity.status(ReviewNotFoundException.getStatusC0de()).body(e.getMessage());
-    }
-
     @ExceptionHandler(NotFoundBookException.class)
     public ResponseEntity<String> handleNotFoundBookException(NotFoundBookException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -46,4 +46,40 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage());
     }
 
+    // TODO: 추후 수정
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<String> handleReviewNotFoundException(ReviewNotFoundException e) {
+        log.error("{}", e.getMessage(), e);
+        return ResponseEntity.status(ReviewNotFoundException.getStatusC0de()).body(e.getMessage());
+    }
+
+    @ExceptionHandler(AlreadyLikedException.class)
+    public ResponseEntity<Object> handleAlreadyLikedException(AlreadyLikedException e) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        Map<String, Object> body = new LinkedHashMap<>();
+
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "Already_Liked"); // <-- 중요: 클라이언트가 파싱할 고유 코드
+        body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
+
+        return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(CannotCancelLikeException.class)
+    public ResponseEntity<Object> handleCannotCancelLikeException(CannotCancelLikeException e) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        Map<String, Object> body = new LinkedHashMap<>();
+
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "Cannot_Cancel_Like"); // <-- 중요: 클라이언트가 파싱할 고유 코드
+        body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
+
+        return new ResponseEntity<>(body, status);
+    }
 }
