@@ -1,8 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
-import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.*;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -19,18 +17,24 @@ public class AdminBookController {
         this.bookService = bookService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<BookExternalResponse>> searchBook(@RequestParam String title){
+    @GetMapping("/external")
+    public ResponseEntity<List<BookExternalResponse>> searchBooksByExternalApi(@RequestParam String title){
 
         List<BookExternalResponse> bookExternalResponses = bookService.searchBookFromExternalApi(title);
 
         return ResponseEntity.ok(bookExternalResponses);
     }
 
-    @PostMapping()
-    public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest req){
+    @GetMapping
+    public ResponseEntity<List<BookDetailResponse>> searchBooksByTitle(@RequestParam String title){
+        List<BookDetailResponse> bookDetailsResponses = bookService.searchBookByTitle(title);
+        return ResponseEntity.ok(bookDetailsResponses);
+    }
 
-        BookDetailResponse detailResponse = bookService.registerBook(req.getIsbn());
+    @PostMapping()
+    public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest reqestDto){
+
+        BookDetailResponse detailResponse = bookService.registerBook(reqestDto.getIsbn());
 
         return ResponseEntity.ok(detailResponse);
     }
@@ -39,6 +43,14 @@ public class AdminBookController {
     public ResponseEntity<Void> deleteBook(@RequestParam String isbn){
 
         bookService.deleteBookByIsbn(isbn);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping
+    public ResponseEntity<Void> updateBook(@PathVariable String isbn, @RequestBody BookUpdateRequest requestDto){
+
+        bookService.updateBook(isbn,requestDto);
 
         return ResponseEntity.noContent().build();
     }
