@@ -48,5 +48,4 @@ public class Book {
     @Column(nullable = false)
     private String imgUrl;
 
-    private String category;
 }
