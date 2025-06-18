@@ -32,7 +32,7 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
 
         reviewLikeRepository.save(ReviewLike.of(review, memberId));
 
-        return ReviewLikeResponse.from(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
+        return new ReviewLikeResponse(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
     }
 
     @Override
@@ -45,13 +45,13 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
 
         reviewLikeRepository.deleteByReview_ReviewIdAndMemberId(reviewId, memberId);
 
-        return ReviewLikeResponse.from(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
+        return new ReviewLikeResponse(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
     }
 
     @Override
     @Transactional(readOnly = true)
     public ReviewLikeResponse getLikeInfo(Long bookId, Long reviewId, Long memberId) {
-        return ReviewLikeResponse.from(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
+        return new ReviewLikeResponse(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
     }
 
     @Override
