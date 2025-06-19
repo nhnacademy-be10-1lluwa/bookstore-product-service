@@ -9,6 +9,7 @@ import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
+import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.repository.BookCategoryRepository;
 import com.nhnacademy.illuwa.d_book.category.repository.CategoryRepository;
@@ -44,6 +45,9 @@ public class BookServiceTest {
 
     @Mock
     CategoryRepository categoryRepository;
+
+    @Mock
+    BookCategoryRepository bookCategoryRepository;
 
 
 

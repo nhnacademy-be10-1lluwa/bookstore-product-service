@@ -51,8 +51,7 @@ public class ReviewLikeControllerTest {
                 100,
                 100,
                 false,
-                "book.jpg",
-                "카테고리없음"
+                "book.jpg"
         );
 
         Review review = new Review(

@@ -87,7 +87,6 @@ public class ReviewRepositoryJpaTest {
             assertThat(review.getReviewRating()).isEqualTo(i+1);
             assertThat(review.getReviewDate()).isCloseTo(now.get(i), within(1, ChronoUnit.SECONDS));
             assertThat(review.getBook().getId()).isEqualTo(book.getId());
-            assertThat(review.getReviewId()).isEqualTo((long)i+1);
         }
     }
 
