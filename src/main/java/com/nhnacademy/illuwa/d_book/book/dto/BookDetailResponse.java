@@ -21,5 +21,4 @@ public class BookDetailResponse {
     private int salePrice;
     private boolean isGiftWrap;
     private String imgUrl;
-    private String category;
 }

@@ -55,8 +55,7 @@ public class ReviewServiceUnitTest {
                 100,
                 100,
                 false,
-                "book.jpg",
-                "카테고리없음"
+                "book.jpg"
         );
     }
 
