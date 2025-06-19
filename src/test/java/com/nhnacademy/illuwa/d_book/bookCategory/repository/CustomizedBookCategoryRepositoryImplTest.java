@@ -44,8 +44,7 @@ public class CustomizedBookCategoryRepositoryImplTest {
                 15000,
                 13000,
                 true,
-                "book/marmaid.jpeg",
-                "카테고리1"
+                "book/marmaid.jpeg"
         );
         entityManager.persist(book);
         this.bookId = book.getId();
