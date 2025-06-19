@@ -57,7 +57,6 @@ public class BookService {
             log.warn("도서를 찾을 수 없습니다. isbn : {}",isbn);
             throw new NotFoundBookException("isbn : " + isbn + "에 해당하는 도서를 찾을 수 없습니다.");
         }
-
         bookRepository.deleteByIsbn(isbn);
     }
 
@@ -91,7 +90,25 @@ public class BookService {
             throw new NotFoundBookException("ISBN과 일치하는 도서가 없습니다.");
         }
 
-        // 카테고리 파싱
+        // TODO
+        Category parentCategory = getCategory(bookByIsbn);
+
+        Book bookEntity = bookExternalMapper.toBookEntity(bookByIsbn);
+        bookRepository.save(bookEntity);
+        log.info("도서 등록 완료 : ID={}, ISBN={}", bookEntity.getId(),isbn);
+
+
+        BookCategory bookCategory = new BookCategory(bookEntity,parentCategory);
+        bookCategoryRepository.save(bookCategory);
+        log.info("도서-카테고리 등록 완료 - 도서 이름 : {}, 카테고리(하위) 이름 : {}", bookCategory.getBook().getTitle(),bookCategory.getCategory().getCategoryName());
+
+        return bookResponseMapper.toBookDetailResponse(bookEntity);
+    }
+
+
+    //카테고리 파싱
+    private Category getCategory(BookExternalResponse bookByIsbn) {
+
         String[] categoryNames = bookByIsbn.getCategoryName().split("<");
         Category parentCategory = null;
         Category currentCategory;
@@ -107,33 +124,20 @@ public class BookService {
                         return categoryRepository.save(newCategory);
                     });
             parentCategory = currentCategory;
-
         }
-
-        Book bookEntity = bookExternalMapper.toBookEntity(bookByIsbn);
-        bookRepository.save(bookEntity);
-        log.info("도서 등록 완료 : ID={}, ISBN={}", bookEntity.getId(),isbn);
-
-
-        BookCategory bookCategory = new BookCategory(bookEntity,parentCategory);
-        bookCategoryRepository.save(bookCategory);
-        log.info("도서-카테고리 등록 완료 - 도서 이름 : {}, 카테고리(하위) 이름 : {}", bookCategory.getBook().getTitle(),bookCategory.getCategory().getCategoryName());
-
-
-
-        return bookResponseMapper.toBookDetailResponse(bookEntity);
+        return parentCategory;
     }
 
 
-    public void updateBook(String isbn, BookUpdateRequest requestDto) {
-        Optional<Book> byIsbn = bookRepository.findByIsbn(isbn);
+    public void updateBook(Long id, BookUpdateRequest requestDto) {
+        Optional<Book> bookById = bookRepository.findById(id);
 
-        if(byIsbn.isEmpty()){
-            log.info("해당 도서를 찾을 수 없습니다. isbn : {}",isbn);
-            throw new NotFoundBookException("isbn : " + isbn + "에 해당하는 도서를 찾을 수 없습니다.");
+        if(bookById.isEmpty()){
+            log.info("해당 도서를 찾을 수 없습니다. id : {}", id);
+            throw new NotFoundBookException("해당 도서는 존재하지 않아서 수정이 불가능합니다.");
         }
 
-        Book book = byIsbn.get();
+        Book book = bookById.get();
         String description = requestDto.getDescription();
         String contents = requestDto.getContents();
         Integer price = requestDto.getPrice();
