@@ -34,4 +34,19 @@ public class Comment {
     @NotNull
     @Column(nullable = false)
     private Long memberId;
+
+    public static Comment of(String commentContents, LocalDateTime commentDate, Review review, Long memberId) {
+        return new Comment(
+                null,
+                commentContents,
+                commentDate,
+                review,
+                memberId
+        );
+    }
+
+    public void update(String content) {
+        if(content != null && content.isBlank()) { this.commentContents = content; }
+        this.commentDate = LocalDateTime.now();
+    }
 }
