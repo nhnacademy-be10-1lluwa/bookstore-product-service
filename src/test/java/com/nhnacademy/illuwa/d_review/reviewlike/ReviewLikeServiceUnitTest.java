@@ -1,6 +1,8 @@
 package com.nhnacademy.illuwa.d_review.reviewlike;
 
+import com.nhnacademy.illuwa.common.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
+import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewRepository;
 import com.nhnacademy.illuwa.d_review.reviewlike.dto.ReviewLikeResponse;
@@ -52,8 +54,8 @@ public class ReviewLikeServiceUnitTest {
                 "11111111111111111",
                 100,
                 100,
-                false,
-                "book.jpg"
+                "book.jpg",
+                new BookExtraInfo(Status.DELETED,true)
         );
 
         review = new Review(

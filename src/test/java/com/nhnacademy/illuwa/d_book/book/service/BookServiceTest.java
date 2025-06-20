@@ -1,11 +1,13 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
+import com.nhnacademy.illuwa.common.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
+import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
@@ -133,8 +135,8 @@ public class BookServiceTest {
                 "012345",
                 10000,
                 9000,
-                true,
-                "imgUrl"
+                "imgUrl",
+                new BookExtraInfo(Status.DELETED,true)
         );
 
         BookDetailResponse bookDetailResponse = new BookDetailResponse(
@@ -240,8 +242,8 @@ public class BookServiceTest {
                 "00800ABZ",
                 20000,
                 10000,
-                false,
-                "imgUrl"
+                "imgUrl",
+                new BookExtraInfo(Status.DELETED,true)
             );
 
         when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.of(book));
@@ -288,8 +290,8 @@ public class BookServiceTest {
                 "0070ABC",
                 10000,
                 6000,
-                false,
-                "imgUrl"
+                "imgUrl",
+                new BookExtraInfo(Status.DELETED,true)
                 );
 
         BookDetailResponse bookDetailResponse = new BookDetailResponse(
@@ -356,8 +358,8 @@ public class BookServiceTest {
                 "00800ABZ",
                 20000,
                 10000,
-                false,
-                "imgUrl"
+                "imgUrl",
+                new BookExtraInfo(Status.DELETED,true)
         );
 
         BookUpdateRequest bookUpdateRequest = new BookUpdateRequest(

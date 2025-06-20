@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.entity;
 
+import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,9 +44,11 @@ public class Book {
     @Column(nullable = false)
     private int salePrice;
 
-    private boolean giftWrap;
-
     @Column(nullable = false)
     private String imgUrl;
+
+    @Column(nullable = false)
+    @Embedded
+    private BookExtraInfo bookExtraInfo;
 
 }

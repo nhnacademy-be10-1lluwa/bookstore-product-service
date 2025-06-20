@@ -107,34 +107,38 @@ public class AladinBookApiServiceTest {
 
     @Test
     @DisplayName("도서 검색 성공 - 도서의 ISBN을 통해 단권 조회")
-    void findBookByIsbn_Success(){
+    void findBookByIsbn_Success() throws JsonProcessingException {
 
         String ISBN = "1234567890F";
 
         String mockApiResponse = """
                 {
-                    "item":
+                    "item": [
                         {
-                            "title": "인어 공주",
-                            "author": "안데르센",
-                            "isbn" : "1234567890F",
-                            "pubDate": "2024-06-16",
-                            "priceStandard": 10000,
-                            "priceSales": 7000,
-                            "cover": "mermaid/princess.jpg",
-                            "categoryName": "서양소설",
-                            "publisher": "출판사S"
+                          "title": "인어 공주",
+                          "author": "안데르센",
+                          "isbn": "1234567890F",
+                          "pubDate": "2024-06-16",
+                          "priceStandard": 10000,
+                          "priceSales": 7000,
+                          "cover": "mermaid/princess.jpg",
+                          "categoryName": "서양소설",
+                          "publisher": "출판사S"
                         }
+                      ]
                 }
                 """;
 
         when(restTemplate.getForObject(any(URI.class), eq(String.class)))
                 .thenReturn(mockApiResponse);
+
+
+
+
         //when
         BookExternalResponse result = aladinBookApiService.findBookByIsbn(ISBN);
 
         //then
-
         assertThat(result.getTitle()).isEqualTo("인어 공주");
         assertThat(result.getIsbn()).isEqualTo("1234567890F");
         verify(restTemplate).getForObject(any(URI.class), eq(String.class));

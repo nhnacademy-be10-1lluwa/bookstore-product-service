@@ -152,9 +152,6 @@ public class BookService {
         if(price != null){
             book.setRegularPrice(price);
         }
-        if(giftWrap != null){
-            book.setGiftWrap(giftWrap);
-        }
 
         bookRepository.save(book);
     }

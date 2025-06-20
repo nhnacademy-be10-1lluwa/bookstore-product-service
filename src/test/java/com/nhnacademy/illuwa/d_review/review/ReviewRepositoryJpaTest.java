@@ -1,7 +1,9 @@
 package com.nhnacademy.illuwa.d_review.review;
 
 import com.nhnacademy.illuwa.common.config.QuerydslConfig;
+import com.nhnacademy.illuwa.common.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
+import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,8 +47,8 @@ public class ReviewRepositoryJpaTest {
                 "11111111111111111",
                 100,
                 100,
-                false,
-                "book.jpg"
+                "book.jpg",
+                new BookExtraInfo(Status.DELETED,true)
         );
         testEntityManager.persist(book);
     }
