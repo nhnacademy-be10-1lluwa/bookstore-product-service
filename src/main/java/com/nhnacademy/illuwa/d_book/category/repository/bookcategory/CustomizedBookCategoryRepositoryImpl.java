@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.category.repository;
+package com.nhnacademy.illuwa.d_book.category.repository.bookcategory;
 
 import com.nhnacademy.illuwa.d_book.category.entity.QBookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.QCategory;
