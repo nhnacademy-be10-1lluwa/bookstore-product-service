@@ -26,7 +26,7 @@ public class ReviewService {
 
     public ReviewResponse createReview(Long bookId, ReviewRequest request) {
         // TODO: memberId 가져오는 방식 확정되면 변경
-        Long memberId = null;
+        Long memberId = 7777L;
 
         String imageUrl = (request.getReviewImageUrl() != null && !request.getReviewImageUrl().isBlank())
                 ? request.getReviewImageUrl()
