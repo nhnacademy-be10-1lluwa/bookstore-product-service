@@ -84,9 +84,10 @@ public class AladinBookApiService {
         try{
         String response = restTemplate.getForObject(uri, String.class);
             JsonNode root = objectMapper.readTree(response);
-            JsonNode itemNode = root.get("item");
+            JsonNode itemArray = root.get("item");
+            JsonNode firstItem = itemArray.get(0);
             return objectMapper.convertValue(
-                    itemNode,
+                    firstItem,
                     new TypeReference<BookExternalResponse>() {}
             );
 

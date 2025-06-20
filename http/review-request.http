@@ -3,7 +3,7 @@ POST http://localhost:8080/admin/books
 Content-Type: application/json
 
 {
-  "isbn": "9788967901349"
+  "isbn": "K832030960"
 }
 
 ### 리뷰작성 1

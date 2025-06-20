@@ -1,13 +1,9 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.illuwa.d_book.book.controller.AdminBookController;
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
-import com.nhnacademy.illuwa.d_book.book.dto.BookSearchRequest;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
-import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.service.AladinBookApiService;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
