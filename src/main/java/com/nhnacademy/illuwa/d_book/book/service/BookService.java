@@ -11,8 +11,8 @@ import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
-import com.nhnacademy.illuwa.d_book.category.repository.BookCategoryRepository;
-import com.nhnacademy.illuwa.d_book.category.repository.CategoryRepository;
+import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
+import com.nhnacademy.illuwa.d_book.category.repository.cateogory.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
