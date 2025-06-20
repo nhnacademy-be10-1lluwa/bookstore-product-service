@@ -4,7 +4,7 @@ import com.nhnacademy.illuwa.common.config.QuerydslConfig;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
-import com.nhnacademy.illuwa.d_book.category.repository.BookCategoryRepository;
+import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

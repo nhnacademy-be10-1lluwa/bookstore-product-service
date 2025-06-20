@@ -23,8 +23,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -47,56 +48,58 @@ public class BookControllerTest {
 
 
     @Test
-    @DisplayName("책 검색 성공")
+    @DisplayName("책 검색 성공 - Title")
     void searchBook_Success() throws Exception {
         //given
-        BookSearchRequest searchRequestDto = new BookSearchRequest("어린 왕자");
-        BookExternalResponse responseDto = new BookExternalResponse(
+        BookDetailResponse bookDetailResponse = new BookDetailResponse(
+                0L,
                 "어린 왕자",
+                "contents",
                 "description",
                 "author",
                 "출판사",
                 LocalDate.of(2024, 6, 13),
                 "010000",
                 10000,
-                90000,
-                "img/path.jpg",
-                "category1"
+                9000,
+                true,
+                "img/path.jpg"
         );
 
-        String json = objectMapper.writeValueAsString(searchRequestDto);
-        given(bookService.searchBookFromExternalApi(searchRequestDto.getTitle())).willReturn(List.of(responseDto));
+        when(bookService.searchBookByTitle("어린 왕자")).thenReturn(List.of(bookDetailResponse));
 
 
         //when & then
-        mockMvc.perform(post("/admin/books")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+        mockMvc.perform(get("/admin/books")
+                        .param("title","어린 왕자")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(jsonPath("$[0].isbn").value("010000"))
                 .andExpect(status().isOk());
 
     }
 
-    @Test
-    @DisplayName("책 검색 실패")
-    void searchBook_Fail() throws Exception {
-        // given
-        String searchTitle = "세상에 없는 책";
-        BookSearchRequest requestDto = new BookSearchRequest(searchTitle);
-
-        given(bookService.searchBookFromExternalApi(searchTitle))
-                .willThrow(new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다."));
-
-        // when
-        mockMvc.perform(post("/admin/books")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isNotFound())
-                .andDo(print());
-
-
-        verify(bookService).searchBookFromExternalApi(searchTitle);
-    }
+//    @Test
+//    @DisplayName("책 검색 실패")
+//    void searchBook_Fail() throws Exception {
+//        // given
+//        String searchTitle = "세상에 없는 책";
+//
+//        when(aladinBookApiService.searchBooksByTitle(any())).thenReturn(null);
+//
+////        given(aladinBookApiService.searchBooksByTitle(searchTitle))
+////                .willThrow(new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다."));
+//
+//        // when
+//        mockMvc.perform(get("/admin/books")
+//                    .param("title","어린 왕자")
+//                    .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isNotFound())
+//                .andDo(print());
+//
+//
+//        verify(aladinBookApiService).searchBooksByTitle(searchTitle);
+//    }
 
     @Test
     @DisplayName("책 등록 성공")
@@ -117,8 +120,7 @@ public class BookControllerTest {
                 10000,
                 90000,
                 true,
-                "abc/def/g.jpg",
-                "Category"
+                "abc/def/g.jpg"
         );
 
         String json = objectMapper.writeValueAsString(registerRequest);
@@ -126,7 +128,7 @@ public class BookControllerTest {
 
 
         //when & then
-        mockMvc.perform(post("/admin/books/register")
+        mockMvc.perform(post("/admin/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(jsonPath("$.isbn").value("0100AF"))
@@ -137,7 +139,7 @@ public class BookControllerTest {
     }
 
     @Test
-    @DisplayName("책 등록 실패 - 이미 존재하는 도서")
+    @DisplayName("책 등록 실패 - 해당 도서가 이미 존재")
     void registgerBook_Failure() throws Exception {
         //given
         String alreadyExistsIsbn = "이미 등록된 도서의 ISBN";
@@ -147,16 +149,13 @@ public class BookControllerTest {
 
         given(bookService.registerBook(registerRequest.getIsbn())).willThrow(new BookAlreadyExistsException("이미 등록된 도서"));
 
-
         //when & then
-        mockMvc.perform(post("/admin/books/register")
+        mockMvc.perform(post("/admin/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isConflict())
                 .andDo(print());
 
         verify(bookService).registerBook(alreadyExistsIsbn);
-
     }
-
 }

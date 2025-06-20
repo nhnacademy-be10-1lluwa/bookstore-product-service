@@ -1,0 +1,29 @@
+package com.nhnacademy.illuwa.d_book.category.repository.cateogory;
+
+import com.nhnacademy.illuwa.d_book.category.entity.Category;
+import com.nhnacademy.illuwa.d_book.category.entity.QCategory;
+import com.querydsl.jpa.JPQLQuery;
+import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+
+import java.util.Optional;
+
+public class CustomizedCategoryRepositoryImpl extends QuerydslRepositorySupport implements CustomizedCategoryRepository{
+    public CustomizedCategoryRepositoryImpl(){
+        super(Category.class);
+    }
+
+    @Override
+    public Optional<Category> findByCategoryNameAndParentCategory(String categoryName, Category parentCategory) {
+        QCategory category = QCategory.category;
+
+        // SELECT *
+        // FROM category c
+        // WHERE c_categoryName = ?
+        // AND c_parentCategory_id = ?
+        JPQLQuery<Category> query = from(category)
+                .select(category)
+                .where(category.categoryName.eq(categoryName).and(category.parentCategory.eq(parentCategory)));
+
+        return Optional.ofNullable(query.fetchOne());
+    }
+}

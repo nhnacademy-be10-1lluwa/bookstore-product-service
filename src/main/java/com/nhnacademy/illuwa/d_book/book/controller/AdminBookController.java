@@ -47,10 +47,10 @@ public class AdminBookController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{isbn}")
-    public ResponseEntity<Void> updateBook(@PathVariable String isbn, @RequestBody BookUpdateRequest requestDto){
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody BookUpdateRequest requestDto){
 
-        bookService.updateBook(isbn,requestDto);
+        bookService.updateBook(id,requestDto);
 
         return ResponseEntity.noContent().build();
     }
