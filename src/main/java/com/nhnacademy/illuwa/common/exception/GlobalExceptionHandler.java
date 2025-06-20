@@ -4,6 +4,8 @@ import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
+import com.nhnacademy.illuwa.d_review.comment.exception.CommentNotFoundException;
+import com.nhnacademy.illuwa.d_review.comment.exception.CommentStatusInvalidException;
 import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
 import com.nhnacademy.illuwa.d_review.reviewlike.exception.AlreadyLikedException;
 import com.nhnacademy.illuwa.d_review.reviewlike.exception.CannotCancelLikeException;
@@ -12,16 +14,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private final Map<String, Object> body = new LinkedHashMap<>();
+    private HttpStatus status;
     @ExceptionHandler(NotFoundBookException.class)
     public ResponseEntity<String> handleNotFoundBookException(NotFoundBookException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -53,11 +55,35 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ReviewNotFoundException.getStatusC0de()).body(e.getMessage());
     }
 
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<Object> handleCommentNotFoundException(CommentNotFoundException e) {
+        status = HttpStatus.NOT_FOUND;
+
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "Comment_Not_Found"); // <-- 중요: 클라이언트가 파싱할 고유 코드
+        body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
+
+        return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(CommentStatusInvalidException.class)
+    public ResponseEntity<Object> handleCommentStatusInvalidException(CommentStatusInvalidException e) {
+        status = HttpStatus.CONFLICT;
+
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "Comment_Status_Invalid"); // <-- 중요: 클라이언트가 파싱할 고유 코드
+        body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
+
+        return new ResponseEntity<>(body, status);
+    }
+
     @ExceptionHandler(AlreadyLikedException.class)
     public ResponseEntity<Object> handleAlreadyLikedException(AlreadyLikedException e) {
-        HttpStatus status = HttpStatus.CONFLICT;
-
-        Map<String, Object> body = new LinkedHashMap<>();
+        HttpStatus status = HttpStatus.NOT_FOUND;
 
         body.put("timestamp", LocalDateTime.now());
         body.put("status", status.value());
