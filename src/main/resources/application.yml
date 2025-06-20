@@ -1,8 +1,8 @@
 spring:
   application:
-    name: illuwa
+    name: product-service
   profiles:
-    active: test
+    active: dev
 
 external:
   aladin:
