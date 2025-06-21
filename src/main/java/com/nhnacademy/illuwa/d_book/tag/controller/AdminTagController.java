@@ -1,13 +1,14 @@
 package com.nhnacademy.illuwa.d_book.tag.controller;
 
 import com.nhnacademy.illuwa.d_book.tag.dto.TagRegisterRequest;
+import com.nhnacademy.illuwa.d_book.tag.dto.TagResponse;
+import com.nhnacademy.illuwa.d_book.tag.entity.Tag;
 import com.nhnacademy.illuwa.d_book.tag.service.TagService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.net.URI;
 
 @RestController
 @RequestMapping("/admin/tags")
@@ -19,20 +20,25 @@ public class AdminTagController {
         this.tagService = tagService;
     }
 
-    // TODO : 1) POST
     @PostMapping()
-    public ResponseEntity<Map<String,String>> registerTag(@RequestBody TagRegisterRequest tagRegisterRequest){
-        tagService.registerTag(tagRegisterRequest);
-        Map<String,String> response = new HashMap<>();
-        response.put("tagName",tagRegisterRequest.getName());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<TagResponse> registerTag(@RequestBody TagRegisterRequest tagRegisterRequest){
+        Tag registeredTag = tagService.registerTag(tagRegisterRequest);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(registeredTag.getId())
+                .toUri();
+
+        TagResponse tagResponse = new TagResponse(registeredTag.getId(),registeredTag.getName());
+
+        return ResponseEntity.created(location).body(tagResponse);
     }
 
-    // TODO : 2) DELETE
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteTag(@PathVariable Long id){
         tagService.deleteTag(id);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
