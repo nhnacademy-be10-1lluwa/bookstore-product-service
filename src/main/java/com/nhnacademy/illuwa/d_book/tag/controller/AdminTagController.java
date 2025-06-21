@@ -4,6 +4,7 @@ import com.nhnacademy.illuwa.d_book.tag.dto.TagRegisterRequest;
 import com.nhnacademy.illuwa.d_book.tag.dto.TagResponse;
 import com.nhnacademy.illuwa.d_book.tag.entity.Tag;
 import com.nhnacademy.illuwa.d_book.tag.service.TagService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -21,7 +22,7 @@ public class AdminTagController {
     }
 
     @PostMapping()
-    public ResponseEntity<TagResponse> registerTag(@RequestBody TagRegisterRequest tagRegisterRequest){
+    public ResponseEntity<TagResponse> registerTag(@RequestBody @Valid TagRegisterRequest tagRegisterRequest){
         Tag registeredTag = tagService.registerTag(tagRegisterRequest);
 
         URI location = ServletUriComponentsBuilder
