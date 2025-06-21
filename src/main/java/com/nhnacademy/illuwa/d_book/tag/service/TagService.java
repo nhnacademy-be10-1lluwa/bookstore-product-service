@@ -6,6 +6,7 @@ import com.nhnacademy.illuwa.d_book.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.tag.exception.TagNotFoundException;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -15,10 +16,12 @@ public class TagService {
     TagRepository tagRepository;
 
 
+
     public TagService(TagRepository tagRepository){
         this.tagRepository = tagRepository;
     }
 
+    @Transactional
     public Tag registerTag(TagRegisterRequest tagRegisterRequest) {
 
 
@@ -34,14 +37,16 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
+    @Transactional
     public void deleteTag(Long tagId) {
 
         Optional<Tag> tagById = tagRepository.findById(tagId);
 
         if(tagById.isEmpty()){
             throw new TagNotFoundException("존재하지 않는 태그입니다.");
-
         }
-        tagRepository.delete(tagById);
+
+        Tag targetTag = tagById.get();
+        tagRepository.delete(targetTag);
     }
 }
