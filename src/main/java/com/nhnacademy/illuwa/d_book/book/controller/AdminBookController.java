@@ -39,10 +39,10 @@ public class AdminBookController {
         return ResponseEntity.ok(detailResponse);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteBook(@RequestParam String isbn){
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteBook(Long id){
 
-        bookService.deleteBookByIsbn(isbn);
+        bookService.deleteBook(id);
 
         return ResponseEntity.noContent().build();
     }
