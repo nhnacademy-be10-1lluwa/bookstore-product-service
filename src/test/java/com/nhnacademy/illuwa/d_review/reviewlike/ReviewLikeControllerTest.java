@@ -1,6 +1,6 @@
 package com.nhnacademy.illuwa.d_review.reviewlike;
 
-import com.nhnacademy.illuwa.common.enums.Status;
+import com.nhnacademy.illuwa.d_book.book.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
@@ -52,7 +52,7 @@ public class ReviewLikeControllerTest {
                 "11111111111111111",
                 100,
                 100,
-                "book.jpg",
+                null,
         new BookExtraInfo(Status.DELETED,true)
         );
 
