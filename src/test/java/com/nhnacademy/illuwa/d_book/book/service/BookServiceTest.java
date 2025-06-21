@@ -1,6 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
-import com.nhnacademy.illuwa.common.enums.Status;
+import com.nhnacademy.illuwa.d_book.book.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookUpdateRequest;
@@ -135,7 +135,7 @@ public class BookServiceTest {
                 "012345",
                 10000,
                 9000,
-                "imgUrl",
+                null,
                 new BookExtraInfo(Status.DELETED,true)
         );
 
@@ -242,7 +242,7 @@ public class BookServiceTest {
                 "00800ABZ",
                 20000,
                 10000,
-                "imgUrl",
+                null,
                 new BookExtraInfo(Status.DELETED,true)
             );
 
@@ -306,7 +306,7 @@ public class BookServiceTest {
                 "0070ABC",
                 10000,
                 6000,
-                "imgUrl",
+                null,
                 new BookExtraInfo(Status.DELETED,true)
                 );
 
@@ -374,7 +374,7 @@ public class BookServiceTest {
                 "00800ABZ",
                 20000,
                 10000,
-                "imgUrl",
+                null,
                 new BookExtraInfo(Status.DELETED,true)
         );
 

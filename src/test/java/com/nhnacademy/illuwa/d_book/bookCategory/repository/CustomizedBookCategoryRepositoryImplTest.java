@@ -1,7 +1,7 @@
 package com.nhnacademy.illuwa.d_book.bookCategory.repository;
 
 import com.nhnacademy.illuwa.common.config.QuerydslConfig;
-import com.nhnacademy.illuwa.common.enums.Status;
+import com.nhnacademy.illuwa.d_book.book.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
@@ -45,7 +45,7 @@ public class CustomizedBookCategoryRepositoryImplTest {
                 "123456789EE",
                 15000,
                 13000,
-                "book/marmaid.jpeg",
+                null,
                 new BookExtraInfo(Status.DELETED,true)
         );
         entityManager.persist(book);
