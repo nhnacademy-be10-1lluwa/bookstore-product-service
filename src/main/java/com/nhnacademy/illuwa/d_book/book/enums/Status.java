@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.common.enums;
+package com.nhnacademy.illuwa.d_book.book.enums;
 
 public enum Status {
     //일반 상태
