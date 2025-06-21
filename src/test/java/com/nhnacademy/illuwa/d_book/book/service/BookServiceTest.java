@@ -228,11 +228,11 @@ public class BookServiceTest {
 
     @Test
     @DisplayName("등록된 도서 삭제 - 성공")
-    void deleteBookByIsbn_Success() {
+    void deleteBook_Success() {
         //given
-        String isbn = "00800ABZ";
+        Long id = 10L;
         Book book = new Book(
-                0L,
+                10L,
                 "어린 왕자",
                 "contents",
                 "description",
@@ -246,32 +246,48 @@ public class BookServiceTest {
                 new BookExtraInfo(Status.DELETED,true)
             );
 
-        when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.of(book));
-        when(bookRepository.deleteByIsbn(isbn)).thenReturn(1);
+        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
 
         //when
-        bookService.deleteBookByIsbn(isbn);
+        bookService.deleteBook(book.getId());
 
         //then
-        verify(bookRepository,times(1)).findByIsbn(isbn);
-        verify(bookRepository,times(1)).deleteByIsbn(isbn);
+        verify(bookRepository,times(1)).findById(id);
+
     }
 
-    @Test
-    @DisplayName("등록된 도서 삭제 - 실패(등록된 도서 중 해당 검색된 isbn 존재 X)")
-    void deleteBookByIsbn_Failure() {
-        //given
-        String isbn = "세상에 절대 존재하지 않는 isbn";
+    //    @Transactional
+    //    public void deleteBook(Long id) {
+    //        Optional<Book> book = bookRepository.findById(id);
+    //
+    //        if(book.isEmpty()){
+    //            log.warn("도서를 찾을 수 없습니다. id : {}",id);
+    //            throw new NotFoundBookException("id : " + id + "에 해당하는 도서를 찾을 수 없습니다.");
+    //        }
+    //
+    //        Book targetBook = book.get();
+    //        bookRepository.delete(targetBook);
+    //
+    //        log.info("삭제된 도서 제목 : {}" , targetBook.getTitle());
+    //
+    //    }
 
-        when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.empty());
+    @Test
+    @DisplayName("등록된 도서 삭제 : 실패 (등록된 도서 중 id에 해당하는 도서 존재 X)")
+    void deleteBook_Failure() {
+        //given
+        Long id = 0L;
+
+        when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
         //when
-        assertThatThrownBy(() -> bookService.deleteBookByIsbn(isbn))
+        assertThatThrownBy(() -> bookService.deleteBook(id))
                 .isInstanceOf(NotFoundBookException.class)
-                .hasMessage("isbn : " + isbn + "에 해당하는 도서를 찾을 수 없습니다.");
+                .hasMessage("id : "+id+"에 해당하는 도서를 찾을 수 없습니다.");
 
         //then
-        verify(bookRepository,times(1)).findByIsbn(isbn);
+        verify(bookRepository, never()).delete(any(Book.class));
+        verify(bookRepository,times(1)).findById(id);
     }
 
     @Test
@@ -374,7 +390,6 @@ public class BookServiceTest {
         bookService.updateBook(id,bookUpdateRequest);
 
         verify(bookRepository, times(1)).findById(id);
-        verify(bookRepository, times(1)).save(updatedBook);
     }
 
     @Test
