@@ -19,7 +19,8 @@ public class TagService {
         this.tagRepository = tagRepository;
     }
 
-    public void registerTag(TagRegisterRequest tagRegisterRequest) {
+    public Tag registerTag(TagRegisterRequest tagRegisterRequest) {
+
 
         String tagName = tagRegisterRequest.getName();
 
@@ -29,7 +30,8 @@ public class TagService {
 
         Tag tag = new Tag();
         tag.setName(tagName);
-        tagRepository.save(tag);
+
+        return tagRepository.save(tag);
     }
 
     public void deleteTag(Long tagId) {
