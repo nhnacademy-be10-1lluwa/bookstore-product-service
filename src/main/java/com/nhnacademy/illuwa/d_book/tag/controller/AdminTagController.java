@@ -30,8 +30,8 @@ public class AdminTagController {
 
     // TODO : 2) DELETE
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteTag(@PathVariable Long tagId){
-        tagService.deleteTag(tagId);
+    public ResponseEntity<Void> deleteTag(@PathVariable Long id){
+        tagService.deleteTag(id);
 
         return ResponseEntity.ok().build();
     }
