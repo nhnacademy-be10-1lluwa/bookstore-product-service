@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -44,11 +46,17 @@ public class Book {
     @Column(nullable = false)
     private int salePrice;
 
-    @Column(nullable = false)
-    private String imgUrl;
+    @OneToMany(mappedBy = "book")
+    private List<BookImage> bookImages = new ArrayList<>();
 
-    @Column(nullable = false)
     @Embedded
     private BookExtraInfo bookExtraInfo;
+
+    public void addImage(BookImage image) {
+        this.bookImages.add(image);
+        image.setBook(this);
+    }
+
+
 
 }

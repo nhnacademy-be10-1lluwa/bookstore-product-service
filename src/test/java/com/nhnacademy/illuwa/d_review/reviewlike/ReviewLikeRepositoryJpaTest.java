@@ -1,7 +1,8 @@
 package com.nhnacademy.illuwa.d_review.reviewlike;
 
 import com.nhnacademy.illuwa.common.config.QuerydslConfig;
-import com.nhnacademy.illuwa.common.enums.Status;
+import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
+import com.nhnacademy.illuwa.d_book.book.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,7 +46,7 @@ public class ReviewLikeRepositoryJpaTest {
                 "11111111111111111",
                 100,
                 100,
-                "book.jpg",
+                null,
                 new BookExtraInfo(Status.DELETED,true)
         );
         testEntityManager.persist(book);

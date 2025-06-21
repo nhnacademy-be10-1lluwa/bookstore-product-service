@@ -13,8 +13,10 @@ import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
 import com.nhnacademy.illuwa.d_book.category.repository.cateogory.CategoryRepository;
+import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,15 +30,17 @@ public class BookService {
     private final BookResponseMapper bookResponseMapper;
     private final CategoryRepository categoryRepository;
     private final BookCategoryRepository bookCategoryRepository;
+    private final TagRepository tagRepository;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookExternalMapper bookExternalMapper, BookResponseMapper bookResponseMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookExternalMapper bookExternalMapper, BookResponseMapper bookResponseMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, TagRepository tagRepository) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
         this.bookExternalMapper = bookExternalMapper;
         this.bookResponseMapper = bookResponseMapper;
         this.categoryRepository = categoryRepository;
         this.bookCategoryRepository = bookCategoryRepository;
+        this.tagRepository = tagRepository;
     }
 
     //도서 등록 전 도서 검색
@@ -49,18 +53,9 @@ public class BookService {
         return bookExternalResponseDtos;
     }
 
-    //등록된 도서 삭제 전 검색
-    public void deleteBookByIsbn(String isbn){
-        Optional<Book> byIsbn = bookRepository.findByIsbn(isbn);
-
-        if(byIsbn.isEmpty()){
-            log.warn("도서를 찾을 수 없습니다. isbn : {}",isbn);
-            throw new NotFoundBookException("isbn : " + isbn + "에 해당하는 도서를 찾을 수 없습니다.");
-        }
-        bookRepository.deleteByIsbn(isbn);
-    }
 
     //도서 수정 전 도서 검색
+    @Transactional(readOnly = true)
     public List<BookDetailResponse> searchBookByTitle(String title) {
         List<Book> books = bookRepository.findByTitleContaining(title);
 
@@ -76,6 +71,8 @@ public class BookService {
 
 
 
+
+    @Transactional
     public BookDetailResponse registerBook(String isbn) {
         //이미 등록된 도서인 경우
         log.info("도서 등록 시작: ISBN={}", isbn);
@@ -89,7 +86,7 @@ public class BookService {
         if (bookByIsbn == null) {
             throw new NotFoundBookException("ISBN과 일치하는 도서가 없습니다.");
         }
-        // TODO
+
         Category parentCategory = getCategory(bookByIsbn);
 
 
@@ -101,6 +98,7 @@ public class BookService {
         BookCategory bookCategory = new BookCategory(bookEntity,parentCategory);
         bookCategoryRepository.save(bookCategory);
         log.info("도서-카테고리 등록 완료 - 도서 이름 : {}, 카테고리(하위) 이름 : {}", bookCategory.getBook().getTitle(),bookCategory.getCategory().getCategoryName());
+
 
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
@@ -129,6 +127,7 @@ public class BookService {
     }
 
 
+    @Transactional
     public void updateBook(Long id, BookUpdateRequest requestDto) {
         Optional<Book> bookById = bookRepository.findById(id);
 
@@ -141,7 +140,6 @@ public class BookService {
         String description = requestDto.getDescription();
         String contents = requestDto.getContents();
         Integer price = requestDto.getPrice();
-        Boolean giftWrap = requestDto.getGiftWrap();
 
         if(description != null){
             book.setDescription(description);
@@ -153,6 +151,22 @@ public class BookService {
             book.setRegularPrice(price);
         }
 
-        bookRepository.save(book);
     }
+
+    @Transactional
+    public void deleteBook(Long id) {
+        Optional<Book> book = bookRepository.findById(id);
+
+        if(book.isEmpty()){
+            log.warn("도서를 찾을 수 없습니다. id : {}",id);
+            throw new NotFoundBookException("id : " + id + "에 해당하는 도서를 찾을 수 없습니다.");
+        }
+
+        Book targetBook = book.get();
+        bookRepository.delete(targetBook);
+
+        log.info("삭제된 도서 제목 : {}" , targetBook.getTitle());
+
+    }
+
 }
