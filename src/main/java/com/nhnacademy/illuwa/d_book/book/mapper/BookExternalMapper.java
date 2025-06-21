@@ -15,7 +15,6 @@ public interface BookExternalMapper {
     @Mapping(source = "pubDate",target = "publishedDate")
     @Mapping(source = "priceStandard", target = "regularPrice")
     @Mapping(source = "priceSales", target = "salePrice")
-    @Mapping(source = "cover", target = "imgUrl")
     @Mapping(target = "contents", constant = "")
     Book toBookEntity(BookExternalResponse responseDto);
 
