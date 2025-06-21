@@ -12,5 +12,6 @@ import lombok.Setter;
 public class TagRegisterRequest {
 
     @NotBlank(message = "태그 이름은 필수입니다.")
+
     private String name;
 }

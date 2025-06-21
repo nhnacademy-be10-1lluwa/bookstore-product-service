@@ -21,6 +21,7 @@ public class TagService {
 
     public Tag registerTag(TagRegisterRequest tagRegisterRequest) {
 
+
         String tagName = tagRegisterRequest.getName();
 
         if(tagRepository.existsByName(tagName)){
