@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>External Book Search</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .search-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #1c1e21;
+        }
+        #search-form {
+            display: flex;
+            gap: 10px;
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        #search-button {
+            padding: 12px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        #search-button:hover {
+            background-color: #0056b3;
+        }
+        #results-container {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .book-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            width: 220px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 15px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        .book-cover {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .book-card h3 {
+            font-size: 16px;
+            margin: 0 0 5px 0;
+            /* 긴 제목은 잘라서 ...으로 표시 */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .book-card p {
+            font-size: 14px;
+            margin: 3px 0;
+            color: #606770;
+        }
+        .book-price {
+            font-size: 15px;
+            font-weight: bold;
+            color: #d9534f;
+            margin-top: auto; /* 카드의 맨 아래에 가격을 위치시킴 */
+        }
+    </style>
+</head>
+<body>
+
+<div class="search-container">
+    <h1>외부 API 도서 검색</h1>
+    <form id="search-form">
+        <input type="text" id="search-input" placeholder="도서 제목을 입력하세요" required>
+        <button type="submit" id="search-button">검색</button>
+    </form>
+</div>
+
+<div id="results-container">
+</div>
+
+<script>
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.getElementById('search-input');
+    const resultsContainer = document.getElementById('results-container');
+
+    searchForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); // 폼 기본 동작 방지
+
+        const query = searchInput.value.trim();
+        if (!query) {
+            alert('검색어를 입력해주세요.');
+            return;
+        }
+
+        resultsContainer.innerHTML = '<p>검색 중...</p>';
+
+        // --- 가장 중요한 부분 ---
+        // 실제 컨트롤러 경로에 맞게 URL을 수정해야 합니다.
+        // 예: 컨트롤러 클래스에 @RequestMapping("/api/books")가 있다면 아래처럼 사용합니다.
+        const url = `/admin/books/external?title=${encodeURIComponent(query)}`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`API 오류: ${response.status} - ${errorText}`);
+            }
+
+            const books = await response.json(); // 응답은 BookExternalResponse 객체의 배열
+            displayResults(books);
+
+        } catch (error) {
+            resultsContainer.innerHTML = `<p style="color: red;">오류가 발생했습니다: ${error.message}</p>`;
+            console.error('Fetch error:', error);
+        }
+    });
+
+    function displayResults(books) {
+        resultsContainer.innerHTML = ''; // 이전 결과 초기화
+
+        if (books.length === 0) {
+            resultsContainer.innerHTML = '<p>검색 결과가 없습니다.</p>';
+            return;
+        }
+
+        books.forEach(book => {
+            const price = book.priceSales ? book.priceSales.toLocaleString() + '원' : '가격 정보 없음';
+            const bookCard = `
+                <div class="book-card">
+                    <img src="${book.cover}" alt="${book.title}" class="book-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/220x280?text=No+Image';">
+                    <h3>${book.title}</h3>
+                    <p><strong>저자:</strong> ${book.author}</p>
+                    <p><strong>출판사:</strong> ${book.publisher}</p>
+                    <p class="book-price">${price}</p>
+                </div>
+            `;
+            resultsContainer.innerHTML += bookCard;
+        });
+    }
+</script>
+
+</body>
+</html>
