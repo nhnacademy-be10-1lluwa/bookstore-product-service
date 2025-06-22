@@ -1,0 +1,67 @@
+name: Deploy Product-Service to Server
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  analyze:
+    name: Run Tests & SonarQube
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      - name: Build + Test + Coverage
+        run: mvn verify
+
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+
+      - name: Run SonarQube
+        run: mvn sonar:sonar 
+          -Dsonar.projectKey=1lluwa-product-service 
+          -Dsonar.projectName=1lluwa-Product-Service 
+          -Dsonar.host.url=${{secrets.SONAR_HOST_URL}} 
+          -Dsonar.login=${{secrets.SONAR_TOKEN}}
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+
+  deploy:
+    name: Build & Deploy
+    needs: analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      - name: Build with Maven (skip tests)
+        run: mvn clean package -DskipTests
+
+      - name: Upload jar to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_IP }}
+          username: ${{ secrets.SSH_ID }}
+          password: ${{ secrets.REMOTE_PASS }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "target/product-service.jar"
+          target: "~/deploy/product"
+          rm: false
