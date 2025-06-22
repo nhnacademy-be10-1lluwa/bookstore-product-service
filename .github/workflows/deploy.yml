@@ -3,6 +3,7 @@ name: Deploy Product-Service to Server
 on:
   push:
     branches:
+      - develop
       - master
 
 jobs:
