@@ -2,8 +2,18 @@ spring:
   application:
     name: product-service
   profiles:
-    active: dev
+    active: test
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 external:
   aladin:
     api-key: ttbchlgur13m0908001
+
+minio:
+  url: http://192.168.35.209:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket: 1lluwa
