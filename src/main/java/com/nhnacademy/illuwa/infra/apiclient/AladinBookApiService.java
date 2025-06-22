@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.book.service;
+package com.nhnacademy.illuwa.infra.apiclient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -48,7 +48,9 @@ public class AladinBookApiService {
         try{
             String response = restTemplate.getForObject(uri,String.class);
 
-            JsonNode root = objectMapper.readTree(response);
+            String fixedResponse = response.replace("\\'", "'");
+
+            JsonNode root = objectMapper.readTree(fixedResponse);
             JsonNode itemNode = root.get("item");
             return objectMapper.convertValue(
                     itemNode,
