@@ -6,7 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
-import com.nhnacademy.illuwa.d_book.book.service.AladinBookApiService;
+import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

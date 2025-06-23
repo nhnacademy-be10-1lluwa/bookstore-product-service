@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
-import com.nhnacademy.illuwa.d_book.book.service.AladinBookApiService;
+import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
