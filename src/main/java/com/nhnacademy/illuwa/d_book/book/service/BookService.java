@@ -4,10 +4,14 @@ import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
+import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
+import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
+import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
+import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
@@ -29,19 +33,17 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookExternalMapper bookExternalMapper;
     private final BookResponseMapper bookResponseMapper;
-    private final CategoryRepository categoryRepository;
-    private final BookCategoryRepository bookCategoryRepository;
     private final TagRepository tagRepository;
+    private final BookImageRepository bookImageRepository;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookExternalMapper bookExternalMapper, BookResponseMapper bookResponseMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, TagRepository tagRepository) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookExternalMapper bookExternalMapper, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
         this.bookExternalMapper = bookExternalMapper;
         this.bookResponseMapper = bookResponseMapper;
-        this.categoryRepository = categoryRepository;
-        this.bookCategoryRepository = bookCategoryRepository;
         this.tagRepository = tagRepository;
+        this.bookImageRepository = bookImageRepository;
     }
 
     //도서 등록 전 도서 검색
@@ -51,7 +53,7 @@ public class BookService {
         if (bookExternalResponseDtos == null || bookExternalResponseDtos.isEmpty()) {
             throw new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다.");
         }
-        return bookExternalResponseDtos;
+            return bookExternalResponseDtos;
     }
 
 
@@ -70,9 +72,6 @@ public class BookService {
         return bookDetailList;
     }
 
-
-
-
     @Transactional
     public BookDetailResponse registerBook(String isbn) {
         //이미 등록된 도서인 경우
@@ -82,50 +81,28 @@ public class BookService {
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
+        //contents , Status, GiftWrap
+
         BookExternalResponse bookByIsbn = aladinBookApiService.findBookByIsbn(isbn);
 
         if (bookByIsbn == null) {
             throw new NotFoundBookException("ISBN과 일치하는 도서가 없습니다.");
         }
 
-        Category parentCategory = getCategory(bookByIsbn);
-
-
+        // 1) 도서 등록
         Book bookEntity = bookExternalMapper.toBookEntity(bookByIsbn);
         bookRepository.save(bookEntity);
-        log.info("도서 등록 완료 : ID={}, ISBN={}", bookEntity.getId(),isbn);
 
-
-        BookCategory bookCategory = new BookCategory(bookEntity,parentCategory);
-        bookCategoryRepository.save(bookCategory);
-        log.info("도서-카테고리 등록 완료 - 도서 이름 : {}, 카테고리(하위) 이름 : {}", bookCategory.getBook().getTitle(),bookCategory.getCategory().getCategoryName());
+        // 2) 도서 이미지 저장 - Book, url, type 필요
+        String imageUrl = bookByIsbn.getCover();
+        BookImage bookImage = new BookImage(bookEntity,imageUrl, ImageType.DETAIL);
+        bookImageRepository.save(bookImage);
 
 
         return bookResponseMapper.toBookDetailResponse(bookEntity);
+
     }
 
-
-    //카테고리 파싱
-    private Category getCategory(BookExternalResponse bookByIsbn) {
-
-        String[] categoryNames = bookByIsbn.getCategoryName().split("<");
-        Category parentCategory = null;
-        Category currentCategory;
-
-        for(String categoryName : categoryNames){
-            Category tempParentCategory = parentCategory;
-            String trimmedCategoryName = categoryName.trim();
-            currentCategory = categoryRepository.findByCategoryNameAndParentCategory(trimmedCategoryName,parentCategory)
-                    .orElseGet(() -> {
-                        Category newCategory = new Category();
-                        newCategory.setCategoryName(trimmedCategoryName);
-                        newCategory.setParentCategory(tempParentCategory);
-                        return categoryRepository.save(newCategory);
-                    });
-            parentCategory = currentCategory;
-        }
-        return parentCategory;
-    }
 
 
     @Transactional

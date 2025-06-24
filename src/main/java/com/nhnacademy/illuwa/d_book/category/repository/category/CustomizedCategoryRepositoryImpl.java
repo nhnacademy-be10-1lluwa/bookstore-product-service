@@ -12,18 +12,20 @@ public class CustomizedCategoryRepositoryImpl extends QuerydslRepositorySupport 
         super(Category.class);
     }
 
-    @Override
-    public Optional<Category> findByCategoryNameAndParentCategory(String categoryName, Category parentCategory) {
-        QCategory category = QCategory.category;
 
-        // SELECT *
-        // FROM category c
-        // WHERE c_categoryName = ?
-        // AND c_parentCategory_id = ?
-        JPQLQuery<Category> query = from(category)
-                .select(category)
-                .where(category.categoryName.eq(categoryName).and(category.parentCategory.eq(parentCategory)));
 
-        return Optional.ofNullable(query.fetchOne());
-    }
+//    @Override
+//    public Optional<Category> findByCategoryNameAndParentCategory(String categoryName, Category parentCategory) {
+//        QCategory category = QCategory.category;
+//
+//        // SELECT *
+//        // FROM category c
+//        // WHERE c_categoryName = ?
+//        // AND c_parentCategory_id = ?
+//        JPQLQuery<Category> query = from(category)
+//                .select(category)
+//                .where(category.categoryName.eq(categoryName).and(category.parentCategory.eq(parentCategory)));
+//
+//        return Optional.ofNullable(query.fetchOne());
+//    }
 }
