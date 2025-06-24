@@ -13,7 +13,7 @@ external:
     api-key: ttbchlgur13m0908001
 
 minio:
-  url: http://192.168.35.209:9000
-  access-key: minioadmin
-  secret-key: minioadmin
+  url: http://storage.java21.net:8000
+  access-key: nhnacademy
+  secret-key: nhnacademy123!
   bucket: 1lluwa

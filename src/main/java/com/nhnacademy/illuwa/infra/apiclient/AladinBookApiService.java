@@ -37,9 +37,12 @@ public class AladinBookApiService {
         URI uri = UriComponentsBuilder
                 .fromHttpUrl("https://www.aladin.co.kr/ttb/api/ItemSearch.aspx")
                 .queryParam("ttbkey", apiKey)
-                .queryParam("Query",title)
-                .queryParam("QueryType","Title")
-                .queryParam("MaxResult", 100)
+                .queryParam("Query", title)
+                .queryParam("QueryType", "Title")
+                .queryParam("SearchTarget", "Book")
+                .queryParam("MaxResults", 50)
+                .queryParam("Sort", "SalesPoint") // 판매량 순
+                .queryParam("Cover", "Big")
                 .queryParam("Output", "JS")
                 .build()
                 .encode()
@@ -56,7 +59,6 @@ public class AladinBookApiService {
                     itemNode,
                     new TypeReference<List<BookExternalResponse>>() {}
             );
-
         }
         catch (RestClientException e) {
             log.error("알라딘 api 호출 실패 : {}" ,title, e);
