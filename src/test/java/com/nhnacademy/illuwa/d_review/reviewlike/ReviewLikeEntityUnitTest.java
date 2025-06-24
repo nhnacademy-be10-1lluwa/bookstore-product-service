@@ -30,7 +30,7 @@ public class ReviewLikeEntityUnitTest {
                 100,
                 100,
                 null,
-                new BookExtraInfo(Status.DELETED,true)
+                new BookExtraInfo(Status.DELETED,true, 1)
         );
 
         Review review = new Review(

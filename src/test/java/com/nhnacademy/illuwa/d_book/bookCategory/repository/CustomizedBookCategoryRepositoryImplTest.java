@@ -46,7 +46,7 @@ public class CustomizedBookCategoryRepositoryImplTest {
                 15000,
                 13000,
                 null,
-                new BookExtraInfo(Status.DELETED,true)
+                new BookExtraInfo(Status.DELETED,true,1)
         );
         entityManager.persist(book);
         this.bookId = book.getId();

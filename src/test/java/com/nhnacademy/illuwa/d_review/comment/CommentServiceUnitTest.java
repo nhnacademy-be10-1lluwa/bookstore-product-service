@@ -53,7 +53,7 @@ public class CommentServiceUnitTest {
             99999999,
             99999999,
             null,
-            new BookExtraInfo(Status.OUT_OF_STOCK,false)
+            new BookExtraInfo(Status.OUT_OF_STOCK,false,1)
     );
 
     private final Review review = new Review(
