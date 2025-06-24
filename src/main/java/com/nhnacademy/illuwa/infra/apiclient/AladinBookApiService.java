@@ -58,7 +58,6 @@ public class AladinBookApiService {
                     itemNode,
                     new TypeReference<List<BookExternalResponse>>() {}
             );
-
         }
         catch (RestClientException e) {
             log.error("알라딘 api 호출 실패 : {}" ,title, e);
