@@ -47,7 +47,6 @@ public class AladinBookApiService {
                 .build()
                 .encode()
                 .toUri();
-
         try{
             String response = restTemplate.getForObject(uri,String.class);
 
@@ -75,13 +74,13 @@ public class AladinBookApiService {
 
     public BookExternalResponse findBookByIsbn(String isbn) {
 
-
         URI uri = UriComponentsBuilder
-                .fromHttpUrl("http://www.aladin.co.kr/ttb/api/ItemSearch.aspx")
+                .fromHttpUrl("http://www.aladin.co.kr/ttb/api/ItemLookUp.aspx")
                 .queryParam("ttbkey", apiKey)
-                .queryParam("Query", isbn)
-                .queryParam("QueryType", "ISBN")
-                .queryParam("output", "JS")  // 대소문자 주의
+                .queryParam("itemIdType", "ISBN")
+                .queryParam("ItemId", isbn)
+                .queryParam("output", "JS")
+                .queryParam("Version", "20131101")
                 .build()
                 .encode()
                 .toUri();

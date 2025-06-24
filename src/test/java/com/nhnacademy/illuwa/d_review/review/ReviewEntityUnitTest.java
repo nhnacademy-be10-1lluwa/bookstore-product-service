@@ -31,7 +31,7 @@ public class ReviewEntityUnitTest {
                 100,
                 100,
                 null,
-                new BookExtraInfo(Status.DELETED,true)
+                new BookExtraInfo(Status.DELETED,true,1)
         );
     }
 
