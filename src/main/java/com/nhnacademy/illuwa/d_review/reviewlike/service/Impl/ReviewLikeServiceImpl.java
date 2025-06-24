@@ -5,8 +5,6 @@ import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewRepository;
 import com.nhnacademy.illuwa.d_review.reviewlike.dto.ReviewLikeResponse;
 import com.nhnacademy.illuwa.d_review.reviewlike.entity.ReviewLike;
-import com.nhnacademy.illuwa.d_review.reviewlike.exception.AlreadyLikedException;
-import com.nhnacademy.illuwa.d_review.reviewlike.exception.CannotCancelLikeException;
 import com.nhnacademy.illuwa.d_review.reviewlike.repository.ReviewLikeRepository;
 import com.nhnacademy.illuwa.d_review.reviewlike.service.ReviewLikeService;
 import lombok.RequiredArgsConstructor;
@@ -21,31 +19,19 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
 
     @Override
     @Transactional
-    public ReviewLikeResponse addLike(Long bookId, Long reviewId, Long memberId) {
-        // TODO: 여기서 예외가 진짜 필요할까??
-        if(isLikedByMe(reviewId, memberId)) {
-            throw new AlreadyLikedException();
-        }
-
+    public ReviewLikeResponse toggleLike(Long bookId, Long reviewId, Long memberId) {
         Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId)
                 .orElseThrow(() -> new ReviewNotFoundException(reviewId));
 
-        reviewLikeRepository.save(ReviewLike.of(review, memberId));
+        boolean isLikedByMe = isLikedByMe(reviewId, memberId); // 중복호출 막으려고 로컬변수 만듬
 
-        return new ReviewLikeResponse(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
-    }
-
-    @Override
-    @Transactional
-    public ReviewLikeResponse cancelLike(Long reviewId, Long memberId) {
-        if(!isLikedByMe(reviewId, memberId)) {
-            // TODO: 여기서 예외가 진짜 필요할까??
-            throw new CannotCancelLikeException();
+        if(isLikedByMe) {
+            reviewLikeRepository.deleteByReview_ReviewIdAndMemberId(reviewId, memberId);
+        } else{
+            reviewLikeRepository.save(ReviewLike.of(review, memberId));
         }
 
-        reviewLikeRepository.deleteByReview_ReviewIdAndMemberId(reviewId, memberId);
-
-        return new ReviewLikeResponse(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
+        return new ReviewLikeResponse(!isLikedByMe, getLikeCount(reviewId));
     }
 
     @Override
