@@ -12,10 +12,12 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
+@Table(name = "categories")
 public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "category_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

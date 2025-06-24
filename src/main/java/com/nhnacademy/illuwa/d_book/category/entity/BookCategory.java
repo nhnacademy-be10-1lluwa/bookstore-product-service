@@ -10,10 +10,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "book_categories")
 public class BookCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "book_category_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
