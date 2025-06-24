@@ -53,7 +53,7 @@ public class CommentService {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException(reviewId));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
 
-        if(!comment.getReview().equals(review)) {
+        if(!comment.getReview().getReviewId().equals(review.getReviewId())) {
             throw new CommentStatusInvalidException(reviewId, commentId);
         }
 

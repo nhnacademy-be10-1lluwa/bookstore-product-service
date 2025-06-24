@@ -71,7 +71,6 @@ public class CommentRepositoryJpaTest {
         List<LocalDateTime> commentDates = new ArrayList<>();
         List<Comment> savedComments = new ArrayList<>();
 
-        // given
         for(int i=0; i<5; i++){
             commentDates.add(LocalDateTime.of(2025, 1, i+1, 20, 30, 15));
             Comment comment = Comment.of(
