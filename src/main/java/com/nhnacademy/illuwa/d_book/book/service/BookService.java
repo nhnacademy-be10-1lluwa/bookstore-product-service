@@ -57,17 +57,17 @@ public class BookService {
 
     //도서 수정 전 도서 검색
     @Transactional(readOnly = true)
-    public List<BookDetailResponse> searchBookByTitle(String title) {
-        List<Book> books = bookRepository.findByTitleContaining(title);
+    public BookDetailResponse searchBookById(Long id) {
+        Optional<Book> book = bookRepository.findById(id);
 
-        if (books.isEmpty()) {
+        if (book.isEmpty()) {
             throw new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다.");
         }
 
-        List<BookDetailResponse> bookDetailList = books.stream().map(bookResponseMapper::toBookDetailResponse).toList();
-        log.info("검색된 도서의 수 : {}", bookDetailList.size());
+        Book bookEntity = book.get();
+        log.info("조회된 도서의 id : {}", bookEntity.getId());
 
-        return bookDetailList;
+        return bookResponseMapper.toBookDetailResponse(bookEntity);;
     }
 
 
