@@ -46,7 +46,7 @@ public class Comment {
     }
 
     public void update(String content) {
-        if(content != null && content.isBlank()) { this.commentContents = content; }
+        if(content != null && !content.isBlank()) { this.commentContents = content; }
         this.commentDate = LocalDateTime.now();
     }
 }
