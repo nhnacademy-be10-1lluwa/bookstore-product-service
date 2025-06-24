@@ -37,14 +37,16 @@ public class AladinBookApiService {
         URI uri = UriComponentsBuilder
                 .fromHttpUrl("https://www.aladin.co.kr/ttb/api/ItemSearch.aspx")
                 .queryParam("ttbkey", apiKey)
-                .queryParam("Query",title)
-                .queryParam("QueryType","Title")
-                .queryParam("MaxResult", 100)
+                .queryParam("Query", title)
+                .queryParam("QueryType", "Title")
+                .queryParam("SearchTarget", "Book")
+                .queryParam("MaxResults", 50)
+                .queryParam("Sort", "SalesPoint") // 판매량 순
+                .queryParam("Cover", "Big")
                 .queryParam("Output", "JS")
                 .build()
                 .encode()
                 .toUri();
-
         try{
             String response = restTemplate.getForObject(uri,String.class);
 
@@ -73,13 +75,13 @@ public class AladinBookApiService {
 
     public BookExternalResponse findBookByIsbn(String isbn) {
 
-
         URI uri = UriComponentsBuilder
-                .fromHttpUrl("http://www.aladin.co.kr/ttb/api/ItemSearch.aspx")
+                .fromHttpUrl("http://www.aladin.co.kr/ttb/api/ItemLookUp.aspx")
                 .queryParam("ttbkey", apiKey)
-                .queryParam("Query", isbn)
-                .queryParam("QueryType", "ISBN")
-                .queryParam("output", "JS")  // 대소문자 주의
+                .queryParam("itemIdType", "ISBN")
+                .queryParam("ItemId", isbn)
+                .queryParam("output", "JS")
+                .queryParam("Version", "20131101")
                 .build()
                 .encode()
                 .toUri();
