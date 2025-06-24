@@ -67,7 +67,7 @@ public class BookService {
         Book bookEntity = book.get();
         log.info("조회된 도서의 id : {}", bookEntity.getId());
 
-        return bookResponseMapper.toBookDetailResponse(bookEntity);;
+        return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
 

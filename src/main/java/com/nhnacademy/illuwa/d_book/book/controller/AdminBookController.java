@@ -34,7 +34,7 @@ public class AdminBookController {
     }
 
     @GetMapping
-    public ResponseEntity<BookDetailResponse> searchBooksById(@RequestParam Long id){
+    public ResponseEntity<BookDetailResponse> searchBookById(@RequestParam Long id){
         BookDetailResponse bookDetailResponse = bookService.searchBookById(id);
 
         return ResponseEntity.ok(bookDetailResponse);
