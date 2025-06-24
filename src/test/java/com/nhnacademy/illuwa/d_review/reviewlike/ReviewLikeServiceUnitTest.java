@@ -120,7 +120,6 @@ public class ReviewLikeServiceUnitTest {
     @DisplayName("좋아요 상태 표시")
     void getLikeInfoTest(){
         // given
-        Long bookId = book.getId();
         Long reviewId = review.getReviewId();
         Long memberId = 7777L;
 
