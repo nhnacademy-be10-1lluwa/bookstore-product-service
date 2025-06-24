@@ -73,11 +73,11 @@ public class ReviewLikeControllerTest {
     }
 
     @Test
-    @DisplayName("좋아요 설정")
+    @DisplayName("좋아요 - 추가")
     public void reviewLikeAddTest() throws Exception {
         // given
         response = new ReviewLikeResponse(true, 16L);
-        given(reviewLikeService.addLike(eq(bookId), eq(reviewId), eq(memberId))).willReturn(response);
+        given(reviewLikeService.toggleLike(eq(bookId), eq(reviewId), eq(memberId))).willReturn(response);
 
         // when & then
         mockMvc.perform(post("/books/{bookId}/reviews/{reviewId}/likes", bookId, reviewId))
@@ -85,23 +85,23 @@ public class ReviewLikeControllerTest {
                 .andExpect(jsonPath("$.likedByMe").value("true"))
                 .andExpect(jsonPath("$.likeCount").value(16L));
 
-        verify(reviewLikeService).addLike(eq(bookId), eq(reviewId), eq(memberId));
+        verify(reviewLikeService).toggleLike(eq(bookId), eq(reviewId), eq(memberId));
     }
 
     @Test
-    @DisplayName("좋아요 취소")
+    @DisplayName("좋아요 - 취소")
     public void reviewLikeCancelTest() throws Exception {
         // given
         response = new ReviewLikeResponse(false, 3L);
-        given(reviewLikeService.cancelLike(eq(reviewId), eq(memberId))).willReturn(response);
+        given(reviewLikeService.toggleLike(eq(bookId), eq(reviewId), eq(memberId))).willReturn(response);
 
         // when & then
-        mockMvc.perform(delete("/books/{bookId}/reviews/{reviewId}/likes", bookId, reviewId))
+        mockMvc.perform(post("/books/{bookId}/reviews/{reviewId}/likes", bookId, reviewId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.likedByMe").value("false"))
                 .andExpect(jsonPath("$.likeCount").value(3L));
 
-        verify(reviewLikeService).cancelLike(eq(reviewId), eq(memberId));
+        verify(reviewLikeService).toggleLike(eq(bookId), eq(reviewId), eq(memberId));
     }
 
     @Test

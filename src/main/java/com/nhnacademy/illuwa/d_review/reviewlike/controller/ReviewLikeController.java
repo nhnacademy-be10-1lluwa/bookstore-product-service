@@ -15,16 +15,10 @@ public class ReviewLikeController {
     // TODO: memberId 가져오는 방법 결정되면 수정
 
     @PostMapping
-    public ResponseEntity<ReviewLikeResponse> addLike(@PathVariable Long bookId, @PathVariable Long reviewId) {
+    public ResponseEntity<ReviewLikeResponse> toggleLike(@PathVariable Long bookId, @PathVariable Long reviewId) {
         Long memberId = 7777L;
 
-        return ResponseEntity.ok(reviewLikeService.addLike(bookId, reviewId, memberId));
-    }
-
-    @DeleteMapping
-    public ResponseEntity<ReviewLikeResponse> cancelLike(@PathVariable Long bookId, @PathVariable Long reviewId) {
-        Long memberId = 7777L;
-        return ResponseEntity.ok(reviewLikeService.cancelLike(reviewId, memberId));
+        return ResponseEntity.ok(reviewLikeService.toggleLike(bookId, reviewId, memberId));
     }
 
     @GetMapping

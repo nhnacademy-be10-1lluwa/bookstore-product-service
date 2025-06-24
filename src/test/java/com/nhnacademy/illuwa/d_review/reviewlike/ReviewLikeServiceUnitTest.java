@@ -71,22 +71,21 @@ public class ReviewLikeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("좋아요 추가 테스트")
+    @DisplayName("좋아요 - 추가")
     void addLikeTest() {
         // given
         Long bookId = book.getId();
         Long reviewId = review.getReviewId();
         Long memberId = 7777L;
-        ReviewLike reviewLike = ReviewLike.of(review, memberId);
 
         // mock
         Mockito.when(reviewRepository.findByBook_IdAndReviewId(bookId, reviewId)).thenReturn(Optional.of(review));
+        Mockito.when(reviewLikeRepository.existsByReview_ReviewIdAndMemberId(reviewId, memberId)).thenReturn(false);
         Mockito.when(reviewLikeRepository.save(any(ReviewLike.class))).thenReturn(ReviewLike.of(review, memberId));
-        Mockito.when(reviewLikeRepository.existsByReview_ReviewIdAndMemberId(reviewId, memberId)).thenReturn(false, true);
         Mockito.when(reviewLikeRepository.countByReview_ReviewId(reviewId)).thenReturn(1L);
 
         // when
-        ReviewLikeResponse response = reviewLikeService.addLike(bookId, reviewId, memberId);
+        ReviewLikeResponse response = reviewLikeService.toggleLike(bookId, reviewId, memberId);
 
         // then
         assertThat(response).isNotNull();
@@ -95,19 +94,21 @@ public class ReviewLikeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("좋아요 취소 테스트")
+    @DisplayName("좋아요 - 취소")
     void cancelLikeTest() {
         // given
+        Long bookId = book.getId();
         Long reviewId = review.getReviewId();
         Long memberId = 7777L;
 
         // mock
-        Mockito.when(reviewLikeRepository.existsByReview_ReviewIdAndMemberId(reviewId, memberId)).thenReturn(true, false);
+        Mockito.when(reviewRepository.findByBook_IdAndReviewId(bookId, reviewId)).thenReturn(Optional.of(review));
+        Mockito.when(reviewLikeRepository.existsByReview_ReviewIdAndMemberId(reviewId, memberId)).thenReturn(true);
         doNothing().when(reviewLikeRepository).deleteByReview_ReviewIdAndMemberId(reviewId, memberId);
         Mockito.when(reviewLikeRepository.countByReview_ReviewId(reviewId)).thenReturn(0L);
 
         // when
-        ReviewLikeResponse response = reviewLikeService.cancelLike(reviewId, memberId);
+        ReviewLikeResponse response = reviewLikeService.toggleLike(bookId, reviewId, memberId);
 
         // then
         assertThat(response).isNotNull();
@@ -119,7 +120,6 @@ public class ReviewLikeServiceUnitTest {
     @DisplayName("좋아요 상태 표시")
     void getLikeInfoTest(){
         // given
-        Long bookId = book.getId();
         Long reviewId = review.getReviewId();
         Long memberId = 7777L;
 
