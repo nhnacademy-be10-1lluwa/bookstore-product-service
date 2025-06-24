@@ -1,6 +1,8 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
 import com.nhnacademy.illuwa.d_book.book.dto.*;
+import com.nhnacademy.illuwa.d_book.book.entity.Book;
+import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,13 @@ public class AdminBookController {
     public ResponseEntity<List<BookDetailResponse>> searchBooksByTitle(@RequestParam String title){
         List<BookDetailResponse> bookDetailsResponses = bookService.searchBookByTitle(title);
         return ResponseEntity.ok(bookDetailsResponses);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<BookDetailResponse> searchBookById(@PathVariable Long id){
+        BookDetailResponse bookDetailResponse = bookService.searchBookById(id);
+
+        return ResponseEntity.ok(bookDetailResponse);
     }
 
     @PostMapping()

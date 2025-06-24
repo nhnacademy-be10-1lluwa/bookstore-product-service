@@ -126,11 +126,8 @@
             return;
         }
 
-        resultsContainer.innerHTML = '<p>검색 중...</p>';
+        resultsContainer.innerHTML = '<p>도서 검색 중...</p>';
 
-        // --- 가장 중요한 부분 ---
-        // 실제 컨트롤러 경로에 맞게 URL을 수정해야 합니다.
-        // 예: 컨트롤러 클래스에 @RequestMapping("/api/books")가 있다면 아래처럼 사용합니다.
         const url = `/admin/books/external?title=${encodeURIComponent(query)}`;
 
         try {
@@ -161,7 +158,7 @@
             const price = book.priceSales ? book.priceSales.toLocaleString() + '원' : '가격 정보 없음';
             const bookCard = `
                 <div class="book-card">
-                    <img src="${book.cover}" alt="${book.title}" class="book-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/220x280?text=No+Image';">
+                    <img src="${book.cover}" alt="${book.title}" class="book-cover">
                     <h3>${book.title}</h3>
                     <p><strong>저자:</strong> ${book.author}</p>
                     <p><strong>출판사:</strong> ${book.publisher}</p>
