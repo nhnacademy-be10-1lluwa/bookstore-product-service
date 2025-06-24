@@ -33,8 +33,8 @@ public class AdminBookController {
         return ResponseEntity.ok(bookDetailsResponses);
     }
 
-    @GetMapping
-    public ResponseEntity<BookDetailResponse> searchBookById(@RequestParam Long id){
+    @GetMapping("/{id}")
+    public ResponseEntity<BookDetailResponse> searchBookById(@PathVariable Long id){
         BookDetailResponse bookDetailResponse = bookService.searchBookById(id);
 
         return ResponseEntity.ok(bookDetailResponse);
