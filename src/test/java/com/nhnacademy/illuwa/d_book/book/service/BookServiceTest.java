@@ -1,5 +1,7 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
+import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
+import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
 import com.nhnacademy.illuwa.d_book.book.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
@@ -10,10 +12,8 @@ import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
+import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
-import com.nhnacademy.illuwa.d_book.category.entity.Category;
-import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
-import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,10 +45,8 @@ public class BookServiceTest {
     BookResponseMapper bookResponseMapper;
 
     @Mock
-    CategoryRepository categoryRepository;
+    BookImageRepository bookImageRepository;
 
-    @Mock
-    BookCategoryRepository bookCategoryRepository;
 
 
 
@@ -83,7 +81,7 @@ public class BookServiceTest {
         //then
         assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getTitle()).isEqualTo("어린 왕자");
+        assertThat(result.getFirst().getTitle()).isEqualTo("어린 왕자");
 
         verify(aladinBookApiService, times(1)).searchBooksByTitle(title);
     }
@@ -137,7 +135,7 @@ public class BookServiceTest {
                 10000,
                 9000,
                 null,
-                new BookExtraInfo(Status.DELETED,true)
+                new BookExtraInfo(Status.DELETED,true,1)
         );
 
         BookDetailResponse bookDetailResponse = new BookDetailResponse(
@@ -155,14 +153,15 @@ public class BookServiceTest {
                 "imgUrl"
         );
 
-        Category parentCategory = new Category("인문학");
+        BookImage mockImage = new BookImage(mockBook,"url", ImageType.DETAIL);
+
 
 
         when(aladinBookApiService.findBookByIsbn("012345")).thenReturn(mockResponse);
         when(bookRepository.existsByIsbn("012345")).thenReturn(false);
-        when(categoryRepository.findByCategoryNameAndParentCategory(eq("인문학"),any())).thenReturn(Optional.of(parentCategory));
         when(bookExternalMapper.toBookEntity(mockResponse)).thenReturn(mockBook);
         when(bookResponseMapper.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
+        doReturn(mockImage).when(bookImageRepository).save(any(BookImage.class));
 
         //when
         BookDetailResponse result = bookService.registerBook(isbn);
@@ -244,7 +243,7 @@ public class BookServiceTest {
                 20000,
                 10000,
                 null,
-                new BookExtraInfo(Status.DELETED,true)
+                new BookExtraInfo(Status.DELETED,true,1)
             );
 
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
@@ -308,7 +307,7 @@ public class BookServiceTest {
                 10000,
                 6000,
                 null,
-                new BookExtraInfo(Status.DELETED,true)
+                new BookExtraInfo(Status.DELETED,true,1)
                 );
 
         BookDetailResponse bookDetailResponse = new BookDetailResponse(
@@ -376,7 +375,7 @@ public class BookServiceTest {
                 20000,
                 10000,
                 null,
-                new BookExtraInfo(Status.DELETED,true)
+                new BookExtraInfo(Status.DELETED,true,1)
         );
 
         BookUpdateRequest bookUpdateRequest = new BookUpdateRequest(
