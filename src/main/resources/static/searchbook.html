@@ -102,7 +102,7 @@
 <body>
 
 <div class="search-container">
-    <h1>외부 API 도서 검색</h1>
+    <h1>등록할 도서 검색</h1>
     <form id="search-form">
         <input type="text" id="search-input" placeholder="도서 제목을 입력하세요" required>
         <button type="submit" id="search-button">검색</button>
@@ -118,7 +118,7 @@
     const resultsContainer = document.getElementById('results-container');
 
     searchForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // 폼 기본 동작 방지
+        event.preventDefault();
 
         const query = searchInput.value.trim();
         if (!query) {
@@ -137,7 +137,9 @@
                 throw new Error(`API 오류: ${response.status} - ${errorText}`);
             }
 
-            const books = await response.json(); // 응답은 BookExternalResponse 객체의 배열
+            const books = await response.json();
+
+
             displayResults(books);
 
         } catch (error) {
@@ -146,8 +148,10 @@
         }
     });
 
+    // 검색 결과 표시 함수 수정
     function displayResults(books) {
-        resultsContainer.innerHTML = ''; // 이전 결과 초기화
+        currentSearchResults = books; // 검색 결과를 전역 변수에 저장
+        resultsContainer.innerHTML = '';
 
         if (books.length === 0) {
             resultsContainer.innerHTML = '<p>검색 결과가 없습니다.</p>';
@@ -157,8 +161,8 @@
         books.forEach(book => {
             const price = book.priceSales ? book.priceSales.toLocaleString() + '원' : '가격 정보 없음';
             const bookCard = `
-                <div class="book-card">
-                    <img src="${book.cover}" alt="${book.title}" class="book-cover">
+                <div class="book-card" data-isbn="${book.isbn}">
+                    <img src="${book.cover}" alt="${book.title}" class="book-cover" onerror="this.onerror=null;this.src='https://via.placeholder.com/220x280.png?text=No+Image';">
                     <h3>${book.title}</h3>
                     <p><strong>저자:</strong> ${book.author}</p>
                     <p><strong>출판사:</strong> ${book.publisher}</p>
@@ -168,7 +172,50 @@
             resultsContainer.innerHTML += bookCard;
         });
     }
+
+
+
+    resultsContainer.addEventListener('click', async (e) => {
+        const card = e.target.closest('.book-card');
+        if (!card) return;
+
+        const isbn = card.dataset.isbn;
+
+        console.log("isbn --> ", isbn);
+
+        if (isbn) {
+            try {
+                const response = await getBookByIsbn(isbn);
+                if (response.ok) {
+                    console.log("190:")
+                    const bookDataDto = await response.json();
+                    console.log("=================")
+                    console.log(bookDataDto)
+                    console.log("=================")
+                    sessionStorage.setItem('BookDetailResponse', JSON.stringify(bookDataDto));
+                    window.location.href = '/registerbook.html';
+                } else {
+                    // 서버가 오류 응답을 보냈을 때
+                    const errorData = await response.json();
+                    alert(`도서 정보 조회 실패: ${errorData.message}`);
+                }
+            } catch (error) {
+                alert(`오류가 발생했습니다: ${error.message}`);
+                console.error(error);
+            }
+        }
+    });
+
+    async function getBookByIsbn(isbn) {
+        const url = `/admin/books/isbn/${isbn}`;
+        const response = await fetch(url);
+
+        console.log(response);
+
+        return response;
+    }
 </script>
+
 
 </body>
 </html>
