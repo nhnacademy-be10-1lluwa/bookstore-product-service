@@ -43,7 +43,7 @@ public class CommentRepositoryJpaTest {
                 "이상한 사람",
                 "무명출판",
                 LocalDate.of(1970, 1, 1),
-                "11111111111111111",
+                "1111111111111",
                 99999999,
                 99999999,
                 null,

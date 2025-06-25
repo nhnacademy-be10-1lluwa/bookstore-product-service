@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>도서 정보 등록</title>
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+  <style>
+    body { font-family: sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding-top: 40px; }
+    .form-container { background: white; padding: 30px 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 700px; }
+    h1 { text-align: center; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: bold; margin-bottom: 8px; }
+    input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+    input[readonly] { background-color: #e9ecef; }
+    textarea { resize: vertical; min-height: 100px; }
+    button { background-color: #007bff; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; display: block; width: 100%;}
+    button:hover { background-color: #0056b3; }
+
+    .form-group .toastui-editor-defaultUI {
+      border: 1px solid #ddd;
+    }
+  </style>
+
+</head>
+
+<body>
+<div class="form-container" >
+  <h1>도서 등록</h1>
+  <form id="register-form">
+    <div class="form-group">
+      <label for="title">도서명</label>
+      <input type="text" id="title" name="title" readonly>
+    </div>
+    <div class="form-group">
+      <label for="author">저자</label>
+      <input type="text" id="author" name="author" readonly>
+    </div>
+    <div class="form-group">
+      <label for="publisher">출판사</label>
+      <input type="text" id="publisher" name="publisher" readonly>
+    </div>
+    <div class="form-group">
+      <label for="pubDate">출판일</label>
+      <input type="text" id="pubDate" name="pubDate" readonly>
+    </div>
+    <div class="form-group">
+      <label for="description">설명</label>
+      <div id="description"></div>
+    </div>
+    <div class="form-group">
+      <label for="contents">목차</label>
+      <textarea id="contents" name="contents" rows="6" placeholder="목차를 입력하세요..."></textarea>
+    </div>
+    <div class="form-group">
+      <label for="regularPrice">정가</label>
+      <input type="number" id="regularPrice" name="regularPrice">
+    </div>
+    <div class="form-group">
+      <label for="salePrice">판매가</label>
+      <input type="number" id="salePrice" name="salePrice">
+    </div>
+    <input type="hidden" id="isbn" name="isbn">
+    <input type="hidden" id="cover" name="cover">
+
+    <button type="submit">도서 최종 등록</button>
+  </form>
+</div>
+
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+<script>
+  let editor;
+  // const formContainer = document.getElementById('results-container');
+  window.addEventListener('DOMContentLoaded', () => {
+    const bookDataString = sessionStorage.getItem('BookDetailResponse');
+    if (!bookDataString) {
+      alert('등록할 도서 정보가 없습니다. 검색 페이지로 돌아갑니다.');
+      window.location.href = 'searchbook.html'; // 실제 검색 페이지 경로
+      return;
+    }
+
+    const book = JSON.parse(bookDataString);
+
+    editor = new toastui.Editor({
+      el: document.querySelector('#description'),
+      initialValue: book.description || '',
+      initialEditType: 'wysiwyg',
+      previewStyle: 'vertical',
+      height: '400px'
+    });
+
+    // 나머지 폼 필드 채우기
+    document.getElementById('title').value = book.title || '';
+    document.getElementById('author').value = book.author || '';
+    document.getElementById('publisher').value = book.publisher || '';
+    document.getElementById('contents').value = book.contents || '';
+    document.getElementById('isbn').value = book.isbn || '';
+    document.getElementById('cover').value = book.cover || '';
+    document.getElementById('regularPrice').value = book.priceStandard || 0;
+    document.getElementById('salePrice').value = book.priceSales || 0;
+    document.getElementById('pubDate').value = book.pubDate || 0;
+
+    sessionStorage.removeItem('BookDetailResponse'); // 데이터 사용 후 제거
+  });
+
+  document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!editor) {
+      alert('에디터가 초기화되지 않았습니다.');
+      return;
+    }
+
+    const descriptionContent = editor.getMarkdown(); // 에디터 내용을 Markdown 형식으로 가져옴
+
+    const formData = new FormData(e.target);
+    const bookRegisterRequest = Object.fromEntries(formData.entries());
+
+    bookRegisterRequest.description = descriptionContent;
+
+    console.log("최종 등록 데이터:", bookRegisterRequest);
+
+    try {
+      const response = await fetch('/admin/books', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookRegisterRequest)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert('도서 등록에 성공했습니다!');
+
+        // window.location.href = '/admin/books';
+
+      } else {
+        const errorData = await response.json();
+        alert(`등록 실패: ${errorData.message}`);
+        console.error('등록 실패:', errorData);
+      }
+    } catch (err) {
+      alert('네트워크 오류 또는 서버 응답에 문제가 있습니다.');
+      console.error('Fetch Error:', err);
+    }
+  });
+</script>
+</body>
+</html>

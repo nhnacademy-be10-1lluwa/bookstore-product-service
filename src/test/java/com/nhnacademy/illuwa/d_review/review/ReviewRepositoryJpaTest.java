@@ -44,7 +44,7 @@ public class ReviewRepositoryJpaTest {
                 "이상한 사람",
                 "무명출판",
                 LocalDate.now().minusYears(1L),
-                "11111111111111111",
+                "1111111111111",
                 100,
                 100,
                 null,

@@ -2,21 +2,16 @@ package com.nhnacademy.illuwa.d_book.book.service;
 
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
-import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
-import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
-import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
+import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
-import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
-import com.nhnacademy.illuwa.d_book.category.entity.Category;
-import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
-import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,15 +30,17 @@ public class BookService {
     private final BookResponseMapper bookResponseMapper;
     private final TagRepository tagRepository;
     private final BookImageRepository bookImageRepository;
+    private final BookMapper bookMapper;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookExternalMapper bookExternalMapper, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookExternalMapper bookExternalMapper, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
         this.bookExternalMapper = bookExternalMapper;
         this.bookResponseMapper = bookResponseMapper;
         this.tagRepository = tagRepository;
         this.bookImageRepository = bookImageRepository;
+        this.bookMapper = bookMapper;
     }
 
     //도서 등록 전 도서 검색
@@ -87,32 +84,31 @@ public class BookService {
     }
 
     @Transactional
-    public BookDetailResponse registerBook(String isbn) {
-        //이미 등록된 도서인 경우
-        log.info("도서 등록 시작: ISBN={}", isbn);
-        if (bookRepository.existsByIsbn(isbn)) {
-            log.warn("이미 등록된 도서: ISBN={}", isbn);
+    public BookDetailResponse registerBook(BookRegisterRequest bookRegisterRequest) {
+
+        // dto -> entity
+        Book bookEntity = bookMapper.toBookEntity(bookRegisterRequest);
+
+        if (bookEntity == null) {
+            throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
+        }
+
+        log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
+        if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
+            log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
-        //contents , Status, GiftWrap
-
-        BookExternalResponse bookByIsbn = aladinBookApiService.findBookByIsbn(isbn);
-
-        if (bookByIsbn == null) {
-            throw new NotFoundBookException("ISBN과 일치하는 도서가 없습니다.");
-        }
-
-        // 1) 도서 등록
-        Book bookEntity = bookExternalMapper.toBookEntity(bookByIsbn);
         bookRepository.save(bookEntity);
 
-        // 2) 도서 이미지 저장 - Book, url, type 필요
-        String imageUrl = bookByIsbn.getCover();
-        BookImage bookImage = new BookImage(bookEntity,imageUrl, ImageType.DETAIL);
-        bookImageRepository.save(bookImage);
+        // 2) 도서 이미지 저장 - Book, url, type 필요c
+//        String imageUrl = .getCover();
+//        BookImage bookImage = new BookImage(bookEntity,imageUrl, ImageType.DETAIL);
+//        bookImageRepository.save(bookImage);
 
 
+
+        //entity -> dto
         return bookResponseMapper.toBookDetailResponse(bookEntity);
 
     }
@@ -142,7 +138,6 @@ public class BookService {
         if(price != null){
             book.setRegularPrice(price);
         }
-
     }
 
     @Transactional
