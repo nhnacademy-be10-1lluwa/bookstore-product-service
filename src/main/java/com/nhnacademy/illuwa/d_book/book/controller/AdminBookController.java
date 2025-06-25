@@ -25,9 +25,7 @@ public class AdminBookController {
 
     @GetMapping("/external")
     public ResponseEntity<List<BookExternalResponse>> searchBooksByExternalApi(@RequestParam String title){
-
         List<BookExternalResponse> bookExternalResponses = bookService.searchBookFromExternalApi(title);
-
         return ResponseEntity.ok(bookExternalResponses);
     }
 
@@ -40,7 +38,6 @@ public class AdminBookController {
     @GetMapping("/{id}")
     public ResponseEntity<BookDetailResponse> searchBookById(@PathVariable Long id){
         BookDetailResponse bookDetailResponse = bookService.searchBookById(id);
-
         return ResponseEntity.ok(bookDetailResponse);
     }
 
@@ -54,26 +51,19 @@ public class AdminBookController {
     // 도서 등록
     @PostMapping()
     public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest bookRegisterRequest){
-
-
         BookDetailResponse detailResponse = bookService.registerBook(bookRegisterRequest);
-
         return ResponseEntity.ok(detailResponse);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteBook(Long id){
-
         bookService.deleteBook(id);
-
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody BookUpdateRequest requestDto){
-
         bookService.updateBook(id,requestDto);
-
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
+import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
 import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
 import com.nhnacademy.illuwa.d_book.book.enums.Status;
@@ -11,10 +12,12 @@ import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
+import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +32,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +43,7 @@ public class BookServiceTest {
     BookRepository bookRepository;
 
     @Mock
-    BookExternalMapper bookExternalMapper;
+    BookMapper bookMapper;
 
     @Mock
     BookResponseMapper bookResponseMapper;
@@ -48,8 +52,23 @@ public class BookServiceTest {
     BookImageRepository bookImageRepository;
 
 
+    static BookRegisterRequest bookRegisterRequest;
 
-
+    @BeforeAll
+    static void setUp() {
+        bookRegisterRequest = new BookRegisterRequest(
+                "어린 왕자",
+                "목차",
+                "설명",
+                "생텍쥐페리",
+                "출판사A",
+                LocalDate.of(2024, 6, 25),
+                "9780123456789",
+                15000,
+                12000,
+                "http://image.com/prince.jpg"
+        );
+    }
 
 
     @InjectMocks
@@ -108,20 +127,6 @@ public class BookServiceTest {
     @DisplayName("도서 등록 성공")
     void registerBookTest_Success(){
 
-        //givnen
-        String isbn = "012345";
-        BookExternalResponse mockResponse = new BookExternalResponse(
-                "어린 왕자",
-                "description",
-                "author",
-                "B출판사",
-                LocalDate.of(2024, 6, 13),
-                "012345",
-                20000,
-                10000,
-                "imgUrl",
-                "인문학"
-        );
 
         Book mockBook = new Book(
                 null,
@@ -153,18 +158,12 @@ public class BookServiceTest {
                 "imgUrl"
         );
 
-        BookImage mockImage = new BookImage(mockBook,"url", ImageType.DETAIL);
 
-
-
-        when(aladinBookApiService.findBookByIsbn("012345")).thenReturn(mockResponse);
+        when(bookMapper.toBookEntity(bookRegisterRequest)).thenReturn(mockBook);
         when(bookRepository.existsByIsbn("012345")).thenReturn(false);
-        when(bookExternalMapper.toBookEntity(mockResponse)).thenReturn(mockBook);
         when(bookResponseMapper.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
-        doReturn(mockImage).when(bookImageRepository).save(any(BookImage.class));
 
-        //when
-        BookDetailResponse result = bookService.registerBook(isbn);
+        BookDetailResponse result = bookService.registerBook(bookRegisterRequest);
 
         //then
         assertThat(result).isNotNull();
@@ -192,39 +191,36 @@ public class BookServiceTest {
                 "category"
         );
 
-        when(bookRepository.existsByIsbn("012345")).thenReturn(true);
+        Book book = new Book(
+                11L,
+                "어린 왕자",
+                "contents",
+                "des",
+                "작가1",
+                "출판사",
+                LocalDate.of(2024, 6, 13),
+                "isbn",
+                20000,
+                10000,
+                null,
+                null
+        );
+
+
+        given(bookMapper.toBookEntity(any(BookRegisterRequest.class))).willReturn(book);
+        when(bookRepository.existsByIsbn(anyString())).thenReturn(true);
+
 
         //when & then
-        assertThatThrownBy(() -> bookService.registerBook(isbn))
+        assertThatThrownBy(() -> bookService.registerBook(bookRegisterRequest))
                 .isInstanceOf(BookAlreadyExistsException.class)
                 .hasMessage("이미 등록된 도서입니다.");
 
-        verify(bookRepository, times(1)).existsByIsbn(isbn);
-        verify(aladinBookApiService, times(0)).findBookByIsbn(isbn);
+
         verify(bookRepository, times(0)).save(any(Book.class));
 
     }
 
-    @Test
-    @DisplayName("도서 등록 실패 - ISBN과 일치하는 도서 없음")
-    void registerBookTest_Fail_NotFoundIsbn(){
-
-        //givnen
-        String isbn = "012345";
-        when(aladinBookApiService.findBookByIsbn("012345")).thenReturn(null);
-
-
-        //when & then
-        assertThatThrownBy(() -> bookService.registerBook(isbn))
-                .isInstanceOf(NotFoundBookException.class)
-                .hasMessage("ISBN과 일치하는 도서가 없습니다.");
-
-        //then
-        verify(bookRepository, times(1)).existsByIsbn(isbn);
-        verify(aladinBookApiService, times(1)).findBookByIsbn(isbn);
-        verify(bookRepository, times(0)).save(any(Book.class));
-
-    }
 
     @Test
     @DisplayName("등록된 도서 삭제 - 성공")
@@ -255,22 +251,6 @@ public class BookServiceTest {
         verify(bookRepository,times(1)).findById(id);
 
     }
-
-    //    @Transactional
-    //    public void deleteBook(Long id) {
-    //        Optional<Book> book = bookRepository.findById(id);
-    //
-    //        if(book.isEmpty()){
-    //            log.warn("도서를 찾을 수 없습니다. id : {}",id);
-    //            throw new NotFoundBookException("id : " + id + "에 해당하는 도서를 찾을 수 없습니다.");
-    //        }
-    //
-    //        Book targetBook = book.get();
-    //        bookRepository.delete(targetBook);
-    //
-    //        log.info("삭제된 도서 제목 : {}" , targetBook.getTitle());
-    //
-    //    }
 
     @Test
     @DisplayName("등록된 도서 삭제 : 실패 (등록된 도서 중 id에 해당하는 도서 존재 X)")

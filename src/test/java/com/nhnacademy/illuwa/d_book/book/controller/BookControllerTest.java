@@ -3,9 +3,17 @@ package com.nhnacademy.illuwa.d_book.book.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
+import com.nhnacademy.illuwa.d_book.book.entity.Book;
+import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
+import com.nhnacademy.illuwa.d_book.book.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
+import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
+import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
+import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
+import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +25,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -40,6 +48,34 @@ public class BookControllerTest {
 
     @MockBean
     private AladinBookApiService aladinBookApiService;
+
+    @MockBean
+    private BookMapper bookMapper;
+
+    static BookRegisterRequest bookRegisterRequest;
+
+    @MockBean
+    private BookRepository bookRepository;
+
+    @MockBean
+    private BookResponseMapper bookResponseMapper;
+
+
+    @BeforeAll
+    static void setUp() {
+        bookRegisterRequest = new BookRegisterRequest(
+                "어린 왕자",
+                "목차",
+                "설명",
+                "생텍쥐페리",
+                "출판사A",
+                LocalDate.of(2024, 6, 25),
+                "9780123456789",
+                15000,
+                12000,
+                "http://image.com/prince.jpg"
+        );
+    }
 
 
     @Test
@@ -74,34 +110,12 @@ public class BookControllerTest {
 
     }
 
-//    @Test
-//    @DisplayName("책 검색 실패")
-//    void searchBook_Fail() throws Exception {
-//        // given
-//        String searchTitle = "세상에 없는 책";
-//
-//        when(aladinBookApiService.searchBooksByTitle(any())).thenReturn(null);
-//
-////        given(aladinBookApiService.searchBooksByTitle(searchTitle))
-////                .willThrow(new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다."));
-//
-//        // when
-//        mockMvc.perform(get("/admin/books")
-//                    .param("title","어린 왕자")
-//                    .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isNotFound())
-//                .andDo(print());
-//
-//
-//        verify(aladinBookApiService).searchBooksByTitle(searchTitle);
-//    }
-
     @Test
     @DisplayName("책 등록 성공")
     void registgerBook_Success() throws Exception {
         //given
-        BookRegisterRequest registerRequest = new BookRegisterRequest("0100AF");
-        String testIsbn = "0100AF";
+        BookRegisterRequest registerRequest = bookRegisterRequest;
+        String isbn = "mockIsbn";
 
         BookDetailResponse responseDto = new BookDetailResponse(
                 1L,
@@ -118,8 +132,42 @@ public class BookControllerTest {
                 "abc/def/g.jpg"
         );
 
+        Book book = new Book(
+                1L,
+                "어린 왕자",
+                "목차",
+                "description",
+                "author",
+                "출판사A",
+                LocalDate.of(2024, 6, 13),
+                "0100AF",
+                10000,
+                90000,
+                null,
+                new BookExtraInfo(Status.DELETED,true,3)
+        );
+
+        BookDetailResponse bookDetailResponse = new BookDetailResponse(
+                1L,
+                "어린 왕자",
+                "목차",
+                "description",
+                "author",
+                "출판사A",
+                LocalDate.of(2024, 6, 13),
+                "0100AF",
+                10000,
+                90000,
+                true,
+                "image/url"
+        );
+
+
         String json = objectMapper.writeValueAsString(registerRequest);
-        given(bookService.registerBook(registerRequest.getIsbn())).willReturn(responseDto);
+        given(bookRepository.existsByIsbn(isbn)).willReturn(true);
+        given(bookService.registerBook(any(BookRegisterRequest.class))).willReturn(responseDto);
+        given(bookResponseMapper.toBookDetailResponse(book)).willReturn(bookDetailResponse);
+
 
 
         //when & then
@@ -129,20 +177,33 @@ public class BookControllerTest {
                 .andExpect(jsonPath("$.isbn").value("0100AF"))
                 .andExpect(status().isOk());
 
-        verify(bookService).registerBook(testIsbn);
-
+        verify(bookService).registerBook(any(BookRegisterRequest.class));
     }
 
     @Test
     @DisplayName("책 등록 실패 - 해당 도서가 이미 존재")
     void registgerBook_Failure() throws Exception {
+
         //given
-        String alreadyExistsIsbn = "이미 등록된 도서의 ISBN";
-        BookRegisterRequest registerRequest = new BookRegisterRequest(alreadyExistsIsbn);
+        Book book = new Book();
+        BookRegisterRequest request = new BookRegisterRequest(
+                "제목",
+                "목차",
+                "설명",
+                "저자",
+                "출판사",
+                LocalDate.of(2024, 6, 13),
+                "내용",
+                10000,
+                8000,
+                "http://cover.url"
+        );
 
-        String json = objectMapper.writeValueAsString(registerRequest);
 
-        given(bookService.registerBook(registerRequest.getIsbn())).willThrow(new BookAlreadyExistsException("이미 등록된 도서"));
+        String json = objectMapper.writeValueAsString(bookRegisterRequest);
+
+        given(bookService.registerBook(any(BookRegisterRequest.class)))
+                .willThrow(new BookAlreadyExistsException("이미 등록된 도서입니다."));
 
         //when & then
         mockMvc.perform(post("/admin/books")
@@ -151,6 +212,6 @@ public class BookControllerTest {
                 .andExpect(status().isConflict())
                 .andDo(print());
 
-        verify(bookService).registerBook(alreadyExistsIsbn);
+        verify(bookRepository,never()).save(any(Book.class));
     }
 }
