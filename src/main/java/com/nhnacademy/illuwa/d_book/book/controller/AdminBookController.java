@@ -1,9 +1,9 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
 import com.nhnacademy.illuwa.d_book.book.dto.*;
-import com.nhnacademy.illuwa.d_book.book.entity.Book;
-import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
+import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
+import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +14,13 @@ import java.util.List;
 @RequestMapping("/admin/books")
 public class AdminBookController {
     BookService bookService;
+    AladinBookApiService aladinBookApiService;
+    BookMapper bookMapper;
 
-    AdminBookController(BookService bookService){
+    AdminBookController(BookService bookService, AladinBookApiService aladinBookApiService, BookMapper bookMapper){
         this.bookService = bookService;
+        this.aladinBookApiService = aladinBookApiService;
+        this.bookMapper = bookMapper;
     }
 
     @GetMapping("/external")
@@ -40,10 +44,19 @@ public class AdminBookController {
         return ResponseEntity.ok(bookDetailResponse);
     }
 
-    @PostMapping()
-    public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest reqestDto){
+    // ISBN으로 도서 검색(도서 클릭)
+    @GetMapping("/isbn/{isbn}")
+    public ResponseEntity<BookExternalResponse> searchBookById(@PathVariable String isbn){
+        BookExternalResponse bookByIsbn = aladinBookApiService.findBookByIsbn(isbn);
+        return ResponseEntity.ok(bookByIsbn);
+    }
 
-        BookDetailResponse detailResponse = bookService.registerBook(reqestDto.getIsbn());
+    // 도서 등록
+    @PostMapping()
+    public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest bookRegisterRequest){
+
+
+        BookDetailResponse detailResponse = bookService.registerBook(bookRegisterRequest);
 
         return ResponseEntity.ok(detailResponse);
     }
