@@ -39,7 +39,7 @@ public class Book {
     @Column(nullable = false)
     private LocalDate publishedDate;
 
-    @Column(length = 17, nullable = false)
+    @Column(length = 13, nullable = false)
     private String isbn;
 
     @Column(nullable = false)
