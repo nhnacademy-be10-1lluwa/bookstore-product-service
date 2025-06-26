@@ -6,6 +6,7 @@ import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface BookResponseMapper {
@@ -21,6 +22,9 @@ public interface BookResponseMapper {
 
     //Book Entity -> BookDetailResponseDto
     BookDetailResponse toBookDetailResponse(Book bookEntity);
+
+
+    List<BookDetailResponse> toBookDetailListResponse(List<Book> bookList);
 
 
 }
