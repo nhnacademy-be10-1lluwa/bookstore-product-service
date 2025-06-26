@@ -34,26 +34,22 @@ import java.util.Optional;
 public class BookService {
     private final AladinBookApiService aladinBookApiService;
     private final BookRepository bookRepository;
-    private final BookExternalMapper bookExternalMapper;
     private final BookResponseMapper bookResponseMapper;
     private final TagRepository tagRepository;
     private final BookImageRepository bookImageRepository;
     private final BookMapper bookMapper;
     private final CategoryRepository categoryRepository;
-    private final BookCategory bookCategory;
     private final BookCategoryRepository bookCategoryRepository;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookExternalMapper bookExternalMapper, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategory bookCategory, BookCategoryRepository bookCategoryRepository) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
-        this.bookExternalMapper = bookExternalMapper;
         this.bookResponseMapper = bookResponseMapper;
         this.tagRepository = tagRepository;
         this.bookImageRepository = bookImageRepository;
         this.bookMapper = bookMapper;
         this.categoryRepository = categoryRepository;
-        this.bookCategory = bookCategory;
         this.bookCategoryRepository = bookCategoryRepository;
     }
 
