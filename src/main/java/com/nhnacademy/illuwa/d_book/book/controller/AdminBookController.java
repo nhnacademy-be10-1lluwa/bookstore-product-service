@@ -55,7 +55,7 @@ public class AdminBookController {
         return ResponseEntity.ok(detailResponse);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(Long id){
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
