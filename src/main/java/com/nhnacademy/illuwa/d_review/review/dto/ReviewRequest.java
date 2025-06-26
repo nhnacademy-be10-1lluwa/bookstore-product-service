@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 public class ReviewRequest {
     private String reviewTitle;
     private String reviewContent;
-    private String reviewImageUrl;
     private Integer reviewRating;
 }

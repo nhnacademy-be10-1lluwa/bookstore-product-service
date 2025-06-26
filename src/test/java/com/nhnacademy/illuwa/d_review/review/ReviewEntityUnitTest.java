@@ -43,17 +43,15 @@ public class ReviewEntityUnitTest {
 
         String title = "인생을 뒤바꾼 책";
         String content = "대가리가 깨져도 추천";
-        String imageUrl = "book.jpg";
         Integer rating = 5;
         LocalDateTime created = LocalDateTime.now();
 
         // when
-        Review review = Review.of(title, content, imageUrl, rating, created, book, memberId);
+        Review review = Review.of(title, content, rating, created, book, memberId);
 
         // then
         assertThat(review.getReviewTitle()).isEqualTo("인생을 뒤바꾼 책");
         assertThat(review.getReviewContent()).isEqualTo("대가리가 깨져도 추천");
-        assertThat(review.getReviewImageUrl()).isEqualTo("book.jpg");
         assertThat(review.getReviewRating()).isEqualTo(5);
         assertThat(review.getReviewDate()).isEqualTo(created);
         assertThat(review.getBook().getId()).isEqualTo(10L);
@@ -67,7 +65,6 @@ public class ReviewEntityUnitTest {
         Review review = Review.of(
                 "낫배드",
                 "하지만 그 뿐",
-                "book.jpg",
                 2,
                 LocalDateTime.now(),
                 book,
@@ -77,44 +74,12 @@ public class ReviewEntityUnitTest {
         // when
         String newTitle = "Not Bad";
         String newContent = "But, That's all, No more.";
-        String newImageUrl = "new_book.jpg";
         Integer newRating = 3;
-        review.update(newTitle, newContent, newImageUrl, newRating);
+        review.update(newTitle, newContent, newRating);
 
         // then
         assertThat(review.getReviewTitle()).isEqualTo("Not Bad");
         assertThat(review.getReviewContent()).isEqualTo("But, That's all, No more.");
-        assertThat(review.getReviewImageUrl()).isEqualTo("new_book.jpg");
         assertThat(review.getReviewRating()).isEqualTo(3);
-    }
-
-    @Test
-    @DisplayName("Review Entity update 메서드 테스트 - Null or Blank")
-    void entityUpdateWithNullTest(){
-        // given
-        Review review = Review.of(
-                "낫배드",
-                "하지만 그 뿐",
-                "book.jpg",
-                2,
-                LocalDateTime.now(),
-                book,
-                99L
-        );
-
-        // when
-        review.update(null, null, " ", null);
-
-        // then
-        assertThat(review.getReviewTitle()).isEqualTo("낫배드");
-        assertThat(review.getReviewContent()).isEqualTo("하지만 그 뿐");
-        assertThat(review.getReviewImageUrl()).isEqualTo("book.jpg");
-        assertThat(review.getReviewRating()).isEqualTo(2);
-
-        // when2
-        review.update(null, null, null, null);
-
-        // then2
-        assertThat(review.getReviewImageUrl()).isEqualTo("book.jpg");
     }
 }
