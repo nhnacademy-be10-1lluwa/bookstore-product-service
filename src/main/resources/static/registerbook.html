@@ -131,7 +131,8 @@
         const data = await response.json();
         alert('도서 등록에 성공했습니다!');
 
-        // window.location.href = '/admin/books';
+        // 도서 등록 후 이동경로
+        window.location.href = '/RegisteredBooks.html';
 
       } else {
         const errorData = await response.json();
