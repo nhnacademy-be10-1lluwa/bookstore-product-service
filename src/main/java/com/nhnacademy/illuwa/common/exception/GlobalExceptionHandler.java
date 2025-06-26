@@ -46,11 +46,19 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage());
     }
 
-    // TODO: 추후 수정
     @ExceptionHandler(ReviewNotFoundException.class)
-    public ResponseEntity<String> handleReviewNotFoundException(ReviewNotFoundException e) {
-        log.error("{}", e.getMessage(), e);
-        return ResponseEntity.status(ReviewNotFoundException.getStatusC0de()).body(e.getMessage());
+    public ResponseEntity<Object> handleReviewNotFoundException(ReviewNotFoundException e) {
+        status = HttpStatus.FORBIDDEN;
+
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "Review_Not_Found"); // <-- 중요: 클라이언트가 파싱할 고유 코드
+        body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
+
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(body, status);
     }
 
     @ExceptionHandler(CommentNotFoundException.class)
