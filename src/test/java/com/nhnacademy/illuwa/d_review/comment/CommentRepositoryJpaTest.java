@@ -55,7 +55,6 @@ public class CommentRepositoryJpaTest {
                 null,
                 "리뷰임",
                 "내용없음",
-                null,
                 5,
                 LocalDateTime.of(2024, 12, 31, 23, 59, 59),
                 book,
