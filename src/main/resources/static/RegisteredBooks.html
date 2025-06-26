@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>등록된 도서 목록 (관리자)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #f9f9f9;
+        }
+        .book {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: flex-start;
+        }
+        .book img {
+            width: 120px;
+            height: auto;
+            margin-right: 1rem;
+            border-radius: 4px;
+        }
+        .book-info {
+            flex: 1;
+        }
+        .book-info h2 {
+            margin: 0 0 0.5rem;
+        }
+        .book-info p {
+            margin: 0.3rem 0;
+        }
+    </style>
+</head>
+<body>
+<h1>등록된 도서 목록</h1>
+<div id="book-list">로딩 중...</div>
+
+<script>
+    fetch('/admin/books')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('book-list');
+            container.innerHTML = '';
+
+            if (data.length === 0) {
+                container.innerHTML = '<p>등록된 도서가 없습니다.</p>';
+                return;
+            }
+
+            data.forEach(book => {
+                const bookEl = document.createElement('div');
+                bookEl.className = 'book';
+                bookEl.innerHTML = `
+            <img src="${book.imgUrl}" alt="${book.title} 표지">
+            <div class="book-info">
+              <h2>${book.title}</h2>
+              <p><strong>저자:</strong> ${book.author}</p>
+              <p><strong>출판사:</strong> ${book.publisher}</p>
+              <p><strong>출간일:</strong> ${book.publishedDate}</p>
+              <p><strong>ISBN:</strong> ${book.isbn}</p>
+              <p><strong>정가:</strong> ${book.regularPrice.toLocaleString()}원</p>
+              <p><strong>판매가:</strong> ${book.salePrice.toLocaleString()}원</p>
+              <p><strong>선물포장:</strong> ${book.isGiftWrap ? '가능' : '불가능'}</p>
+              <p><strong>내용 요약:</strong> ${book.contents}</p>
+              <p><strong>상세 설명:</strong> ${book.description}</p>
+            </div>
+          `;
+                container.appendChild(bookEl);
+            });
+        })
+        .catch(err => {
+            document.getElementById('book-list').innerHTML = '도서 목록을 불러오지 못했습니다.';
+            console.error(err);
+        });
+</script>
+</body>
+</html>

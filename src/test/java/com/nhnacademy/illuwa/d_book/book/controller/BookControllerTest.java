@@ -102,7 +102,7 @@ public class BookControllerTest {
 
 
         //when & then
-        mockMvc.perform(get("/admin/books")
+        mockMvc.perform(get("/admin/books/search")
                         .param("title","어린 왕자")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
