@@ -30,6 +30,6 @@ public class BookCart {
 
     @Setter
     @Column(name = "amount", nullable = false)
-    private int quantity;
+    private int amount;
 
 }
