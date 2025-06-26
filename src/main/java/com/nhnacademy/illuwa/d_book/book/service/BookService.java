@@ -110,7 +110,12 @@ public class BookService {
 
         //entity -> dto
         return bookResponseMapper.toBookDetailResponse(bookEntity);
+    }
 
+    @Transactional(readOnly = true)
+    public List<BookDetailResponse> getAllBooks(){
+        List<Book> bookEntityList = bookRepository.findAll();
+        return bookResponseMapper.toBookDetailListResponse(bookEntityList);
     }
 
 
