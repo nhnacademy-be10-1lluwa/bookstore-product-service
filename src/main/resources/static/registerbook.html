@@ -20,7 +20,6 @@
       border: 1px solid #ddd;
     }
   </style>
-
 </head>
 
 <body>
@@ -60,8 +59,19 @@
       <input type="number" id="salePrice" name="salePrice">
     </div>
     <div class="form-group">
+      <label>카테고리</label>
+      <div style="display: flex; gap: 10px;">
+        <select id="main-category" name="main-category" style="flex: 1;">
+          <option value="">-- 대분류 선택 --</option>
+        </select>
+        <select id="sub-category" name="categoryId" style="flex: 1;" disabled>
+          <option value="">-- 소분류 선택 --</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
       <label for="count">도서 수량</label>
-      <input type="number" id="count" name="salePrice">
+      <input type="number" id="count" name="count">
     </div>
     <input type="hidden" id="isbn" name="isbn">
     <input type="hidden" id="cover" name="cover">
@@ -74,15 +84,17 @@
 
 <script>
   let editor;
-  // const formContainer = document.getElementById('results-container');
-  window.addEventListener('DOMContentLoaded', () => {
+  let allCategories = [];
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    await loadCategories();
+
     const bookDataString = sessionStorage.getItem('BookDetailResponse');
     if (!bookDataString) {
       alert('등록할 도서 정보가 없습니다. 검색 페이지로 돌아갑니다.');
-      window.location.href = 'searchbook.html'; // 실제 검색 페이지 경로
+      window.location.href = 'searchbook.html';
       return;
     }
-
     const book = JSON.parse(bookDataString);
 
     editor = new toastui.Editor({
@@ -93,7 +105,6 @@
       height: '400px'
     });
 
-    // 나머지 폼 필드 채우기
     document.getElementById('title').value = book.title || '';
     document.getElementById('author').value = book.author || '';
     document.getElementById('publisher').value = book.publisher || '';
@@ -104,49 +115,109 @@
     document.getElementById('salePrice').value = book.priceSales || 0;
     document.getElementById('pubDate').value = book.pubDate || 0;
 
-    sessionStorage.removeItem('BookDetailResponse'); // 데이터 사용 후 제거
+    sessionStorage.removeItem('BookDetailResponse');
+    document.getElementById('main-category').addEventListener('change', (e) => {
+      const selectedParentId = e.target.value;
+      console.log(selectedParentId)
+      populateSubCategories(selectedParentId);
+    });
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!editor) {
+        alert('에디터가 초기화되지 않았습니다.');
+        return;
+      }
+
+      const selectedCategoryId = document.getElementById('sub-category').value;
+      if (!selectedCategoryId) {
+        alert('카테고리를 선택해주세요.');
+        return;
+      }
+
+      const descriptionContent = editor.getMarkdown();
+      const formData = new FormData(e.target);
+      const bookRegisterRequest = Object.fromEntries(formData.entries());
+
+      bookRegisterRequest.description = descriptionContent;
+
+      console.log("최종 등록 데이터:", bookRegisterRequest);
+
+      try {
+        const response = await fetch('/admin/books', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bookRegisterRequest)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert('도서 등록에 성공했습니다!');
+          // window.location.href = '/admin/books';
+        } else {
+          const errorData = await response.json();
+          alert(`등록 실패: ${errorData.message}`);
+          console.error('등록 실패:', errorData);
+        }
+      } catch (err) {
+        alert('네트워크 오류 또는 서버 응답에 문제가 있습니다.');
+        console.error('Fetch Error:', err);
+      }
+    });
   });
 
-  document.getElementById('register-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    if (!editor) {
-      alert('에디터가 초기화되지 않았습니다.');
-      return;
-    }
-
-    const descriptionContent = editor.getMarkdown(); // 에디터 내용을 Markdown 형식으로 가져옴
-
-    const formData = new FormData(e.target);
-    const bookRegisterRequest = Object.fromEntries(formData.entries());
-
-    bookRegisterRequest.description = descriptionContent;
-
-    console.log("최종 등록 데이터:", bookRegisterRequest);
-
+  async function loadCategories() {
     try {
-      const response = await fetch('/admin/books', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookRegisterRequest)
-      });
+      const response = await fetch('/categories');
 
-      if (response.ok) {
-        const data = await response.json();
-        alert('도서 등록에 성공했습니다!');
-
-        // window.location.href = '/admin/books';
-
-      } else {
-        const errorData = await response.json();
-        alert(`등록 실패: ${errorData.message}`);
-        console.error('등록 실패:', errorData);
+      if (!response.ok) {
+        throw new Error('카테고리 정보를 불러오는 데 실패했습니다.');
       }
+
+      allCategories = await response.json();
+      populateMainCategories(allCategories);
     } catch (err) {
-      alert('네트워크 오류 또는 서버 응답에 문제가 있습니다.');
+      alert(err.message);
       console.error('Fetch Error:', err);
     }
-  });
+  }
+
+  function populateMainCategories(categories) {
+    const mainCategorySelect = document.getElementById('main-category');
+    const mainCategories = categories.filter(c => c.parentCategoryId === null);
+
+    mainCategories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category.id;
+      option.textContent = category.categoryName;
+      mainCategorySelect.appendChild(option);
+    });
+  }
+
+  function populateSubCategories(parentId) {
+
+    const subCategorySelect = document.getElementById('sub-category');
+    subCategorySelect.innerHTML = '<option value="">-- 소분류 선택 --</option>';
+
+    if (!parentId) {
+      subCategorySelect.disabled = true;
+    }
+    console.log("parentId:",parentId);
+
+    const subCategories = allCategories.filter(c => c.parentCategoryId == parentId);
+
+    subCategories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category.id;
+      option.textContent = category.categoryName;
+      subCategorySelect.appendChild(option);
+    });
+    subCategorySelect.disabled = false;
+  }
+
+
+
 </script>
 </body>
 </html>
