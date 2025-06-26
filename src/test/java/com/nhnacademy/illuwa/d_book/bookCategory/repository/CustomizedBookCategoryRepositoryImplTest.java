@@ -51,9 +51,9 @@ public class CustomizedBookCategoryRepositoryImplTest {
         entityManager.persist(book);
         this.bookId = book.getId();
 
-        Category category1 = new Category("서양");
-        Category category2 = new Category("문학");
-        Category category3 = new Category("소설");
+        Category category1 = new Category("카테고리1");
+        Category category2 = new Category("카테고리2");
+        Category category3 = new Category("카테고리3");
 
 
         category1.addChildCategory(category2);
@@ -77,7 +77,7 @@ public class CustomizedBookCategoryRepositoryImplTest {
 
         assertThat(categoryNames).isNotNull();
         assertThat(categoryNames).hasSize(3);
-        assertThat(categoryNames).containsExactlyInAnyOrder("서양","문학","소설");
+        assertThat(categoryNames).containsExactlyInAnyOrder("카테고리1","카테고리2","카테고리3");
 
     }
 
