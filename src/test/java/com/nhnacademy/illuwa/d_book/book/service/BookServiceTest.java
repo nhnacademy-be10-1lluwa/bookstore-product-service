@@ -66,7 +66,8 @@ public class BookServiceTest {
                 "9780123456789",
                 15000,
                 12000,
-                "http://image.com/prince.jpg"
+                "http://image.com/prince.jpg",
+                3
         );
     }
 
