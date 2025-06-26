@@ -29,4 +29,7 @@ public class BookRegisterRequest {
     @NotBlank
     @JsonProperty("cover")
     private String imgUrl;
+
+    @NotNull
+    private Integer count;
 }

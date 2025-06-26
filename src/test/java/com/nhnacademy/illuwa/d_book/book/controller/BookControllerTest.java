@@ -73,7 +73,8 @@ public class BookControllerTest {
                 "9780123456789",
                 15000,
                 12000,
-                "http://image.com/prince.jpg"
+                "http://image.com/prince.jpg",
+                3
         );
     }
 
@@ -196,7 +197,8 @@ public class BookControllerTest {
                 "내용",
                 10000,
                 8000,
-                "http://cover.url"
+                "http://cover.url",
+                3
         );
 
 
