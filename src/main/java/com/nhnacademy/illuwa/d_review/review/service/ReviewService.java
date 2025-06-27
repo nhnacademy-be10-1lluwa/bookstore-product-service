@@ -11,11 +11,12 @@ import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewImageRepository;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -44,10 +45,10 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewResponse> getReviewList(Long bookId) {
-        List<Review> reviews = reviewRepository.findReviewsByBook_Id(bookId);
+    public Page<ReviewResponse> getReviewPages(Long bookId, Pageable pageable) {
+        Page<Review> reviews = reviewRepository.findReviewsByBook_Id(bookId, pageable);
 
-        return reviews.stream().map(ReviewResponse::from).toList();
+        return reviews.map(ReviewResponse::from);
     }
 
     @Transactional

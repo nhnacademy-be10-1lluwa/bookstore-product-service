@@ -4,10 +4,12 @@ import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,8 +25,10 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReviewResponse>> getReviewList(@PathVariable Long bookId) {
-        return ResponseEntity.ok(reviewService.getReviewList(bookId));
+    public ResponseEntity<Page<ReviewResponse>> getReviewPages(@PathVariable Long bookId,
+                                              @PageableDefault(size = 5, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        return ResponseEntity.ok(reviewService.getReviewPages(bookId, pageable));
     }
 
     @PutMapping("/{reviewId}")
