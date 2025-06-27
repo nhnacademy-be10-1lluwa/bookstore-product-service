@@ -1,10 +1,8 @@
 package com.nhnacademy.illuwa.infra.storage;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.http.Method;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
@@ -29,8 +27,8 @@ public class MinioStorageService {
                 .build();
     }
 
-    public String uploadFile(MultipartFile file) throws Exception {
-        String objectName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+    public String uploadFile(String domain, Long memberId, MultipartFile file) throws Exception {
+        String objectName = String.format("%s/%s/%s_%s", domain, memberId, UUID.randomUUID(), file.getOriginalFilename());
 
         minioClient.putObject(
                 PutObjectArgs.builder()

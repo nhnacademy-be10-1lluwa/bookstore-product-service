@@ -1,11 +1,55 @@
 <!DOCTYPE html>
-<html>
-<head><title>파일 업로드 테스트</title></head>
+<html lang="kr">
+<head>
+    <meta charset="utf-8">
+    <title>파일 업로드 테스트</title>
+</head>
 <body>
 <h2>MinIO에 파일 업로드 테스트</h2>
-<form action="http://localhost:8080/files/upload" method="post" enctype="multipart/form-data">
+
+<h3>책 이미지 업로드</h3>
+<form id="bookForm" enctype="multipart/form-data">
+    <input type="hidden" name="domain" value="book" />
     <input type="file" name="file" required />
-    <button type="submit">업로드</button>
+    <button type="submit">책 이미지 업로드</button>
 </form>
+
+<hr>
+
+<h3>리뷰 이미지 업로드</h3>
+<form id="reviewForm" enctype="multipart/form-data">
+    <input type="hidden" name="domain" value="review" />
+    <input type="file" name="file" required />
+    <button type="submit">리뷰 이미지 업로드</button>
+</form>
+
+<script>
+    function handleFormSubmit(formId) {
+        document.getElementById(formId).addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch("http://localhost:8080/files/upload", {
+                method: "POST",
+                headers: {
+                    "X-USER-ID": "7777"
+                },
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("업로드 실패: " + response.status);
+                    return response.text();
+                })
+                .then(result => alert(formId + " 업로드 성공: " + result))
+                .catch(error => alert(error));
+        });
+    }
+
+    handleFormSubmit("bookForm");
+    handleFormSubmit("reviewForm");
+</script>
+
 </body>
 </html>
