@@ -74,7 +74,8 @@ public class BookControllerTest {
                 15000,
                 12000,
                 "http://image.com/prince.jpg",
-                3
+                3,
+                2L
         );
     }
 
@@ -198,7 +199,8 @@ public class BookControllerTest {
                 10000,
                 8000,
                 "http://cover.url",
-                3
+                3,
+                2L
         );
 
 

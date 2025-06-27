@@ -16,6 +16,9 @@ import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
+import com.nhnacademy.illuwa.d_book.category.entity.Category;
+import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
+import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -51,6 +54,18 @@ public class BookServiceTest {
     @Mock
     BookImageRepository bookImageRepository;
 
+    @Mock
+    BookCategoryRepository bookCategoryRepository;
+
+
+    @Mock
+    CategoryRepository categoryRepository;
+
+
+
+    @InjectMocks
+    BookService bookService;
+
 
     static BookRegisterRequest bookRegisterRequest;
 
@@ -67,13 +82,11 @@ public class BookServiceTest {
                 15000,
                 12000,
                 "http://image.com/prince.jpg",
-                3
+                3,
+                2L
         );
     }
 
-
-    @InjectMocks
-    BookService bookService;
 
     @Test
     @DisplayName("알라딘 api를 통한 도서 검색 성공")
@@ -127,8 +140,6 @@ public class BookServiceTest {
     @Test
     @DisplayName("도서 등록 성공")
     void registerBookTest_Success(){
-
-
         Book mockBook = new Book(
                 null,
                 "어린 왕자",
@@ -160,6 +171,9 @@ public class BookServiceTest {
         );
 
 
+
+        Category mockCategory = new Category("테스트 카테고리");
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(mockCategory));
         when(bookMapper.toBookEntity(bookRegisterRequest)).thenReturn(mockBook);
         when(bookRepository.existsByIsbn("012345")).thenReturn(false);
         when(bookResponseMapper.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
@@ -176,21 +190,6 @@ public class BookServiceTest {
     @Test
     @DisplayName("도서 등록 실패 - 이미 등록된 도서")
     void registerBookTest_Fail_AlreadyExists(){
-        //givnen
-        String isbn = "012345";
-
-        BookExternalResponse mockResponse = new BookExternalResponse(
-                "어린 왕자",
-                "description",
-                "author",
-                "B출판사",
-                LocalDate.of(2024, 6, 13),
-                "isbn",
-                20000,
-                10000,
-                "imgUrl",
-                "category"
-        );
 
         Book book = new Book(
                 11L,
@@ -207,6 +206,9 @@ public class BookServiceTest {
                 null
         );
 
+
+        Category mockCategory = new Category("테스트 카테고리");
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(mockCategory));
 
         given(bookMapper.toBookEntity(any(BookRegisterRequest.class))).willReturn(book);
         when(bookRepository.existsByIsbn(anyString())).thenReturn(true);
