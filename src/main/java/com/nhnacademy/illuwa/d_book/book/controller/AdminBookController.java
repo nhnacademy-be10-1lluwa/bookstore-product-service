@@ -13,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/books")
 public class AdminBookController {
+
     BookService bookService;
     AladinBookApiService aladinBookApiService;
     BookMapper bookMapper;
@@ -50,7 +51,7 @@ public class AdminBookController {
 
     // ISBN으로 도서 검색(도서 클릭)
     @GetMapping("/isbn/{isbn}")
-    public ResponseEntity<BookExternalResponse> searchBookById(@PathVariable String isbn){
+    public ResponseEntity<BookExternalResponse> searchBookByIsbn(@PathVariable String isbn){
         BookExternalResponse bookByIsbn = aladinBookApiService.findBookByIsbn(isbn);
         return ResponseEntity.ok(bookByIsbn);
     }
@@ -63,7 +64,7 @@ public class AdminBookController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBook(Long id){
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id){
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
     }
