@@ -60,7 +60,6 @@ public class ReviewLikeControllerTest {
                 1L,
                 "리뷰 제목",
                 "리뷰 내용",
-                "/img/review.jpg",
                 5,
                 LocalDateTime.of(2099, 8, 22, 4, 17, 32),
                 book,

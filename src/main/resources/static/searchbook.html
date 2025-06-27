@@ -187,11 +187,8 @@
             try {
                 const response = await getBookByIsbn(isbn);
                 if (response.ok) {
-                    console.log("190:")
                     const bookDataDto = await response.json();
-                    console.log("=================")
                     console.log(bookDataDto)
-                    console.log("=================")
                     sessionStorage.setItem('BookDetailResponse', JSON.stringify(bookDataDto));
                     window.location.href = '/registerbook.html';
                 } else {

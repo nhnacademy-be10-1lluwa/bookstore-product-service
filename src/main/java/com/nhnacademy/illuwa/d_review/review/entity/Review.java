@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "reviews")
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +23,6 @@ public class Review {
 
     @Column(length = 5000, nullable = false)
     private String reviewContent;
-
-    //파일 경로
-    private String reviewImageUrl;
 
     @Column(nullable = false)
     private Integer reviewRating;
@@ -39,16 +37,14 @@ public class Review {
     @Column(nullable = false)
     private Long memberId;
 
-    public static Review of(String title, String content, String imageUrl, Integer rating, LocalDateTime date, Book book, Long memberId) {
-        return new Review(null, title, content, imageUrl, rating, date, book, memberId);
+    public static Review of(String title, String content, Integer rating, LocalDateTime date, Book book, Long memberId) {
+        return new Review(null, title, content, rating, date, book, memberId);
     }
 
-    public void update(String title, String content, String imageUrl, Integer rating) {
+    public void update(String title, String content, Integer rating) {
         if (title != null) { this.reviewTitle = title; }
         if (content != null) { this.reviewContent = content; }
-        if (imageUrl != null && !imageUrl.isBlank()) { this.reviewImageUrl = imageUrl; }
         if (rating != null) { this.reviewRating = rating; }
         this.reviewDate = LocalDateTime.now();
     }
-
 }

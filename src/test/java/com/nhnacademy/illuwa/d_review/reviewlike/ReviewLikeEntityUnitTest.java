@@ -37,7 +37,6 @@ public class ReviewLikeEntityUnitTest {
                 4L,
                 "리뷰임",
                 "내용임",
-                "/img/review.png",
                 3,
                 LocalDateTime.of(2025, 6, 20, 13, 20),
                 book,

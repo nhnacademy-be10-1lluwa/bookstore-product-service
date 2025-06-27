@@ -3,42 +3,36 @@ package com.nhnacademy.illuwa.d_review.review.service;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
-import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponseList;
 
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
 import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
+import com.nhnacademy.illuwa.d_review.review.repository.ReviewImageRepository;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Objects;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ReviewService {
-    private final ReviewRepository reviewRepository;
     private final BookRepository bookRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReviewImageRepository reviewImageRepository;
 
-    public ReviewResponse createReview(Long bookId, ReviewRequest request) {
-        // TODO: memberId 가져오는 방식 확정되면 변경
-        Long memberId = 7777L;
-
-        String imageUrl = (request.getReviewImageUrl() != null && !request.getReviewImageUrl().isBlank())
-                ? request.getReviewImageUrl()
-                : null;
-
-        // TODO: BookNotFoundException 작성되면 변경
+    @Transactional
+    public ReviewResponse createReview(Long bookId, ReviewRequest request, Long memberId) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new NotFoundBookException("도서를 찾을 수 없습니다."));
 
         Review review = Review.of(
                 request.getReviewTitle(),
                 request.getReviewContent(),
-                imageUrl,
                 request.getReviewRating(),
                 LocalDateTime.now(),
                 book,
@@ -50,24 +44,23 @@ public class ReviewService {
         return ReviewResponse.from(saved);
     }
 
-    public ReviewResponseList getReviewList(Long bookId) {
-        List<Review> reviews = reviewRepository.findReviewsByBook_Id(bookId);
-        List<ReviewResponse> reviewResponseList = reviews.stream().map(ReviewResponse::from).toList();
-        return new ReviewResponseList(reviewResponseList);
+    @Transactional(readOnly = true)
+    public Page<ReviewResponse> getReviewPages(Long bookId, Pageable pageable) {
+        Page<Review> reviews = reviewRepository.findReviewsByBook_Id(bookId, pageable);
+
+        return reviews.map(ReviewResponse::from);
     }
 
-    public ReviewResponse getReviewDetail(Long bookId, Long reviewId) {
+    @Transactional
+    public ReviewResponse updateReview(Long bookId, Long reviewId, ReviewRequest request, Long memberId) {
         Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(() -> new ReviewNotFoundException(reviewId));
-        return ReviewResponse.from(review);
-    }
-
-    public ReviewResponse updateReview(Long bookId, Long reviewId, ReviewRequest request) {
-        Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(() -> new ReviewNotFoundException(reviewId));
+        if(!Objects.equals(memberId, review.getMemberId())){
+            throw new ReviewNotFoundException(reviewId);
+        }
 
         review.update(
                 request.getReviewTitle(),
                 request.getReviewContent(),
-                request.getReviewImageUrl(),
                 request.getReviewRating()
         );
 

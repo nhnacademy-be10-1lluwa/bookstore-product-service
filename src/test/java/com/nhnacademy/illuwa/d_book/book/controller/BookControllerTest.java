@@ -73,7 +73,9 @@ public class BookControllerTest {
                 "9780123456789",
                 15000,
                 12000,
-                "http://image.com/prince.jpg"
+                "http://image.com/prince.jpg",
+                3,
+                2L
         );
     }
 
@@ -101,7 +103,7 @@ public class BookControllerTest {
 
 
         //when & then
-        mockMvc.perform(get("/admin/books")
+        mockMvc.perform(get("/admin/books/search")
                         .param("title","어린 왕자")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -196,7 +198,9 @@ public class BookControllerTest {
                 "내용",
                 10000,
                 8000,
-                "http://cover.url"
+                "http://cover.url",
+                3,
+                2L
         );
 
 

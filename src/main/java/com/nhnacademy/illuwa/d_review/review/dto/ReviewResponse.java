@@ -13,7 +13,6 @@ public class ReviewResponse {
     private Long reviewId;
     private String reviewTitle;
     private String reviewContent;
-    private String reviewImageUrl;
     private Integer reviewRating;
     private LocalDateTime reviewDate;
     private Long bookId;
@@ -24,7 +23,6 @@ public class ReviewResponse {
                 review.getReviewId(),
                 review.getReviewTitle(),
                 review.getReviewContent(),
-                review.getReviewImageUrl(),
                 review.getReviewRating(),
                 review.getReviewDate(),
                 review.getBook().getId(),

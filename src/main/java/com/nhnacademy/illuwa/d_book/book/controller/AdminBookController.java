@@ -29,7 +29,7 @@ public class AdminBookController {
         return ResponseEntity.ok(bookExternalResponses);
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<List<BookDetailResponse>> searchBooksByTitle(@RequestParam String title){
         List<BookDetailResponse> bookDetailsResponses = bookService.searchBookByTitle(title);
         return ResponseEntity.ok(bookDetailsResponses);
@@ -39,6 +39,13 @@ public class AdminBookController {
     public ResponseEntity<BookDetailResponse> searchBookById(@PathVariable Long id){
         BookDetailResponse bookDetailResponse = bookService.searchBookById(id);
         return ResponseEntity.ok(bookDetailResponse);
+    }
+
+    //등록된 도서 목록
+    @GetMapping
+    public ResponseEntity<List<BookDetailResponse>> getRegisteredBooks(){
+        List<BookDetailResponse> registeredBooks = bookService.getAllBooks();
+        return ResponseEntity.ok(registeredBooks);
     }
 
     // ISBN으로 도서 검색(도서 클릭)
@@ -55,7 +62,7 @@ public class AdminBookController {
         return ResponseEntity.ok(detailResponse);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(Long id){
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
