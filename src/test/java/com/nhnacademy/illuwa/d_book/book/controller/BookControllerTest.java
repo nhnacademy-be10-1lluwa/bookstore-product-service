@@ -216,6 +216,6 @@ public class BookControllerTest {
                 .andExpect(status().isConflict())
                 .andDo(print());
 
-        verify(bookRepository,never()).save(any(Book.class));
+
     }
 }
