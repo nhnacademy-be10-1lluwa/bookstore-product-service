@@ -158,7 +158,7 @@
                 </executions>
                 <configuration>
                     <excludes>
-                        <exclude>**/Q*</exclude>
+                        <exclude>**/Q*/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

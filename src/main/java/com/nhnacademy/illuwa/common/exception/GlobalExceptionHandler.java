@@ -1,5 +1,8 @@
 package com.nhnacademy.illuwa.common.exception;
 
+import com.nhnacademy.illuwa.cart.exception.BookCartNotFoundException;
+import com.nhnacademy.illuwa.cart.exception.InsufficientStockException;
+import com.nhnacademy.illuwa.cart.exception.NotFoundMemberIdException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
@@ -77,6 +80,51 @@ public class GlobalExceptionHandler {
         body.put("error", status.getReasonPhrase());
         body.put("code", "Comment_Status_Invalid"); // <-- 중요: 클라이언트가 파싱할 고유 코드
         body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
+
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(body, status);
+    }
+
+
+
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<Object> handleInsufficientStockException(InsufficientStockException e) {
+        status = HttpStatus.CONFLICT;
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "Insufficient_Stock");
+        body.put("message", e.getMessage());
+
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(NotFoundMemberIdException.class)
+    public ResponseEntity<Object> handleNotFoundMemberIdException(NotFoundMemberIdException e) {
+        status = HttpStatus.NOT_FOUND;
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "Member_Not_Found");
+        body.put("message", e.getMessage());
+
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(BookCartNotFoundException.class)
+    public ResponseEntity<Object> handleBookCartNotFoundException(BookCartNotFoundException e) {
+        status = HttpStatus.NOT_FOUND;
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "Book_Cart_Not_Found");
+        body.put("message", e.getMessage());
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 

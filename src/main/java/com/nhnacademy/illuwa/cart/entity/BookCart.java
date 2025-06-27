@@ -32,4 +32,10 @@ public class BookCart {
     @Column(name = "amount", nullable = false)
     private int amount;
 
+    public BookCart(Cart cart, Book book, int amount) {
+        this.book = book;
+        this.cart = cart;
+        this.amount = amount;
+    }
+
 }
