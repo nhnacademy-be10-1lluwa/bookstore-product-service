@@ -43,7 +43,6 @@ public class ReviewDtoUnitTest {
         LocalDateTime now = LocalDateTime.now();
         Review review = Review.of( "title",
                 "content",
-                "img.jpg",
                 5,
                 now,
                 book,
@@ -56,7 +55,6 @@ public class ReviewDtoUnitTest {
         // then
         assertThat(response.getReviewTitle()).isEqualTo("title");
         assertThat(response.getReviewContent()).isEqualTo("content");
-        assertThat(response.getReviewImageUrl()).isEqualTo("img.jpg");
         assertThat(response.getReviewRating()).isEqualTo(5);
         assertThat(response.getReviewDate()).isEqualTo(now);
         assertThat(response.getBookId()).isEqualTo(10L);

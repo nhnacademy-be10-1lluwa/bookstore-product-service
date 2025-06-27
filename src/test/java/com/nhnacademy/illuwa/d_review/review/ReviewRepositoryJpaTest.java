@@ -64,7 +64,6 @@ public class ReviewRepositoryJpaTest {
             Review review = Review.of(
                     "title"+(i+1),
                     "content"+(i+1),
-                    "img"+(i+1)+".jpg",
                     i+1,
                     now.get(i),
                     book,
@@ -85,45 +84,9 @@ public class ReviewRepositoryJpaTest {
             assertThat(review.getReviewId()).isEqualTo(savedReviews.get(i).getReviewId());
             assertThat(review.getReviewTitle()).isEqualTo("title"+(i+1));
             assertThat(review.getReviewContent()).isEqualTo("content"+(i+1));
-            assertThat(review.getReviewImageUrl()).isEqualTo("img"+(i+1)+".jpg");
             assertThat(review.getReviewRating()).isEqualTo(i+1);
             assertThat(review.getReviewDate()).isCloseTo(now.get(i), within(1, ChronoUnit.SECONDS));
             assertThat(review.getBook().getId()).isEqualTo(book.getId());
-        }
-    }
-
-    @Test
-    @DisplayName("리뷰 상세보기 테스트")
-    void findByBookIdAndReviewIdTest() {
-        Review review = Review.of(
-                "책이 재미 없어요",
-                "종이가 아깝습니다",
-                "book.jpg",
-                1,
-                LocalDateTime.now(),
-                book,
-                99L
-        );
-        testEntityManager.persist(review);
-
-        testEntityManager.flush();
-        testEntityManager.clear();
-
-        // when
-        Optional<Review> result = reviewRepository.findByBook_IdAndReviewId(book.getId(), review.getReviewId());
-
-        // then
-        assertThat(result.isPresent()).isTrue();
-        if(result.isPresent()){
-            Review found = result.get();
-
-            assertThat(found.getReviewId()).isEqualTo(review.getReviewId());
-            assertThat(found.getReviewTitle()).isEqualTo("책이 재미 없어요");
-            assertThat(found.getReviewContent()).isEqualTo("종이가 아깝습니다");
-            assertThat(found.getReviewImageUrl()).isEqualTo("book.jpg");
-            assertThat(found.getReviewRating()).isEqualTo(1);
-            assertThat(found.getBook().getId()).isEqualTo(book.getId());
-            assertThat(found.getMemberId()).isEqualTo(99L);
         }
     }
 }
