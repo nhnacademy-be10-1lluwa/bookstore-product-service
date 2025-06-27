@@ -3,17 +3,5 @@ spring:
     name: product-service
   profiles:
     active: test
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-
-external:
-  aladin:
-    api-key: ttbchlgur13m0908001
-
-minio:
-  url: http://storage.java21.net:8000
-  access-key: nhnacademy
-  secret-key: nhnacademy123!
-  bucket: 1lluwa
+  config:
+    import: optional:configserver:https://book1lluwa.store/config/
