@@ -58,7 +58,7 @@ public class ReviewControllerTest {
         given(reviewService.createReview(eq(bookId), any(ReviewRequest.class), eq(memberId))).willReturn(response);
 
         // when & then
-        mockMvc.perform(post("/books/{bookId}/reviews", bookId)
+        mockMvc.perform(post("/books/{bookId}/reviews", bookId).header("X-USER-ID", memberId)
                         .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.reviewId").value(reviewId))
@@ -89,20 +89,20 @@ public class ReviewControllerTest {
         // when & then
         mockMvc.perform(get("/books/{bookId}/reviews", bookId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.reviews[0].reviewId").value(reviewId))
-                .andExpect(jsonPath("$.reviews[0].reviewTitle").value("리뷰리뷰리뷰"))
-                .andExpect(jsonPath("$.reviews[0].reviewContent").value("포인트 냠냠"))
-                .andExpect(jsonPath("$.reviews[0].reviewRating").value(4))
-                .andExpect(jsonPath("$.reviews[0].reviewDate").value(fixedDate.toString()))
-                .andExpect(jsonPath("$.reviews[0].bookId").value(bookId))
-                .andExpect(jsonPath("$.reviews[0].memberId").value(memberId))
-                .andExpect(jsonPath("$.reviews[1].reviewId").value(reviewId2))
-                .andExpect(jsonPath("$.reviews[1].reviewTitle").value("대충 리뷰 제목"))
-                .andExpect(jsonPath("$.reviews[1].reviewContent").value("대충 내용"))
-                .andExpect(jsonPath("$.reviews[1].reviewRating").value(3))
-                .andExpect(jsonPath("$.reviews[1].reviewDate").value(fixedDate.toString()))
-                .andExpect(jsonPath("$.reviews[1].bookId").value(bookId))
-                .andExpect(jsonPath("$.reviews[1].memberId").value(memberId2));
+                .andExpect(jsonPath("$[0].reviewId").value(reviewId))
+                .andExpect(jsonPath("$[0].reviewTitle").value("리뷰리뷰리뷰"))
+                .andExpect(jsonPath("$[0].reviewContent").value("포인트 냠냠"))
+                .andExpect(jsonPath("$[0].reviewRating").value(4))
+                .andExpect(jsonPath("$[0].reviewDate").value(fixedDate.toString()))
+                .andExpect(jsonPath("$[0].bookId").value(bookId))
+                .andExpect(jsonPath("$[0].memberId").value(memberId))
+                .andExpect(jsonPath("$[1].reviewId").value(reviewId2))
+                .andExpect(jsonPath("$[1].reviewTitle").value("대충 리뷰 제목"))
+                .andExpect(jsonPath("$[1].reviewContent").value("대충 내용"))
+                .andExpect(jsonPath("$[1].reviewRating").value(3))
+                .andExpect(jsonPath("$[1].reviewDate").value(fixedDate.toString()))
+                .andExpect(jsonPath("$[1].bookId").value(bookId))
+                .andExpect(jsonPath("$[1].memberId").value(memberId2));
 
         verify(reviewService).getReviewList(eq(bookId));
     }
@@ -119,7 +119,10 @@ public class ReviewControllerTest {
 
         // when & then
         mockMvc.perform(put("/books/{bookId}/reviews/{reviewId}", bookId, reviewId)
-                        .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request2)))
+                        .header("X-USER-ID", memberId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request2))
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.reviewId").value(reviewId))
                 .andExpect(jsonPath("$.reviewTitle").value("대충 리뷰 수정함"))
@@ -131,4 +134,6 @@ public class ReviewControllerTest {
 
         verify(reviewService).updateReview(eq(bookId), eq(reviewId), any(ReviewRequest.class), eq(memberId));
     }
+
+    // TODO: 수정시 memberId 불일치 case 추가
 }
