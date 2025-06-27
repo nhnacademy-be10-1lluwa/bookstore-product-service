@@ -16,6 +16,7 @@ import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
+import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
 import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
@@ -60,7 +61,6 @@ public class BookServiceTest {
 
     @Mock
     CategoryRepository categoryRepository;
-
 
 
     @InjectMocks
@@ -170,19 +170,25 @@ public class BookServiceTest {
                 "imgUrl"
         );
 
+        Long categoryId = 2L;
+
 
 
         Category mockCategory = new Category("테스트 카테고리");
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(mockCategory));
+        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(mockCategory));
         when(bookMapper.toBookEntity(bookRegisterRequest)).thenReturn(mockBook);
         when(bookRepository.existsByIsbn("012345")).thenReturn(false);
         when(bookResponseMapper.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
+
 
         BookDetailResponse result = bookService.registerBook(bookRegisterRequest);
 
         //then
         assertThat(result).isNotNull();
         assertThat(result.getTitle()).isEqualTo("어린 왕자");
+        verify(bookRepository, times(1)).save(any(Book.class));
+        verify(bookImageRepository, times(1)).save(any(BookImage.class));
+        verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
 
     }
 
@@ -206,12 +212,12 @@ public class BookServiceTest {
                 null
         );
 
+        Category category = new Category("name");
 
-        Category mockCategory = new Category("테스트 카테고리");
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(mockCategory));
 
         given(bookMapper.toBookEntity(any(BookRegisterRequest.class))).willReturn(book);
         when(bookRepository.existsByIsbn(anyString())).thenReturn(true);
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
 
 
         //when & then
@@ -243,7 +249,7 @@ public class BookServiceTest {
                 10000,
                 null,
                 new BookExtraInfo(Status.DELETED,true,1)
-            );
+        );
 
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
 
@@ -291,7 +297,7 @@ public class BookServiceTest {
                 6000,
                 null,
                 new BookExtraInfo(Status.DELETED,true,1)
-                );
+        );
 
         BookDetailResponse bookDetailResponse = new BookDetailResponse(
                 0L,
