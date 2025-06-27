@@ -24,9 +24,6 @@ public class Review {
     @Column(length = 5000, nullable = false)
     private String reviewContent;
 
-//    //파일 경로
-//    private String reviewImageUrl;
-
     @Column(nullable = false)
     private Integer reviewRating;
 

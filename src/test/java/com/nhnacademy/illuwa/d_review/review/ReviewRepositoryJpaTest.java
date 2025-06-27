@@ -13,13 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.within;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -57,6 +60,7 @@ public class ReviewRepositoryJpaTest {
     @DisplayName("리뷰 목록 가져오기 테스트")
     void findReviewsByBookIdTest(){
         //given
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("reviewDate").ascending());
         List<LocalDateTime> now = new ArrayList<>();
         List<Review> savedReviews = new ArrayList<>();
         for(int i=0; i<5; i++){
@@ -76,11 +80,11 @@ public class ReviewRepositoryJpaTest {
         testEntityManager.clear();
 
         // when
-        List<Review> reviews = reviewRepository.findReviewsByBook_Id(book.getId());
+        Page<Review> reviewPages = reviewRepository.findReviewsByBook_Id(book.getId(), pageable);
 
-        assertThat(reviews.size()).isEqualTo(5);
+        assertThat(reviewPages.getContent().size()).isEqualTo(5);
         for(int i=0; i<5; i++){
-            Review review = reviews.get(i);
+            Review review = reviewPages.getContent().get(i);
             assertThat(review.getReviewId()).isEqualTo(savedReviews.get(i).getReviewId());
             assertThat(review.getReviewTitle()).isEqualTo("title"+(i+1));
             assertThat(review.getReviewContent()).isEqualTo("content"+(i+1));
