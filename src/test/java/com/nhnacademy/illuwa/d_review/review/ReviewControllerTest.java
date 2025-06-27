@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -77,34 +77,33 @@ public class ReviewControllerTest {
         // 리뷰 목록 설정
         Long reviewId2 = 2L;
         Long memberId2 = 22L;
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("reviewDate").descending());
 
         ReviewResponse response2 = new ReviewResponse(reviewId2, "대충 리뷰 제목", "대충 내용", 3, fixedDate, bookId, memberId2);
-        List<ReviewResponse> reviewResponseList = new ArrayList<>();
-        reviewResponseList.add(response);
-        reviewResponseList.add(response2);
+        Page<ReviewResponse> reviewResponsePages = new PageImpl<>(Arrays.asList(response, response2));
 
         // given
-        given(reviewService.getReviewList(eq(bookId))).willReturn(reviewResponseList);
+        given(reviewService.getReviewPages(eq(bookId), eq(pageable))).willReturn(reviewResponsePages);
 
         // when & then
         mockMvc.perform(get("/books/{bookId}/reviews", bookId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].reviewId").value(reviewId))
-                .andExpect(jsonPath("$[0].reviewTitle").value("리뷰리뷰리뷰"))
-                .andExpect(jsonPath("$[0].reviewContent").value("포인트 냠냠"))
-                .andExpect(jsonPath("$[0].reviewRating").value(4))
-                .andExpect(jsonPath("$[0].reviewDate").value(fixedDate.toString()))
-                .andExpect(jsonPath("$[0].bookId").value(bookId))
-                .andExpect(jsonPath("$[0].memberId").value(memberId))
-                .andExpect(jsonPath("$[1].reviewId").value(reviewId2))
-                .andExpect(jsonPath("$[1].reviewTitle").value("대충 리뷰 제목"))
-                .andExpect(jsonPath("$[1].reviewContent").value("대충 내용"))
-                .andExpect(jsonPath("$[1].reviewRating").value(3))
-                .andExpect(jsonPath("$[1].reviewDate").value(fixedDate.toString()))
-                .andExpect(jsonPath("$[1].bookId").value(bookId))
-                .andExpect(jsonPath("$[1].memberId").value(memberId2));
+                .andExpect(jsonPath("$.content[0].reviewId").value(reviewId))
+                .andExpect(jsonPath("$.content[0].reviewTitle").value("리뷰리뷰리뷰"))
+                .andExpect(jsonPath("$.content[0].reviewContent").value("포인트 냠냠"))
+                .andExpect(jsonPath("$.content[0].reviewRating").value(4))
+                .andExpect(jsonPath("$.content[0].reviewDate").value(fixedDate.toString()))
+                .andExpect(jsonPath("$.content[0].bookId").value(bookId))
+                .andExpect(jsonPath("$.content[0].memberId").value(memberId))
+                .andExpect(jsonPath("$.content[1].reviewId").value(reviewId2))
+                .andExpect(jsonPath("$.content[1].reviewTitle").value("대충 리뷰 제목"))
+                .andExpect(jsonPath("$.content[1].reviewContent").value("대충 내용"))
+                .andExpect(jsonPath("$.content[1].reviewRating").value(3))
+                .andExpect(jsonPath("$.content[1].reviewDate").value(fixedDate.toString()))
+                .andExpect(jsonPath("$.content[1].bookId").value(bookId))
+                .andExpect(jsonPath("$.content[1].memberId").value(memberId2));
 
-        verify(reviewService).getReviewList(eq(bookId));
+        verify(reviewService).getReviewPages(eq(bookId), eq(pageable));
     }
 
     @Test

@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -114,8 +115,9 @@ public class ReviewServiceUnitTest {
 
     @Test
     @DisplayName("리뷰 목록 가져오기")
-    void getReviewListTest(){
+    void getReviewPagesTest(){
         // given
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("reviewDate").descending());
         List<LocalDateTime> now = new ArrayList<>();
         List<Review> savedReviews = new ArrayList<>();
         for(int i=0; i<5; i++) {
@@ -131,17 +133,19 @@ public class ReviewServiceUnitTest {
             savedReviews.add(review);
         }
 
+        Page<Review> reviewPage = new PageImpl<>(savedReviews, pageable, 5);
+
         // mock
-        Mockito.when(reviewRepository.findReviewsByBook_Id(book.getId())).thenReturn(savedReviews);
+        Mockito.when(reviewRepository.findReviewsByBook_Id(book.getId(), pageable)).thenReturn(reviewPage);
 
         // when
-        List<ReviewResponse> response = reviewService.getReviewList(book.getId());
+        Page<ReviewResponse> response = reviewService.getReviewPages(book.getId(), pageable);
 
         // then
-        assertThat(response.size()).isEqualTo(5);
+        assertThat(response.getContent().size()).isEqualTo(5);
         for(int i=0; i<5; i++){
             Review review = savedReviews.get(i);
-            ReviewResponse reviewResponse = response.get(i);
+            ReviewResponse reviewResponse = response.getContent().get(i);
 
             assertThat(reviewResponse.getReviewId()).isEqualTo(review.getReviewId());
             assertThat(reviewResponse.getReviewTitle()).isEqualTo(review.getReviewTitle());
