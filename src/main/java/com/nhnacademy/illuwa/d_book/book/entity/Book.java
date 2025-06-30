@@ -59,6 +59,4 @@ public class Book {
         image.setBook(this);
     }
 
-
-
 }
