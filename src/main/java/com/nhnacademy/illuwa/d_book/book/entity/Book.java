@@ -48,7 +48,7 @@ public class Book {
     @Column(nullable = false)
     private int salePrice;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", cascade = CascadeType.PERSIST)
     private List<BookImage> bookImages = new ArrayList<>();
 
     @Embedded
