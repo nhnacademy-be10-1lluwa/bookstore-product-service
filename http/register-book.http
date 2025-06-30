@@ -1,5 +1,5 @@
 
-//도서 등록
+### 도서 등록
 POST http://localhost:10304/admin/books
 Content-Type: application/json
 
@@ -17,3 +17,15 @@ Content-Type: application/json
   "count": 0,
   "categoryId": 2
 }
+
+
+### config-server refresh
+
+POST https://book1lluwa.store:10319/actuator/refresh
+Authorization: Basic pear-c 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
+Content-Type: application/json
+
+{}
+
+
+
