@@ -29,4 +29,13 @@ public class CategoryService {
         return categoryResponseList;
     }
 
+    public CategoryResponse getCategoryInfo(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 카테고리를 찾을 수 없습니다."));
+
+        return new CategoryResponse(category.getId(),
+                category.getParentCategory() != null ? category.getParentCategory().getId() : null,
+                category.getCategoryName());
+    }
+
 }

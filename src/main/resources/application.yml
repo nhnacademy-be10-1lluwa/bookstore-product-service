@@ -2,15 +2,9 @@ spring:
   application:
     name: product-service
   profiles:
-    active: test
+    active: dev
   config:
     import: optional:configserver:https://book1lluwa.store/config/
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info, refresh
-  endpoint:
-    health:
-      show-details: always
+#  sql:
+#    init:
+#      mode: always
