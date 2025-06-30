@@ -1,6 +1,7 @@
 package com.nhnacademy.illuwa.d_book.tag.service;
 
 import com.nhnacademy.illuwa.d_book.tag.dto.TagRegisterRequest;
+import com.nhnacademy.illuwa.d_book.tag.dto.TagResponse;
 import com.nhnacademy.illuwa.d_book.tag.entity.Tag;
 import com.nhnacademy.illuwa.d_book.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.tag.exception.TagNotFoundException;
@@ -22,8 +23,7 @@ public class TagService {
     }
 
     @Transactional
-    public Tag registerTag(TagRegisterRequest tagRegisterRequest) {
-
+    public TagResponse registerTag(TagRegisterRequest tagRegisterRequest) {
 
         String tagName = tagRegisterRequest.getName();
 
@@ -31,10 +31,12 @@ public class TagService {
             throw new TagAlreadyExistsException("이미 존재하는 태그입니다.");
         }
 
-        Tag tag = new Tag();
-        tag.setName(tagName);
+        //request -> entity 변환 필요없음, 태그명만 있으면 entity 생성가능
+        Tag tag = new Tag(tagRegisterRequest.getName());
 
-        return tagRepository.save(tag);
+        Tag registeredTag = tagRepository.save(tag);
+
+        return new TagResponse(registeredTag.getId(),registeredTag.getName());
     }
 
     @Transactional

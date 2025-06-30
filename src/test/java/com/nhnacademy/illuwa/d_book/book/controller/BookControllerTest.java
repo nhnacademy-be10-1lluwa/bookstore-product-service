@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
-import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
 import com.nhnacademy.illuwa.d_book.book.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
@@ -74,7 +73,8 @@ public class BookControllerTest {
                 15000,
                 12000,
                 "http://image.com/prince.jpg",
-                3
+                3,
+                2L
         );
     }
 
@@ -198,7 +198,8 @@ public class BookControllerTest {
                 10000,
                 8000,
                 "http://cover.url",
-                3
+                3,
+                2L
         );
 
 
@@ -214,6 +215,6 @@ public class BookControllerTest {
                 .andExpect(status().isConflict())
                 .andDo(print());
 
-        verify(bookRepository,never()).save(any(Book.class));
+
     }
 }

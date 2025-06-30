@@ -1,6 +1,5 @@
 package com.nhnacademy.illuwa.cart.entity;
 
-import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,4 +19,8 @@ public class Cart {
     @Setter
     @Column(name = "member_id")
     private Long memberId;
+
+    public Cart(Long memberId) {
+        this.memberId = memberId;
+    }
 }

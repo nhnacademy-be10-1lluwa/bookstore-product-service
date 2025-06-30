@@ -32,4 +32,8 @@ public class BookRegisterRequest {
 
     @NotNull
     private Integer count;
+
+    //category의 id (상위 카테고리 id 아님)
+    private Long categoryId;
+
 }

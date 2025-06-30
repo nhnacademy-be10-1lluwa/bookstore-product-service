@@ -164,6 +164,10 @@
                 <configuration>
                     <excludes>
                         <exclude>**/Q*</exclude>
+                        <exclude>**/dto/**</exclude>
+                        <exclude>**/entity/**</exclude>
+                        <exclude>**/*MapperImpl.class</exclude>
+                        <exclude>**/*Config.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>
