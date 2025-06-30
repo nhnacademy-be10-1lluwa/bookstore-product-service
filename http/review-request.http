@@ -1,10 +1,30 @@
 ### 책 추가
-POST http://localhost:8080/admin/books
+POST http://localhost:10304/admin/books
 Content-Type: application/json
 
 {
-  "isbn": "K832030960"
+  "title": "모두의 자바",
+  "contents": "기초 문법부터 객체지향까지",
+  "description": "초보자를 위한 자바 입문서입니다.",
+  "author": "홍길동",
+  "publisher": "길벗",
+  "pubDate": "2023-11-12",
+  "isbn": "9781234567890",
+  "regularPrice": 20000,
+  "salePrice": 18000,
+  "cover": "https://example.com/image.jpg",
+  "count": 50,
+  "categoryId": 8
 }
+
+### 등록도서 조회
+GET http://localhost:10304/admin/books
+
+### 카테고리 조회
+GET http://localhost:10304/categories
+
+### 카테고리 정보 조회 (ID기준)
+GET http://localhost:10304/categories/8
 
 ### 리뷰작성 1
 POST http://localhost:8080/books/1/reviews

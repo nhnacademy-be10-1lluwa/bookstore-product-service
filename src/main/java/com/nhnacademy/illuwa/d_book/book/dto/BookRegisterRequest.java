@@ -15,17 +15,22 @@ public class BookRegisterRequest {
 
     @NotBlank
     private String title;
+
     private String contents;
     private String description;
     @NotBlank
     private String author;
+
     @NotBlank
     private String publisher;
+
     private LocalDate pubDate;
     @NotBlank
     private String isbn;
+
     private int regularPrice;
     private int salePrice;
+
     @NotBlank
     @JsonProperty("cover")
     private String imgUrl;
