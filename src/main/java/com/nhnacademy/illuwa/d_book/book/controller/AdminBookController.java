@@ -30,32 +30,6 @@ public class AdminBookController {
         return ResponseEntity.ok(bookExternalResponses);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<BookDetailResponse>> searchBooksByTitle(@RequestParam String title){
-        List<BookDetailResponse> bookDetailsResponses = bookService.searchBookByTitle(title);
-        return ResponseEntity.ok(bookDetailsResponses);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<BookDetailResponse> searchBookById(@PathVariable Long id){
-        BookDetailResponse bookDetailResponse = bookService.searchBookById(id);
-        return ResponseEntity.ok(bookDetailResponse);
-    }
-
-    //등록된 도서 목록
-    @GetMapping
-    public ResponseEntity<List<BookDetailResponse>> getRegisteredBooks(){
-        List<BookDetailResponse> registeredBooks = bookService.getAllBooks();
-        return ResponseEntity.ok(registeredBooks);
-    }
-
-    // ISBN으로 도서 검색(도서 클릭)
-    @GetMapping("/isbn/{isbn}")
-    public ResponseEntity<BookExternalResponse> searchBookByIsbn(@PathVariable String isbn){
-        BookExternalResponse bookByIsbn = aladinBookApiService.findBookByIsbn(isbn);
-        return ResponseEntity.ok(bookByIsbn);
-    }
-
     // 도서 등록
     @PostMapping()
     public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest bookRegisterRequest){
