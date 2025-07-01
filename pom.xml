@@ -204,7 +204,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>1lluwa-product-service</finalName>
+        <finalName>product-service</finalName>
     </build>
 
     <profiles>
