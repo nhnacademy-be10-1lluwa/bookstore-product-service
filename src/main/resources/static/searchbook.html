@@ -203,7 +203,7 @@
     });
 
     async function getBookByIsbn(isbn) {
-        const url = `/admin/books/isbn/${isbn}`;
+        const url = `/books/isbn/${isbn}`;
         const response = await fetch(url);
 
         console.log(response);
