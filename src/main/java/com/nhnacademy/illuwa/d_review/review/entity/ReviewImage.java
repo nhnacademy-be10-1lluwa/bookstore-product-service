@@ -22,4 +22,8 @@ public class ReviewImage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewId", nullable = false)
     private Review review;
+
+    public static ReviewImage of(String imageUrl, Review review) {
+        return new ReviewImage(null, imageUrl, review);
+    }
 }

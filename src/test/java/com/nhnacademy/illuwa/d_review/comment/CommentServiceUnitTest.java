@@ -7,7 +7,7 @@ import com.nhnacademy.illuwa.d_review.comment.dto.CommentRequest;
 import com.nhnacademy.illuwa.d_review.comment.dto.CommentResponse;
 import com.nhnacademy.illuwa.d_review.comment.entity.Comment;
 import com.nhnacademy.illuwa.d_review.comment.exception.CommentNotFoundException;
-import com.nhnacademy.illuwa.d_review.comment.exception.CommentStatusInvalidException;
+import com.nhnacademy.illuwa.d_review.comment.exception.InvalidCommentStatusException;
 import com.nhnacademy.illuwa.d_review.comment.repository.CommentRepository;
 import com.nhnacademy.illuwa.d_review.comment.service.CommentService;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
@@ -228,7 +228,7 @@ public class CommentServiceUnitTest {
 
         // when & then
         assertThatThrownBy(() -> commentService.updateComment(review.getReviewId(), comment.getCommentId(), request))
-                .isInstanceOf(CommentStatusInvalidException.class)
+                .isInstanceOf(InvalidCommentStatusException.class)
                 .hasMessageContaining("리뷰와 댓글이 일치하지 않습니다.");
     }
 }

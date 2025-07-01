@@ -4,7 +4,7 @@ import com.nhnacademy.illuwa.d_review.comment.dto.CommentRequest;
 import com.nhnacademy.illuwa.d_review.comment.dto.CommentResponse;
 import com.nhnacademy.illuwa.d_review.comment.entity.Comment;
 import com.nhnacademy.illuwa.d_review.comment.exception.CommentNotFoundException;
-import com.nhnacademy.illuwa.d_review.comment.exception.CommentStatusInvalidException;
+import com.nhnacademy.illuwa.d_review.comment.exception.InvalidCommentStatusException;
 import com.nhnacademy.illuwa.d_review.comment.repository.CommentRepository;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
 import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
@@ -27,7 +27,7 @@ public class CommentService {
         // TODO: memberId 가져오는 방식 확정되면 변경
         Long memberId = 7777L;
 
-        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException(reviewId));
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다. Review ID: " + reviewId));
 
         Comment comment = Comment.of(
                 request.getCommentContents(),
@@ -50,11 +50,11 @@ public class CommentService {
 
     @Transactional
     public CommentResponse updateComment(Long reviewId, Long commentId, CommentRequest request) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException(reviewId));
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다. Review ID: " + reviewId));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException("댓글을 찾을 수 없습니다. Comment ID: " + commentId));
 
         if(!comment.getReview().getReviewId().equals(review.getReviewId())) {
-            throw new CommentStatusInvalidException(reviewId, commentId);
+            throw new InvalidCommentStatusException("리뷰와 댓글이 일치하지 않습니다. Review ID: " + reviewId + "Comment ID: " + commentId);
         }
 
         // 영속 상태인 엔티티 수정하면 자동으로 update 반영됨

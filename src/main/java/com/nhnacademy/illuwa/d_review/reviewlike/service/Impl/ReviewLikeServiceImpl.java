@@ -21,7 +21,7 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
     @Transactional
     public ReviewLikeResponse toggleLike(Long bookId, Long reviewId, Long memberId) {
         Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId)
-                .orElseThrow(() -> new ReviewNotFoundException(reviewId));
+                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다. Review ID: " + reviewId));
 
         boolean isLikedByMe = isLikedByMe(reviewId, memberId); // 중복호출 막으려고 로컬변수 만듬
 

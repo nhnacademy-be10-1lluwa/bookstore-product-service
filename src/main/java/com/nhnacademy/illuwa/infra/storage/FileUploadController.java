@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,50 +21,58 @@ public class FileUploadController {
 
     private final MinioStorageService minioStorageService;
     private final MinioClient minioClient;
-    private final String bucket = "1lluwa";  // 필요 시 config 에서 주입 가능
+    private final String bucket = "1lluwa"; // config 로 주입해도 좋음
 
-    // 파일 업로드
-    @PostMapping("/upload")
-    public ResponseEntity<String> upload(@RequestPart MultipartFile file,
-                                         @RequestParam String domain,
-                                         @RequestHeader("X-USER-ID") Long memberId) throws Exception {
+    // 다중 파일 업로드
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<List<UploadResponse>> upload(@RequestPart("file") List<MultipartFile> files,
+                                                       @RequestParam String domain,
+                                                       @RequestHeader("X-USER-ID") Long memberId) throws Exception {
 
-        String fileName = minioStorageService.uploadFile(domain, memberId, file);
+        List<UploadResponse> responses = new ArrayList<>();
 
-        return ResponseEntity.ok("Uploaded: " + fileName);
+        for (MultipartFile file : files) {
+            String objectName = minioStorageService.uploadFile(domain, memberId, file);
+            String url = minioStorageService.getPreSignedUrl(objectName);
+            responses.add(new UploadResponse(objectName, url));
+        }
+
+        return ResponseEntity.ok(responses);
     }
 
-    // 저장된 이미지 Presigned URL 반환 (제한된 시간 동안 접근 가능)
-    @GetMapping("/image-url")
-    public ResponseEntity<String> getImageUrl(@RequestParam String objectName) throws Exception {
-        String url = minioStorageService.getPresignedUrl(objectName);
+    // 파일 삭제
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@RequestParam String img) throws Exception {
+        minioStorageService.deleteFile(img);
+        return ResponseEntity.noContent().build();
+    }
 
+    // pre-signed URL 반환
+    @GetMapping("/url")
+    public ResponseEntity<String> getPreSignedUrl(@RequestParam String img) throws Exception {
+        String url = minioStorageService.getPreSignedUrl(img);
         return ResponseEntity.ok(url);
     }
 
-    // 저장된 이미지 직접 다운로드/표시
-    @GetMapping("/{objectName}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String objectName) throws Exception {
-        System.out.println("Request for object: " + objectName);
+    // 파일 직접 다운로드 또는 표시
+    @GetMapping("/show")
+    public ResponseEntity<byte[]> getImage(@RequestParam String img){
         try (InputStream stream = minioClient.getObject(
                 GetObjectArgs.builder()
                         .bucket(bucket)
-                        .object(objectName)
-                        .build())) {
-
-            byte[] imageBytes = stream.readAllBytes();
-
-            String contentType = URLConnection.guessContentTypeFromName(objectName);
-            if (contentType == null) {
-                contentType = "application/octet-stream";
-            }
+                        .object(img)
+                        .build()))
+        {
+            byte[] bytes = stream.readAllBytes();
+            String contentType = URLConnection.guessContentTypeFromName(img);
+            if (contentType == null) contentType = "application/octet-stream";
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + objectName + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + img + "\"")
                     .contentType(MediaType.parseMediaType(contentType))
-                    .body(imageBytes);
-        } catch (Exception e) {
+                    .body(bytes);
 
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
