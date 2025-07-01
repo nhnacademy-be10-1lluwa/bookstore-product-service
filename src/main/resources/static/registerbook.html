@@ -118,7 +118,6 @@
     sessionStorage.removeItem('BookDetailResponse');
     document.getElementById('main-category').addEventListener('change', (e) => {
       const selectedParentId = e.target.value;
-      console.log(selectedParentId)
       populateSubCategories(selectedParentId);
     });
 
@@ -142,8 +141,6 @@
 
       bookRegisterRequest.description = descriptionContent;
 
-      console.log("최종 등록 데이터:", bookRegisterRequest);
-
       try {
         const response = await fetch('/admin/books', {
           method: 'POST',
@@ -153,8 +150,9 @@
 
         if (response.ok) {
           const data = await response.json();
+          console.log("등록 도서 -->",data);
           alert('도서 등록에 성공했습니다!');
-          // window.location.href = '/admin/books';
+          window.location.href = '/adminbooks.html';
         } else {
           const errorData = await response.json();
           alert(`등록 실패: ${errorData.message}`);

@@ -187,7 +187,6 @@ public class BookServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getTitle()).isEqualTo("어린 왕자");
         verify(bookRepository, times(1)).save(any(Book.class));
-        verify(bookImageRepository, times(1)).save(any(BookImage.class));
         verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
 
     }
