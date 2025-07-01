@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,6 +100,7 @@ public class BookService {
 
         // dto -> entity
         Book bookEntity = bookMapper.toBookEntity(bookRegisterRequest);
+        bookEntity.setBookImages(new ArrayList<>());
 
         Long categoryId = bookRegisterRequest.getCategoryId();
         Category categoryEntity = categoryRepository.findById(categoryId).get();
@@ -115,6 +117,7 @@ public class BookService {
             log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
+
 
 
 
