@@ -8,9 +8,10 @@ import com.nhnacademy.illuwa.d_book.book.exception.BookApiException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_review.comment.exception.CommentNotFoundException;
-import com.nhnacademy.illuwa.d_review.comment.exception.CommentStatusInvalidException;
+import com.nhnacademy.illuwa.d_review.comment.exception.InvalidCommentStatusException;
 import com.nhnacademy.illuwa.d_review.review.exception.MemberIdDoesNotMatchWithReviewException;
 import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
+import com.nhnacademy.illuwa.infra.storage.exception.InvalidFileFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +81,21 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, status);
     }
 
+    @ExceptionHandler(InvalidFileFormatException.class)
+    public ResponseEntity<Object> handleInvalidFileFormatException(InvalidFileFormatException e) {
+        status = HttpStatus.BAD_REQUEST;
+
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "Invalid_File_Format"); // <-- 중요: 클라이언트가 파싱할 고유 코드
+        body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
+
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(body, status);
+    }
+
     @ExceptionHandler(CommentNotFoundException.class)
     public ResponseEntity<Object> handleCommentNotFoundException(CommentNotFoundException e) {
         status = HttpStatus.NOT_FOUND;
@@ -95,8 +111,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, status);
     }
 
-    @ExceptionHandler(CommentStatusInvalidException.class)
-    public ResponseEntity<Object> handleCommentStatusInvalidException(CommentStatusInvalidException e) {
+    @ExceptionHandler(InvalidCommentStatusException.class)
+    public ResponseEntity<Object> handleCommentStatusInvalidException(InvalidCommentStatusException e) {
         status = HttpStatus.CONFLICT;
 
         body.put("timestamp", LocalDateTime.now());
