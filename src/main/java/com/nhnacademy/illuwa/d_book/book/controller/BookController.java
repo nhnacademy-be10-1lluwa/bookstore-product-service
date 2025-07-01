@@ -51,6 +51,12 @@ public class BookController {
         return ResponseEntity.ok(bookByIsbn);
     }
 
+    @GetMapping("/bestseller")
+    public ResponseEntity<List<BestSellerResponse>> getBestSeller(){
+        List<BestSellerResponse> bestSellerList = aladinBookApiService.getBestSeller();
+        return ResponseEntity.ok(bestSellerList);
+    }
+
 
 
 }
