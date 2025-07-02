@@ -151,7 +151,7 @@ class AdminBookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(jsonPath("$.isbn").value("0100AF"))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         verify(bookService).registerBook(any(BookRegisterRequest.class));
     }
