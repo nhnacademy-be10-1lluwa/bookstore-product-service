@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -117,9 +118,20 @@ public class MinioStorageService {
                                 .build()
                 );
 
-                log.info("'{}' 성공적으로 업로드 '{}' --> bucket 이름 : '{}'.", bookImageFile.getOriginalFilename(), bookImageFileName, bucket);
+                String url = minioClient.getPresignedObjectUrl(
+                        GetPresignedObjectUrlArgs.builder()
+                                .method(Method.GET) // GET 요청에 대한 URL을 생성
+                                .bucket(bucket)
+                                .object(bookImageFileName)
+                                .expiry(7, TimeUnit.DAYS) // URL의 유효기간을 7일로 설정
+                                // Duration.ofDays(7) 도 사용 가능
+                                .build()
+                );
 
-                return bookImageFileName;
+
+                        log.info("'{}' 성공적으로 업로드 '{}' --> bucket 이름 : '{}'.", bookImageFile.getOriginalFilename(), bookImageFileName, bucket);
+
+                return url;
 
             } catch (Exception e) {
                 log.error("MinIO에 업로드 중 에러 발생", e);
