@@ -26,6 +26,7 @@ import com.nhnacademy.illuwa.infra.storage.MinioStorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +43,10 @@ public class BookService {
     private final BookMapper bookMapper;
     private final CategoryRepository categoryRepository;
     private final BookCategoryRepository bookCategoryRepository;
+    private final MinioStorageService minioStorageService;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, MinioStorageService minioStorageService) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
         this.bookResponseMapper = bookResponseMapper;
@@ -53,6 +55,7 @@ public class BookService {
         this.bookMapper = bookMapper;
         this.categoryRepository = categoryRepository;
         this.bookCategoryRepository = bookCategoryRepository;
+        this.minioStorageService = minioStorageService;
     }
 
     //도서 등록 전 도서 검색
@@ -143,9 +146,6 @@ public class BookService {
 
 
 
-
-
-
         //entity -> dto
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
@@ -199,4 +199,16 @@ public class BookService {
 
     }
 
+    public BookDetailResponse createBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
+        String savedImageName = minioStorageService.uploadBookImageFile(bookImageFile);
+
+
+        Book book = bookMapper.toBookEntity(bookRegisterRequest); // DTO -> Entity
+        BookImage bookImageEntity = new BookImage(book, savedImageName, ImageType.THUMBNAIL);
+        book.addImage(bookImageEntity);
+
+        bookRepository.save(book);
+
+        return bookResponseMapper.toBookDetailResponse(book); // Entity -> DTO
+    }
 }
