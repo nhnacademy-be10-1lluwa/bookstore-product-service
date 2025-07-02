@@ -1,8 +1,8 @@
 package com.nhnacademy.illuwa.infra.storage;
 import com.nhnacademy.illuwa.infra.storage.exception.InvalidFileFormatException;
-import io.minio.GetPresignedObjectUrlArgs;
-import io.minio.RemoveObjectArgs;
+import io.minio.*;
 import io.minio.http.Method;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,10 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Set;
 import java.util.UUID;
 
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-
 @Service
+@Slf4j
 public class MinioStorageService {
 
     private final MinioClient minioClient;
@@ -93,4 +91,39 @@ public class MinioStorageService {
             throw new InvalidFileFormatException("지원하지 않는 이미지 콘텐츠 타입입니다: " + contentType);
         }
     }
-}
+
+    public String uploadBookImageFile(MultipartFile bookImageFile) {
+            try {
+                // 버킷이 존재하는지 확인하고, 없으면 생성
+                boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+                if (!found) {
+                    minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+                    log.info("Bucket '{}' 생성 ", bucket);
+                } else {
+                    log.info("Bucket '{}' 이미 존재", bucket);
+                }
+
+                // 파일 이름이 겹치지 않도록 UUID를 사용해 고유한 파일 이름 생성
+                String originalFilename = bookImageFile.getOriginalFilename();
+                String bookImageFileName = UUID.randomUUID().toString() + "-" + originalFilename;
+
+                // 파일 업로드
+                minioClient.putObject(
+                        PutObjectArgs.builder()
+                                .bucket(bucket)
+                                .object(bookImageFileName)
+                                .stream(bookImageFile.getInputStream(), bookImageFile.getSize(), -1)
+                                .contentType(bookImageFile.getContentType())
+                                .build()
+                );
+
+                log.info("'{}' 성공적으로 업로드 '{}' --> bucket 이름 : '{}'.", bookImageFile.getOriginalFilename(), bookImageFileName, bucket);
+
+                return bookImageFileName;
+
+            } catch (Exception e) {
+                log.error("MinIO에 업로드 중 에러 발생", e);
+                throw new RuntimeException("파일 업로드에 실패했습니다.", e);
+            }
+        }
+    }
