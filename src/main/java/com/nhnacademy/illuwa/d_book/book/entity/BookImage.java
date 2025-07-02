@@ -22,7 +22,7 @@ public class BookImage {
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    @Column(nullable = false)
+    @Column(name = "image_url", length = 1000)
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
