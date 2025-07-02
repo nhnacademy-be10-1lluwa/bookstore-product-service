@@ -25,6 +25,9 @@ public class AladinBookApiService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
+    @Value("${external.aladin.api-key}")
+    private String apiKey;
+
     private final String VERSION = "20131101";
     private final String QUERYTYPE = "Bestseller";
     private final String MAXRESULT = "10";
@@ -36,7 +39,7 @@ public class AladinBookApiService {
     }
 
     @Value("${external.aladin.api-key}")
-    private String apiKey;
+
 
     public List<BookExternalResponse> searchBooksByTitle(String title) {
 
