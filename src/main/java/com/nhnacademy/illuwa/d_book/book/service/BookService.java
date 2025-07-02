@@ -101,7 +101,6 @@ public class BookService {
     @Transactional
     public BookDetailResponse registerBook(BookRegisterRequest bookRegisterRequest) {
 
-        // dto -> entity
         Book bookEntity = bookMapper.toBookEntity(bookRegisterRequest);
         bookEntity.setBookImages(new ArrayList<>());
 
@@ -113,25 +112,17 @@ public class BookService {
             throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
         }
 
-
-
         log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
         if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
             log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
-
-
-
         // TODO 1 : 도서 이미지 저장
-        // 도서 , 도서 url 경로, 도서 유형(상세 이미지는 등록할 때 1번만 저장)
         BookImage bookImage = new BookImage(bookEntity,bookRegisterRequest.getImgUrl(), ImageType.THUMBNAIL);
         bookEntity.addImage(bookImage);
 
-
         // TODO 2 : 도서 외부 정보
-        //2) 도서 외부 정보 저장 - Status, giftwrap, count
         // 도서 판매 상태(status), 포장 여부(wrap)는 등록 관리 단계
         BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
         bookEntity.setBookExtraInfo(bookExtraInfo);
@@ -139,14 +130,9 @@ public class BookService {
         // TODO 3 : 도서 카테고리 저장
         bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));
 
-
         // TODO 4 : 도서 저장
         bookRepository.save(bookEntity);
 
-
-
-
-        //entity -> dto
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
@@ -202,13 +188,39 @@ public class BookService {
     public BookDetailResponse createBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
         String savedImageName = minioStorageService.uploadBookImageFile(bookImageFile);
 
+        Book bookEntity = bookMapper.toBookEntity(bookRegisterRequest);
+        bookEntity.setBookImages(new ArrayList<>());
 
-        Book book = bookMapper.toBookEntity(bookRegisterRequest); // DTO -> Entity
-        BookImage bookImageEntity = new BookImage(book, savedImageName, ImageType.THUMBNAIL);
-        book.addImage(bookImageEntity);
+//        Long categoryId = bookRegisterRequest.getCategoryId();
+//        Category categoryEntity = categoryRepository.findById(categoryId).get();
+//
+//        if (bookEntity == null) {
+//            throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
+//        }
 
-        bookRepository.save(book);
+        log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
+        if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
+            log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
+            throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
+        }
 
-        return bookResponseMapper.toBookDetailResponse(book); // Entity -> DTO
+        // TODO 1 : 도서 이미지 저장
+        BookImage bookImage = new BookImage(bookEntity,savedImageName, ImageType.THUMBNAIL);
+        bookEntity.addImage(bookImage);
+
+        // TODO 2 : 도서 외부 정보
+        //2) 도서 외부 정보 저장 - Status, giftwrap, count
+        // 도서 판매 상태(status), 포장 여부(wrap)는 등록 관리 단계
+        BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
+        bookEntity.setBookExtraInfo(bookExtraInfo);
+
+        /*// TODO 3 : 도서 카테고리 저장
+        bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));*/
+
+        // TODO 4 : 도서 저장
+        bookRepository.save(bookEntity);
+
+
+        return bookResponseMapper.toBookDetailResponse(bookEntity); // Entity -> DTO
     }
 }
