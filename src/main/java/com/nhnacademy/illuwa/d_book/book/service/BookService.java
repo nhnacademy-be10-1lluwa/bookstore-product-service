@@ -198,7 +198,7 @@ public class BookService {
 
 
     public BookDetailResponse createBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
-        String savedImageName = minioStorageService.uploadBookImageFile(bookImageFile);
+        String savedImageName = minioStorageService.uploadBookImage(bookImageFile);
 
         Book bookEntity = bookMapper.toBookEntity(bookRegisterRequest);
         bookEntity.setBookImages(new ArrayList<>());

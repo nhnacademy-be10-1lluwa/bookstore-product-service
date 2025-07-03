@@ -52,7 +52,7 @@ public class ReviewServiceImpl implements ReviewService {
         List<String> imageUrls = new ArrayList<>();
         if(images != null) {
             for(MultipartFile image : images){
-                String uploadedUrl = minioStorageService.uploadFile("review", memberId, image);
+                String uploadedUrl = minioStorageService.uploadReviewImage(memberId, image);
                 imageUrls.add(uploadedUrl);
                 ReviewImage reviewImage = ReviewImage.of(uploadedUrl, saved);
                 reviewImageRepository.save(reviewImage);
@@ -117,7 +117,7 @@ public class ReviewServiceImpl implements ReviewService {
         List<String> updateImages = new ArrayList<>();
         if(images != null) {
             for(MultipartFile newImage : images){
-                String uploadedUrl = minioStorageService.uploadFile("review", memberId, newImage);
+                String uploadedUrl = minioStorageService.uploadReviewImage(memberId, newImage);
                 updateImages.add(uploadedUrl);
                 ReviewImage reviewImage = ReviewImage.of(uploadedUrl, review);
                 reviewImageRepository.save(reviewImage);
