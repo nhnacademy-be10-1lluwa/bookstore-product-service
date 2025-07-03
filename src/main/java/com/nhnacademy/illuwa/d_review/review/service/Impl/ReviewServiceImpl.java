@@ -114,20 +114,20 @@ public class ReviewServiceImpl implements ReviewService {
         );
 
         List<ReviewImage> existingImages = reviewImageRepository.findAllByReview_ReviewId(reviewId);
-        List<String> updateImages = request.getReviewImageUrls();
+        List<String> updateImages = new ArrayList<>();
+        if(images != null) {
+            for(MultipartFile newImage : images){
+                String uploadedUrl = minioStorageService.uploadFile("review", memberId, newImage);
+                updateImages.add(uploadedUrl);
+                ReviewImage reviewImage = ReviewImage.of(uploadedUrl, review);
+                reviewImageRepository.save(reviewImage);
+            }
+        }
 
         for(ReviewImage image : existingImages){
             if(!updateImages.contains(image.getImageUrl())){
                 reviewImageRepository.delete(image);
                 minioStorageService.deleteFile(image.getImageUrl());
-            }
-        }
-
-        if(images != null) {
-            for(MultipartFile newImage : images){
-                String uploadedUrl = minioStorageService.uploadFile("review", memberId, newImage);
-                ReviewImage reviewImage = ReviewImage.of(uploadedUrl, review);
-                reviewImageRepository.save(reviewImage);
             }
         }
 
