@@ -106,7 +106,7 @@ public class MinioStorageService {
 
             // 도메인별로 분리해서 저장
             String extension = getExtension(file.getOriginalFilename());
-            String objectName = String.format("%s/%s.%s", path, UUID.randomUUID(), extension);
+            String objectName = String.format("%s/%s_%s.%s", path, UUID.randomUUID(), file.getOriginalFilename(), extension);
 
             minioClient.putObject(
                     PutObjectArgs.builder()
