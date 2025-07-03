@@ -16,8 +16,8 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<CommentResponse> createComment(@PathVariable Long bookId, @PathVariable Long reviewId, @RequestBody CommentRequest request) {
-        return ResponseEntity.ok(commentService.createComment(reviewId, request));
+    public ResponseEntity<CommentResponse> createComment(@PathVariable Long bookId, @PathVariable Long reviewId, @RequestBody CommentRequest request, @RequestHeader("X-USER-ID") Long memberId) {
+        return ResponseEntity.ok(commentService.createComment(reviewId, request, memberId));
     }
 
     @GetMapping
@@ -26,7 +26,7 @@ public class CommentController {
     }
 
     @PatchMapping("/{commentId}")
-    public ResponseEntity<CommentResponse> updateComment(@PathVariable Long bookId, @PathVariable Long reviewId, @PathVariable Long commentId, @RequestBody CommentRequest request) {
-        return ResponseEntity.ok(commentService.updateComment(reviewId, commentId, request));
+    public ResponseEntity<CommentResponse> updateComment(@PathVariable Long bookId, @PathVariable Long reviewId, @PathVariable Long commentId, @RequestBody CommentRequest request, @RequestHeader("X-USER-ID") Long memberId) {
+        return ResponseEntity.ok(commentService.updateComment(reviewId, commentId, request, memberId));
     }
 }
