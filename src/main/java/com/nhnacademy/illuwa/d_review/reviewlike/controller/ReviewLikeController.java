@@ -12,19 +12,11 @@ import org.springframework.web.bind.annotation.*;
 public class ReviewLikeController {
     private final ReviewLikeService reviewLikeService;
 
-    // TODO: memberId 가져오는 방법 결정되면 수정
-
     @PostMapping
-    public ResponseEntity<ReviewLikeResponse> toggleLike(@PathVariable Long bookId, @PathVariable Long reviewId) {
-        Long memberId = 7777L;
+    public ResponseEntity<ReviewLikeResponse> toggleLike(@PathVariable Long bookId,
+                                                         @PathVariable Long reviewId,
+                                                         @RequestHeader("X-USER-ID") Long memberId) {
 
         return ResponseEntity.ok(reviewLikeService.toggleLike(bookId, reviewId, memberId));
-    }
-
-    @GetMapping
-    public ResponseEntity<ReviewLikeResponse> getLikeInfo(@PathVariable Long bookId, @PathVariable Long reviewId) {
-        Long memberId = 7777L;
-
-        return ResponseEntity.ok(reviewLikeService.getLikeInfo(reviewId, memberId));
     }
 }

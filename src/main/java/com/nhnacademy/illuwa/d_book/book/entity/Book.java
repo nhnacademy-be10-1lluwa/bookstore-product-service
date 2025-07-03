@@ -49,7 +49,7 @@ public class Book {
     private int salePrice;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.PERSIST)
-    private List<BookImage> bookImages = new ArrayList<>();
+    private List<BookImage> bookImages;
 
     @Embedded
     private BookExtraInfo bookExtraInfo;
