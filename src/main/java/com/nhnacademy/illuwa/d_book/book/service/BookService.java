@@ -21,6 +21,7 @@ import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategor
 import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
+import com.nhnacademy.illuwa.infra.storage.MinioStorageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +44,10 @@ public class BookService {
     private final BookMapper bookMapper;
     private final CategoryRepository categoryRepository;
     private final BookCategoryRepository bookCategoryRepository;
+    private final MinioStorageService minioStorageService;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, MinioStorageService minioStorageService) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
         this.bookResponseMapper = bookResponseMapper;
@@ -54,6 +56,7 @@ public class BookService {
         this.bookMapper = bookMapper;
         this.categoryRepository = categoryRepository;
         this.bookCategoryRepository = bookCategoryRepository;
+        this.minioStorageService = minioStorageService;
     }
 
     //도서 등록 전 도서 검색
