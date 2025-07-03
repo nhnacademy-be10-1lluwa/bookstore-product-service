@@ -106,7 +106,7 @@ public class BookControllerTest {
         mockMvc.perform(get("/books"))
                 .andExpect(status().isOk());
 
-        verify(bookService).getAllBooks();
+        verify(bookService).getAllBooksByPaging(any());
     }
 
     @Test

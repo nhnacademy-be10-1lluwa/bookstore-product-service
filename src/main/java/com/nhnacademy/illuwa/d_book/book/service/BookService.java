@@ -11,7 +11,6 @@ import com.nhnacademy.illuwa.d_book.book.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
-import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
@@ -23,7 +22,10 @@ import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryReposit
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import com.nhnacademy.illuwa.infra.storage.MinioStorageService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -133,6 +135,8 @@ public class BookService {
         // TODO 4 : 도서 저장
         bookRepository.save(bookEntity);
 
+        //entity -> dto
+
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
@@ -141,7 +145,6 @@ public class BookService {
         List<Book> bookEntityList = bookRepository.findAll();
         return bookResponseMapper.toBookDetailListResponse(bookEntityList);
     }
-
 
 
     @Transactional
@@ -182,8 +185,17 @@ public class BookService {
         bookRepository.delete(targetBook);
 
         log.info("삭제된 도서 제목 : {}" , targetBook.getTitle());
-
     }
+
+
+    public Page<BookDetailResponse> getAllBooksByPaging(Pageable pageable){
+        Page<Book> bookPage = bookRepository.findAll(pageable);
+
+        Page<BookDetailResponse> pageMap = bookPage.map(bookResponseMapper::toBookDetailResponse);
+
+        return pageMap;
+    }
+
 
     public BookDetailResponse createBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
         String savedImageName = minioStorageService.uploadBookImageFile(bookImageFile);
@@ -223,4 +235,5 @@ public class BookService {
 
         return bookResponseMapper.toBookDetailResponse(bookEntity); // Entity -> DTO
     }
+
 }

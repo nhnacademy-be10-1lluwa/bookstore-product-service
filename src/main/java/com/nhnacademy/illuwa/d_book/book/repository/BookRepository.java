@@ -41,6 +41,6 @@ public interface BookRepository extends JpaRepository<Book,Long> {
 
     boolean existsByIsbn(String isbn);
 
-
+    Page<Book> findAll(Pageable pageable);
 
 }
