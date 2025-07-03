@@ -39,7 +39,7 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getReviewPages(bookId, pageable, memberId));
     }
 
-    @PutMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ReviewResponse> updateReview(@PathVariable Long bookId,
                                                        @PathVariable Long reviewId,
                                                        @RequestPart("review") ReviewRequest request,
