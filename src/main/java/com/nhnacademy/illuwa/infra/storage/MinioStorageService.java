@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-
 @Slf4j
 @Service
 public class MinioStorageService {
@@ -50,36 +49,13 @@ public class MinioStorageService {
                 .build();
     }
 
-    public String uploadFile(String domain, Long memberId, MultipartFile file){
-        try {
-            validateImageExtension(file);
-            validateImageContentType(file);
+    public String uploadBookImage(MultipartFile file) {
+        return uploadImage("Book", file);
+    }
 
-            // 도메인별로 분리해서 저장
-            String extension = getExtension(file.getOriginalFilename());
-            String objectName = domain.equalsIgnoreCase("Book")
-                    ? String.format("%s/%s.%s", domain, UUID.randomUUID(), extension)
-                    : String.format("%s/%s/%s.%s", domain, memberId, UUID.randomUUID(), extension);
-
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucket)
-                            .object(objectName)
-                            .stream(file.getInputStream(), file.getSize(), -1)
-                            .contentType(file.getContentType())
-                            .build()
-            );
-
-            String url = getPreSignedUrl(objectName);
-
-            log.info("이미지 '{}' 을(를) 성공적으로 업로드 했습니다.", file.getOriginalFilename());
-
-            return url;
-
-        }
-        catch (Exception e) {
-            throw new FileUploadFailedException("파일 업로드에 실패했습니다.", e);
-        }
+    public String uploadReviewImage(Long memberId, MultipartFile file){
+        String path = String.format("Review/%s", memberId);
+        return uploadImage(path, file);
     }
 
     public void deleteFile(String objectName) throws Exception {
@@ -120,6 +96,35 @@ public class MinioStorageService {
         String contentType = file.getContentType();
         if (!ALLOWED_CONTENT_TYPES.contains(contentType)) {
             throw new InvalidFileFormatException("지원하지 않는 이미지 콘텐츠 타입입니다: " + contentType);
+        }
+    }
+
+    private String uploadImage(String path, MultipartFile file) {
+        try {
+            validateImageExtension(file);
+            validateImageContentType(file);
+
+            // 도메인별로 분리해서 저장
+            String extension = getExtension(file.getOriginalFilename());
+            String objectName = String.format("%s/%s.%s", path, UUID.randomUUID(), extension);
+
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(objectName)
+                            .stream(file.getInputStream(), file.getSize(), -1)
+                            .contentType(file.getContentType())
+                            .build()
+            );
+
+            String url = getPreSignedUrl(objectName);
+
+            log.info("이미지 '{}' 을(를) 성공적으로 업로드 했습니다.", file.getOriginalFilename());
+
+            return url;
+        }
+        catch (Exception e) {
+            throw new FileUploadFailedException("파일 업로드에 실패했습니다.", e);
         }
     }
 }

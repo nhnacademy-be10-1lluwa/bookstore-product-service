@@ -198,7 +198,7 @@ public class BookService {
 
 
     public BookDetailResponse createBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
-        String savedImageName = minioStorageService.uploadFile("Book", 0L, bookImageFile); // Book 은 memberId 안쓰니 0L로 고정해서 전달
+        String savedImageName = minioStorageService.uploadBookImage(bookImageFile);
 
         Book bookEntity = bookMapper.toBookEntity(bookRegisterRequest);
         bookEntity.setBookImages(new ArrayList<>());
