@@ -4,6 +4,8 @@ import com.nhnacademy.illuwa.d_book.category.dto.CategoryResponse;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,4 +40,13 @@ public class CategoryService {
                 category.getCategoryName());
     }
 
+    public Page<CategoryResponse> getAllCategoriesByPaging(Pageable pageable) {
+        Page<Category> categoryPage = categoryRepository.findAll(pageable);
+
+        Page<CategoryResponse> categoryPageMap = categoryPage.map(category ->
+                new CategoryResponse(category.getId(), category.getParentCategory().getId(), category.getCategoryName())
+        );
+
+        return categoryPageMap;
+    }
 }

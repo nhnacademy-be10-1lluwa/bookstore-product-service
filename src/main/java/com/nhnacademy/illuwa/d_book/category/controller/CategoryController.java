@@ -4,6 +4,8 @@ import com.nhnacademy.illuwa.d_book.category.dto.CategoryResponse;
 import com.nhnacademy.illuwa.d_book.category.service.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -14,6 +16,11 @@ public class CategoryController {
 
     public CategoryController(CategoryService categoryService){
         this.categoryService = categoryService;
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Page<CategoryResponse>> getAllCategoriesByPaging(Pageable pageable){
+        return ResponseEntity.ok(categoryService.getAllCategoriesByPaging(pageable));
     }
 
     @GetMapping()
