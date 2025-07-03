@@ -11,7 +11,6 @@ import com.nhnacademy.illuwa.d_book.book.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
-import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
@@ -22,8 +21,10 @@ import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategor
 import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
-import com.nhnacademy.illuwa.infra.storage.MinioStorageService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,22 +111,16 @@ public class BookService {
             throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
         }
 
-
-
         log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
         if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
             log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
-
-
-
         // TODO 1 : 도서 이미지 저장
         // 도서 , 도서 url 경로, 도서 유형(상세 이미지는 등록할 때 1번만 저장)
         BookImage bookImage = new BookImage(bookEntity,bookRegisterRequest.getImgUrl(), ImageType.THUMBNAIL);
         bookEntity.addImage(bookImage);
-
 
         // TODO 2 : 도서 외부 정보
         //2) 도서 외부 정보 저장 - Status, giftwrap, count
@@ -136,15 +131,8 @@ public class BookService {
         // TODO 3 : 도서 카테고리 저장
         bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));
 
-
         // TODO 4 : 도서 저장
         bookRepository.save(bookEntity);
-
-
-
-
-
-
 
         //entity -> dto
         return bookResponseMapper.toBookDetailResponse(bookEntity);
@@ -155,7 +143,6 @@ public class BookService {
         List<Book> bookEntityList = bookRepository.findAll();
         return bookResponseMapper.toBookDetailListResponse(bookEntityList);
     }
-
 
 
     @Transactional
@@ -196,7 +183,16 @@ public class BookService {
         bookRepository.delete(targetBook);
 
         log.info("삭제된 도서 제목 : {}" , targetBook.getTitle());
-
     }
+
+
+    public Page<BookDetailResponse> getAllBooksByPaging(Pageable pageable){
+        Page<Book> bookPage = bookRepository.findAll(pageable);
+
+        Page<BookDetailResponse> pageMap = bookPage.map(bookResponseMapper::toBookDetailResponse);
+
+        return pageMap;
+    }
+
 
 }

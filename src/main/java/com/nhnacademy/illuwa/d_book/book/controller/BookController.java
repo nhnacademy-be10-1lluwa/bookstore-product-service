@@ -5,6 +5,8 @@ import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +40,16 @@ public class BookController {
     }
 
     //등록된 도서 목록
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<BookDetailResponse>> getRegisteredBooks(){
         List<BookDetailResponse> registeredBooks = bookService.getAllBooks();
+        return ResponseEntity.ok(registeredBooks);
+    }
+
+    //등록된 도서 목록
+    @GetMapping()
+    public ResponseEntity<Page<BookDetailResponse>> getRegisteredBooksByPaging(Pageable pageable){
+        Page<BookDetailResponse> registeredBooks = bookService.getAllBooksByPaging(pageable);
         return ResponseEntity.ok(registeredBooks);
     }
 
