@@ -2,7 +2,6 @@ package com.nhnacademy.illuwa.d_book.tag.controller;
 
 import com.nhnacademy.illuwa.d_book.tag.dto.TagRegisterRequest;
 import com.nhnacademy.illuwa.d_book.tag.dto.TagResponse;
-import com.nhnacademy.illuwa.d_book.tag.entity.Tag;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import com.nhnacademy.illuwa.d_book.tag.service.TagService;
 import jakarta.validation.Valid;
@@ -15,13 +14,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/tags")
-public class AdminTagController {
+public class TagController {
 
     TagService tagService;
 
     TagRepository tagRepository;
 
-    AdminTagController(TagService tagService,TagRepository tagRepository){
+    TagController(TagService tagService, TagRepository tagRepository){
         this.tagService = tagService;
         this.tagRepository = tagRepository;
     }
