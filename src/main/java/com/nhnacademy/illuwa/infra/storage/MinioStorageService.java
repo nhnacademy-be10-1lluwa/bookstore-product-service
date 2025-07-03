@@ -1,18 +1,25 @@
 package com.nhnacademy.illuwa.infra.storage;
+import com.nhnacademy.illuwa.infra.storage.exception.FileUploadFailedException;
 import com.nhnacademy.illuwa.infra.storage.exception.InvalidFileFormatException;
 import io.minio.*;
+import io.minio.errors.*;
 import io.minio.http.Method;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-@Service
+
 @Slf4j
+@Service
 public class MinioStorageService {
 
     private final MinioClient minioClient;
@@ -23,6 +30,16 @@ public class MinioStorageService {
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of("jpg", "jpeg", "png", "gif", "webp");
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpeg", "image/png", "image/gif", "image/webp");
 
+    @PostConstruct
+    public void init() throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+        if (!found) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+            log.info("Bucket '{}' 을(를) 생성했습니다.", bucket);
+        } else {
+            log.info("Bucket '{}' 이(가) 이미 존재합니다.", bucket);
+        }
+    }
 
     public MinioStorageService(@Value("${minio.url}") String url,
                                @Value("${minio.access-key}") String accessKey,
@@ -33,23 +50,36 @@ public class MinioStorageService {
                 .build();
     }
 
-    public String uploadFile(String domain, Long memberId, MultipartFile file) throws Exception {
-        validateImageExtension(file);
-        validateImageContentType(file);
-        String extension = getExtension(file.getOriginalFilename());
+    public String uploadFile(String domain, Long memberId, MultipartFile file){
+        try {
+            validateImageExtension(file);
+            validateImageContentType(file);
 
-        String objectName = String.format("%s/%s/%s.%s", domain, memberId, UUID.randomUUID(), extension);
+            // 도메인별로 분리해서 저장
+            String extension = getExtension(file.getOriginalFilename());
+            String objectName = domain.equalsIgnoreCase("Book")
+                    ? String.format("%s/%s.%s", domain, UUID.randomUUID(), extension)
+                    : String.format("%s/%s/%s.%s", domain, memberId, UUID.randomUUID(), extension);
 
-        minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(objectName)
-                        .stream(file.getInputStream(), file.getSize(), -1)
-                        .contentType(file.getContentType())
-                        .build()
-        );
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(objectName)
+                            .stream(file.getInputStream(), file.getSize(), -1)
+                            .contentType(file.getContentType())
+                            .build()
+            );
 
-        return objectName;
+            String url = getPreSignedUrl(objectName);
+
+            log.info("이미지 '{}' 을(를) 성공적으로 업로드 했습니다.", file.getOriginalFilename());
+
+            return url;
+
+        }
+        catch (Exception e) {
+            throw new FileUploadFailedException("파일 업로드에 실패했습니다.", e);
+        }
     }
 
     public void deleteFile(String objectName) throws Exception {
@@ -67,7 +97,7 @@ public class MinioStorageService {
                         .method(Method.GET)
                         .bucket(bucket)
                         .object(objectName)
-                        .expiry(60 * 60)  // 1시간
+                        .expiry(7, TimeUnit.DAYS)  // 7일
                         .build()
         );
     }
@@ -92,50 +122,4 @@ public class MinioStorageService {
             throw new InvalidFileFormatException("지원하지 않는 이미지 콘텐츠 타입입니다: " + contentType);
         }
     }
-
-    public String uploadBookImageFile(MultipartFile bookImageFile) {
-            try {
-                // 버킷이 존재하는지 확인하고, 없으면 생성
-                boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
-                if (!found) {
-                    minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
-                    log.info("Bucket '{}' 생성 ", bucket);
-                } else {
-                    log.info("Bucket '{}' 이미 존재", bucket);
-                }
-
-                // 파일 이름이 겹치지 않도록 UUID를 사용해 고유한 파일 이름 생성
-                String originalFilename = bookImageFile.getOriginalFilename();
-                String bookImageFileName = UUID.randomUUID().toString() + "-" + originalFilename;
-
-                // 파일 업로드
-                minioClient.putObject(
-                        PutObjectArgs.builder()
-                                .bucket(bucket)
-                                .object(bookImageFileName)
-                                .stream(bookImageFile.getInputStream(), bookImageFile.getSize(), -1)
-                                .contentType(bookImageFile.getContentType())
-                                .build()
-                );
-
-                String url = minioClient.getPresignedObjectUrl(
-                        GetPresignedObjectUrlArgs.builder()
-                                .method(Method.GET) // GET 요청에 대한 URL을 생성
-                                .bucket(bucket)
-                                .object(bookImageFileName)
-                                .expiry(7, TimeUnit.DAYS) // URL의 유효기간을 7일로 설정
-                                // Duration.ofDays(7) 도 사용 가능
-                                .build()
-                );
-
-
-                        log.info("'{}' 성공적으로 업로드 '{}' --> bucket 이름 : '{}'.", bookImageFile.getOriginalFilename(), bookImageFileName, bucket);
-
-                return url;
-
-            } catch (Exception e) {
-                log.error("MinIO에 업로드 중 에러 발생", e);
-                throw new RuntimeException("파일 업로드에 실패했습니다.", e);
-            }
-        }
-    }
+}
