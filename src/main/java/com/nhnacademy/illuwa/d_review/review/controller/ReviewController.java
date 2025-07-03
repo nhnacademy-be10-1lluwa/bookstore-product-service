@@ -33,9 +33,10 @@ public class ReviewController {
 
     @GetMapping
     public ResponseEntity<Page<ReviewResponse>> getReviewPages(@PathVariable Long bookId,
-                                              @PageableDefault(size = 5, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                               @RequestHeader("X-USER-ID") Long memberId,
+                                                               @PageableDefault(size = 5, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        return ResponseEntity.ok(reviewService.getReviewPages(bookId, pageable));
+        return ResponseEntity.ok(reviewService.getReviewPages(bookId, pageable, memberId));
     }
 
     @PutMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
