@@ -1,6 +1,7 @@
 package com.nhnacademy.illuwa.d_book.book.entity;
 
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
+import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.tag.entity.BookTag;
 import jakarta.persistence.*;
 import lombok.*;
