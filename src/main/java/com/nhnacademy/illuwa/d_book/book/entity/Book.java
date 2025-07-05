@@ -1,11 +1,9 @@
 package com.nhnacademy.illuwa.d_book.book.entity;
 
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
+import com.nhnacademy.illuwa.d_book.tag.entity.BookTag;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,6 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "books")
 public class Book {
     @Id
@@ -58,5 +57,9 @@ public class Book {
         this.bookImages.add(image);
         image.setBook(this);
     }
+
+    @Builder.Default
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookTag> bookTags = new ArrayList<>();
 
 }
