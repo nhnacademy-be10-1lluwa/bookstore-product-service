@@ -11,9 +11,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@ActiveProfiles("test")
 @Import(QuerydslConfig.class)
 public class CustomizedBookCategoryRepositoryImplTest {
 
@@ -46,6 +49,7 @@ public class CustomizedBookCategoryRepositoryImplTest {
                 .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
                 .build();
         entityManager.persist(book);
+        entityManager.flush();
         this.bookId = book.getId();
 
         Category category1 = new Category("카테고리1");
