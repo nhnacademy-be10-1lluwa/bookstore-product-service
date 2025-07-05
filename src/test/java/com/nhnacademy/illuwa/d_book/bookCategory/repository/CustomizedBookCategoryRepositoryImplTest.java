@@ -34,20 +34,17 @@ public class CustomizedBookCategoryRepositoryImplTest {
 
     @BeforeEach
     void setUp(){
-        Book book =new Book(
-                null,
-                "인어 공주",
-                "",
-                "인어 공주는...",
-                "안데르센",
-                "스웨덴출판사",
-                LocalDate.of(2016,06,16),
-                "123456789EE",
-                15000,
-                13000,
-                null,
-                new BookExtraInfo(Status.DELETED,true,1)
-        );
+        Book book = Book.builder()
+                .title("인어 공주")
+                .description("인어 공주는...")
+                .author("안데르센")
+                .publisher("스웨덴출판사")
+                .publishedDate(LocalDate.of(2016, 6, 16))
+                .isbn("123456789EE")
+                .regularPrice(15000)
+                .salePrice(13000)
+                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
+                .build();
         entityManager.persist(book);
         this.bookId = book.getId();
 

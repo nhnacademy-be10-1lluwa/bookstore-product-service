@@ -106,20 +106,17 @@ class AdminBookControllerTest {
                 "abc/def/g.jpg"
         );
 
-        Book book = new Book(
-                1L,
-                "어린 왕자",
-                "목차",
-                "description",
-                "author",
-                "출판사A",
-                LocalDate.of(2024, 6, 13),
-                "0100AF",
-                10000,
-                90000,
-                null,
-                new BookExtraInfo(Status.DELETED,true,3)
-        );
+        Book book =Book.builder()
+                .title("인어 공주")
+                .description("인어 공주는...")
+                .author("안데르센")
+                .publisher("스웨덴출판사")
+                .publishedDate(LocalDate.of(2016, 6, 16))
+                .isbn("123456789EE")
+                .regularPrice(15000)
+                .salePrice(13000)
+                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
+                .build();
 
         BookDetailResponse bookDetailResponse = new BookDetailResponse(
                 1L,
