@@ -66,6 +66,18 @@ public class BookController {
         return ResponseEntity.ok(bestSellerList);
     }
 
+    @GetMapping("/search/criteria")
+    public ResponseEntity<Page<BookDetailResponse>> searchBooksByCriteria(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String tagName,
+            Pageable pageable) {
+
+        Page<BookDetailResponse> BooksByCriteria
+                = bookService.searchBooksByCriteria(categoryId, tagName, pageable);
+        return ResponseEntity.ok(BooksByCriteria);
+    }
+
+
 
 
 }
