@@ -25,6 +25,8 @@ import com.nhnacademy.illuwa.infra.storage.MinioStorageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import lombok.extern.slf4j.Slf4j;
+import com.nhnacademy.illuwa.d_book.book.document.BookDocument;
+import com.nhnacademy.illuwa.d_book.book.repository.BookSearchRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,9 +48,10 @@ public class BookService {
     private final CategoryRepository categoryRepository;
     private final BookCategoryRepository bookCategoryRepository;
     private final MinioStorageService minioStorageService;
+    private final BookSearchRepository bookSearchRepository;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, MinioStorageService minioStorageService) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, MinioStorageService minioStorageService, BookSearchRepository bookSearchRepository) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
         this.bookResponseMapper = bookResponseMapper;
@@ -58,6 +61,7 @@ public class BookService {
         this.categoryRepository = categoryRepository;
         this.bookCategoryRepository = bookCategoryRepository;
         this.minioStorageService = minioStorageService;
+        this.bookSearchRepository = bookSearchRepository;
     }
 
     //도서 등록 전 도서 검색
@@ -128,7 +132,8 @@ public class BookService {
 
         bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));
 
-        bookRepository.save(bookEntity);
+        Book savedBook = bookRepository.save(bookEntity);
+        syncBookToElasticsearch(savedBook);
 
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
@@ -174,8 +179,11 @@ public class BookService {
             throw new NotFoundBookException("id : " + id + "에 해당하는 도서를 찾을 수 없습니다.");
         }
 
+        bookSearchRepository.deleteById(id);
+
         Book targetBook = book.get();
         bookRepository.delete(targetBook);
+
 
         log.info("삭제된 도서 제목 : {}" , targetBook.getTitle());
     }
@@ -217,7 +225,8 @@ public class BookService {
 
         bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));
 
-        bookRepository.save(bookEntity);
+        Book savedBook = bookRepository.save(bookEntity);
+        syncBookToElasticsearch(savedBook);
 
 
         return bookResponseMapper.toBookDetailResponse(bookEntity); // Entity -> DTO
@@ -228,6 +237,20 @@ public class BookService {
         Page<Book> bookPage = bookRepository.findBooksByCriteria(categoryId, tagName, pageable);
 
         return bookPage.map(bookResponseMapper::toBookDetailResponse);
+    }
+
+    private void syncBookToElasticsearch(Book book) {
+        BookDocument bookDocument = BookDocument.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .description(book.getDescription())
+                .author(book.getAuthor())
+                .publisher(book.getPublisher())
+                .isbn(book.getIsbn())
+                .salePrice(book.getSalePrice())
+                .thumbnailUrl(book.getBookImages() != null && !book.getBookImages().isEmpty() ? book.getBookImages().get(0).getImageUrl() : null)
+                .build();
+        bookSearchRepository.save(bookDocument);
     }
 
 }
