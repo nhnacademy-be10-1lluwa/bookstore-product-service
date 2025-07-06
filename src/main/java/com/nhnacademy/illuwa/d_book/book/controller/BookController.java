@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
+import com.nhnacademy.illuwa.d_book.book.document.BookDocument;
 import com.nhnacademy.illuwa.d_book.book.dto.*;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
@@ -78,6 +79,14 @@ public class BookController {
     }
 
 
+    @GetMapping("/search/es")
+    public ResponseEntity<Page<BookDocument>> searchBooksByKeyword(
+            @RequestParam String keyword,
+            Pageable pageable) {
+
+        Page<BookDocument> results = bookService.searchByKeyword(keyword, pageable);
+        return ResponseEntity.ok(results);
+    }
 
 
 }
