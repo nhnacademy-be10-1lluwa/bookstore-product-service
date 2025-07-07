@@ -14,16 +14,15 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "comments")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
-    @Length(max = 500)
     @Column(length = 500, nullable = false)
     private String commentContents;
 
-    @NotNull
     @Column(nullable = false)
     private LocalDateTime commentDate;
 
@@ -31,7 +30,6 @@ public class Comment {
     @JoinColumn(name = "reviewId", nullable = false)
     private Review review;
 
-    @NotNull
     @Column(nullable = false)
     private Long memberId;
 
