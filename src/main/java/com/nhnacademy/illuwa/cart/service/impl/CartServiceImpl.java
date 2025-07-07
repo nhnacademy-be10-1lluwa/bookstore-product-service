@@ -20,7 +20,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
@@ -28,6 +27,7 @@ public class CartServiceImpl implements CartService {
     private final BookRepository bookRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public Cart getOrCreateCart(Long memberId) {
 
         return cartRepository.findByMemberId(memberId)
@@ -35,6 +35,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public BookCart addItem(Long memberId, Long bookId, int amount) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new NotFoundBookException("해당 ID에 적합한 책은 존재하지 않습니다."));
@@ -63,6 +64,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public BookCart updateItem(Long memberId, Long bookId, int amount) {
 
         Book book = bookRepository.findById(bookId)
@@ -91,6 +93,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public void removeItem(Long memberId, Long bookId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new NotFoundBookException("해당 ID에 적합한 책이 존재하지 않습니다."));
@@ -104,6 +107,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookCart> getCartItems(Long memberId) {
         getOrCreateCart(memberId);
 
@@ -111,6 +115,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public void cleanCart(Long memberId) {
         Cart cart = getOrCreateCart(memberId);
 

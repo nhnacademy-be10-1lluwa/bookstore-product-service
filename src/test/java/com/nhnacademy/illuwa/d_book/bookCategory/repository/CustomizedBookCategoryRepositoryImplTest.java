@@ -11,9 +11,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@ActiveProfiles("test")
 @Import(QuerydslConfig.class)
 public class CustomizedBookCategoryRepositoryImplTest {
 
@@ -34,21 +37,19 @@ public class CustomizedBookCategoryRepositoryImplTest {
 
     @BeforeEach
     void setUp(){
-        Book book =new Book(
-                null,
-                "인어 공주",
-                "",
-                "인어 공주는...",
-                "안데르센",
-                "스웨덴출판사",
-                LocalDate.of(2016,06,16),
-                "123456789EE",
-                15000,
-                13000,
-                null,
-                new BookExtraInfo(Status.DELETED,true,1)
-        );
+        Book book = Book.builder()
+                .title("인어 공주")
+                .description("인어 공주는...")
+                .author("안데르센")
+                .publisher("스웨덴출판사")
+                .publishedDate(LocalDate.of(2016, 6, 16))
+                .isbn("123456789EE")
+                .regularPrice(15000)
+                .salePrice(13000)
+                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
+                .build();
         entityManager.persist(book);
+        entityManager.flush();
         this.bookId = book.getId();
 
         Category category1 = new Category("카테고리1");

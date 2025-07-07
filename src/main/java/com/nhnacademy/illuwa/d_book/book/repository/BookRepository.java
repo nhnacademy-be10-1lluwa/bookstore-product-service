@@ -15,8 +15,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface BookRepository extends JpaRepository<Book,Long> {
-
+public interface BookRepository extends JpaRepository<Book, Long>, BookRepositoryCustom {
 
     List<Book> findByTitleContaining(String title);
 
@@ -41,6 +40,6 @@ public interface BookRepository extends JpaRepository<Book,Long> {
 
     boolean existsByIsbn(String isbn);
 
-
+    Page<Book> findAll(Pageable pageable);
 
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -17,8 +18,11 @@ public class ReviewResponse {
     private LocalDateTime reviewDate;
     private Long bookId;
     private Long memberId;
+    private List<String> reviewImageUrls;
+    private boolean likedByMe;
+    private Long likeCount;
 
-    public static ReviewResponse from(Review review) {
+    public static ReviewResponse from(Review review, List<String> imageUrls, boolean likedByMe, Long likeCount) {
         return new ReviewResponse(
                 review.getReviewId(),
                 review.getReviewTitle(),
@@ -26,7 +30,10 @@ public class ReviewResponse {
                 review.getReviewRating(),
                 review.getReviewDate(),
                 review.getBook().getId(),
-                review.getMemberId()
+                review.getMemberId(),
+                imageUrls,
+                likedByMe,
+                likeCount
         );
     }
 }
