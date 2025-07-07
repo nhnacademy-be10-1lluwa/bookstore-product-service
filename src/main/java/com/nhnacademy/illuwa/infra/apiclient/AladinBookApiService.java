@@ -39,8 +39,6 @@ public class AladinBookApiService {
     }
 
     @Value("${external.aladin.api-key}")
-
-
     public List<BookExternalResponse> searchBooksByTitle(String title) {
 
         URI uri = UriComponentsBuilder

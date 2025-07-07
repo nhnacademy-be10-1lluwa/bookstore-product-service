@@ -16,6 +16,7 @@ import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
+import com.nhnacademy.illuwa.d_book.book.repository.BookSearchRepository;
 import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
@@ -61,6 +62,9 @@ public class BookServiceTest {
 
     @Mock
     CategoryRepository categoryRepository;
+
+    @Mock
+    BookSearchRepository bookSearchRepository;
 
 
     @InjectMocks
