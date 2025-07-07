@@ -176,10 +176,12 @@ public class BookServiceTest {
 
 
         Category mockCategory = new Category("테스트 카테고리");
+
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(mockCategory));
         when(bookMapper.toBookEntity(bookRegisterRequest)).thenReturn(mockBook);
         when(bookRepository.existsByIsbn("123456789EE")).thenReturn(false);
         when(bookResponseMapper.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
+        when(bookRepository.save(any())).thenReturn(mockBook);
 
 
         BookDetailResponse result = bookService.registerBook(bookRegisterRequest);
