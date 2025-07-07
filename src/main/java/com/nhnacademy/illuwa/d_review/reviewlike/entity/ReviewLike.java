@@ -10,19 +10,20 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "review_like", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"reviewId", "memberId"})
+@Table(name = "review_likes", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"review_id", "member_id"})
 })
 public class ReviewLike {
     @Id
+    @Column(name = "like_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long likeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reviewId", nullable = false)
+    @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 
-    @Column(nullable = false)
+    @Column(name = "member_id", nullable = false)
     private Long memberId;
 
     public static ReviewLike of(Review review, Long memberId) {

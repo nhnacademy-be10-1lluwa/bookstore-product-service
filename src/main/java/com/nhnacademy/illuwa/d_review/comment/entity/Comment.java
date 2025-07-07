@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 public class Comment {
     @Id
+    @Column(name = "comment_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
@@ -27,10 +28,10 @@ public class Comment {
     private LocalDateTime commentDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reviewId", nullable = false)
+    @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 
-    @Column(nullable = false)
+    @Column(name = "member_id", nullable = false)
     private Long memberId;
 
     public static Comment of(String commentContents, LocalDateTime commentDate, Review review, Long memberId) {
