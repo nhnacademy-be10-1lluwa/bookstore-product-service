@@ -1,8 +1,6 @@
 spring:
   application:
     name: product-service
-  profiles:
-    active: dev
   config:
     import: optional:configserver:https://book1lluwa.store/config/
 #  sql:
