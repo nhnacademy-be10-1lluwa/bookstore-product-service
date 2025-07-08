@@ -33,7 +33,6 @@ public class AdminBookController {
         bookService.registgerBookDirectly(request, request.getImageFile());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
-
     }
 
     // 외부 API 사용
@@ -53,5 +52,14 @@ public class AdminBookController {
     public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody BookUpdateRequest requestDto){
         bookService.updateBook(id,requestDto);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/register/api")
+    public ResponseEntity<Void> registerBookByAladin(
+            @RequestBody FinalAladinBookRegisterRequest request) {
+
+        bookService.registerBookByAladin(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
