@@ -16,6 +16,7 @@ import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
+import com.nhnacademy.illuwa.d_book.book.repository.BookSearchRepository;
 import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
@@ -61,6 +62,9 @@ public class BookServiceTest {
 
     @Mock
     CategoryRepository categoryRepository;
+
+    @Mock
+    BookSearchRepository bookSearchRepository;
 
 
     @InjectMocks
@@ -172,10 +176,12 @@ public class BookServiceTest {
 
 
         Category mockCategory = new Category("테스트 카테고리");
+
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(mockCategory));
         when(bookMapper.toBookEntity(bookRegisterRequest)).thenReturn(mockBook);
         when(bookRepository.existsByIsbn("123456789EE")).thenReturn(false);
         when(bookResponseMapper.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
+        when(bookRepository.save(any())).thenReturn(mockBook);
 
 
         BookDetailResponse result = bookService.registerBook(bookRegisterRequest);
