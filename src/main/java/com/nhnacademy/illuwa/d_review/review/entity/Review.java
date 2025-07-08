@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "reviews")
 public class Review {
     @Id
+    @Column(name = "review_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
@@ -31,10 +32,10 @@ public class Review {
     private LocalDateTime reviewDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bookId", nullable = false)
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    @Column(nullable = false)
+    @Column(name = "member_id", nullable = false)
     private Long memberId;
 
     public static Review of(String title, String content, Integer rating, LocalDateTime date, Book book, Long memberId) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.illuwa.d_book.book.dto.BestSellerResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
@@ -24,14 +25,20 @@ public class AladinBookApiService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
+    @Value("${external.aladin.api-key}")
+    private String apiKey;
+
+    private final String VERSION = "20131101";
+    private final String QUERYTYPE = "Bestseller";
+    private final String MAXRESULT = "10";
+    private final String SEARCH_TARGET = "Book";
+
     public AladinBookApiService(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }
 
     @Value("${external.aladin.api-key}")
-    private String apiKey;
-
     public List<BookExternalResponse> searchBooksByTitle(String title) {
 
         URI uri = UriComponentsBuilder
@@ -70,8 +77,6 @@ public class AladinBookApiService {
     }
 
 
-
-
     public BookExternalResponse findBookByIsbn(String isbn) {
 
         URI uri = UriComponentsBuilder
@@ -100,6 +105,39 @@ public class AladinBookApiService {
         }
         catch (JsonProcessingException e) {
             log.error("알라딘 api 응답값의 파싱 실패 - 해당 도서의 ISBN : {}" ,isbn,e);
+            throw new BookApiParsingException("알라딘 API 응답의 파싱 실패");
+        }
+    }
+
+    public List<BestSellerResponse> getBestSeller() {
+
+        URI uri = UriComponentsBuilder
+                .fromHttpUrl("http://www.aladin.co.kr/ttb/api/ItemList.aspx")
+                .queryParam("ttbkey", apiKey)
+                .queryParam("QueryType", QUERYTYPE)
+                .queryParam("MaxResults", MAXRESULT)
+                .queryParam("start", "1")
+                .queryParam("searchTarget", SEARCH_TARGET)
+                .queryParam("output","JS")
+                .queryParam("Version",VERSION)
+                .build()
+                .encode()
+                .toUri();
+        try{
+            String response = restTemplate.getForObject(uri, String.class);
+            JsonNode root = objectMapper.readTree(response);
+            JsonNode itemArray = root.get("item");
+            return objectMapper.convertValue(
+                    itemArray,
+                    new TypeReference<List<BestSellerResponse>>() {}
+            );
+
+        }  catch (RestClientException e) {
+            log.error("알라딘 api 호출 실패 - 인기 도서 조회 실패" , e);
+            throw new BookApiException("알라딘 도서 api 호출 실패", HttpStatus.BAD_GATEWAY);
+        }
+        catch (JsonProcessingException e) {
+            log.error("알라딘 api 응답값의 파싱 실패 : {}" , e);
             throw new BookApiParsingException("알라딘 API 응답의 파싱 실패");
         }
     }

@@ -6,6 +6,8 @@ import com.nhnacademy.illuwa.d_book.tag.entity.Tag;
 import com.nhnacademy.illuwa.d_book.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.tag.exception.TagNotFoundException;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,5 +52,9 @@ public class TagService {
 
         Tag targetTag = tagById.get();
         tagRepository.delete(targetTag);
+    }
+
+    public Page<Tag> getAllTags(Pageable pageable) {
+        return tagRepository.findAll(pageable);
     }
 }

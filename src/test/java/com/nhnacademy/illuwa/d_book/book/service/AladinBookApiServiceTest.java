@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.List;
 
@@ -37,9 +37,14 @@ public class AladinBookApiServiceTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IllegalAccessException, NoSuchFieldException {
         objectMapper.registerModule(new JavaTimeModule());
         aladinBookApiService = new AladinBookApiService(restTemplate, objectMapper);
+
+        Field field = AladinBookApiService.class.getDeclaredField("apiKey");
+        field.setAccessible(true);
+        field.set(aladinBookApiService, "ttbchlgur13m0908001");
+
     }
 
 

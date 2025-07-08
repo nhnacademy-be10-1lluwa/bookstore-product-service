@@ -14,25 +14,24 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "comments")
 public class Comment {
     @Id
+    @Column(name = "comment_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
-    @Length(max = 500)
     @Column(length = 500, nullable = false)
     private String commentContents;
 
-    @NotNull
     @Column(nullable = false)
     private LocalDateTime commentDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reviewId", nullable = false)
+    @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 
-    @NotNull
-    @Column(nullable = false)
+    @Column(name = "member_id", nullable = false)
     private Long memberId;
 
     public static Comment of(String commentContents, LocalDateTime commentDate, Review review, Long memberId) {

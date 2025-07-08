@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "review_images")
 public class ReviewImage {
     @Id
-    @Column(nullable = false)
+    @Column(name = "image_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long imageId;
 
@@ -20,7 +20,7 @@ public class ReviewImage {
     String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reviewId", nullable = false)
+    @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 
     public static ReviewImage of(String imageUrl, Review review) {
