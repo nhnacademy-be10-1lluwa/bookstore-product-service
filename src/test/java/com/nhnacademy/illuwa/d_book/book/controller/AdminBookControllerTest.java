@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -66,18 +67,18 @@ class AdminBookControllerTest {
     @BeforeAll
     static void setUp() {
         bookRegisterRequest = new BookRegisterRequest(
-                "어린 왕자",
-                "목차",
-                "설명",
-                "생텍쥐페리",
-                "출판사A",
-                LocalDate.of(2024, 6, 25),
-                "9780123456789",
-                15000,
-                12000,
-                "http://image.com/prince.jpg",
-                3,
-                2L
+                "테스트 책 제목",
+                "홍길동",
+                "테스트 출판사",
+                "테스트 내용",
+                "2025-07-10", // pubDate (String)
+                "1234567890123", // isbn
+                20000,           // regularPrice
+                15000,           // salePrice
+                "테스트 설명입니다.",
+                new MockMultipartFile("imageFile", "test.jpg", "image/jpeg", "fake-image-content".getBytes()),
+                10,              // count
+                1L               // categoryId
         );
     }
 
@@ -158,18 +159,18 @@ class AdminBookControllerTest {
         //given
         Book book = new Book();
         BookRegisterRequest request = new BookRegisterRequest(
-                "제목",
-                "목차",
-                "설명",
-                "저자",
-                "출판사",
-                LocalDate.of(2024, 6, 13),
-                "내용",
-                10000,
-                8000,
-                "http://cover.url",
-                3,
-                2L
+                "테스트 책 제목",
+                "홍길동",
+                "테스트 출판사",
+                "테스트 내용",
+                "2025-07-10", // pubDate (String)
+                "1234567890123", // isbn
+                20000,           // regularPrice
+                15000,           // salePrice
+                "테스트 설명입니다.",
+                new MockMultipartFile("imageFile", "test.jpg", "image/jpeg", "fake-image-content".getBytes()),
+                10,              // count
+                1L               // categoryId
         );
 
 
