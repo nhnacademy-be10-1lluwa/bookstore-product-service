@@ -11,6 +11,7 @@ import com.nhnacademy.illuwa.d_review.comment.exception.CommentNotFoundException
 import com.nhnacademy.illuwa.d_review.comment.exception.InvalidCommentStatusException;
 import com.nhnacademy.illuwa.d_review.review.exception.MemberIdDoesNotMatchWithReviewException;
 import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
+import com.nhnacademy.illuwa.infra.storage.exception.FileUploadFailedException;
 import com.nhnacademy.illuwa.infra.storage.exception.InvalidFileFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,38 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     private final Map<String, Object> body = new LinkedHashMap<>();
     private HttpStatus status;
+
+    @ExceptionHandler(InvalidFileFormatException.class)
+    public ResponseEntity<Object> handleInvalidFileFormatException(InvalidFileFormatException e) {
+        status = HttpStatus.BAD_REQUEST;
+
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "Invalid_File_Format");
+        body.put("message", e.getMessage());
+
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(FileUploadFailedException.class)
+    public ResponseEntity<Object> handleFileUploadFailedException(FileUploadFailedException e) {
+        status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "File_Upload_Failed");
+        body.put("message", e.getMessage());
+
+        log.error("MinIO에 업로드 중 에러가 발생했습니다.", e);
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(body, status);
+    }
+
     @ExceptionHandler(NotFoundBookException.class)
     public ResponseEntity<String> handleNotFoundBookException(NotFoundBookException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -58,8 +91,8 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
-        body.put("code", "Review_Not_Found"); // <-- 중요: 클라이언트가 파싱할 고유 코드
-        body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
+        body.put("code", "Review_Not_Found");
+        body.put("message", e.getMessage());
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
@@ -73,23 +106,8 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
-        body.put("code", "Member_Id_Does_Not_Match"); // <-- 중요: 클라이언트가 파싱할 고유 코드
-        body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
-
-        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
-
-        return new ResponseEntity<>(body, status);
-    }
-
-    @ExceptionHandler(InvalidFileFormatException.class)
-    public ResponseEntity<Object> handleInvalidFileFormatException(InvalidFileFormatException e) {
-        status = HttpStatus.BAD_REQUEST;
-
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("code", "Invalid_File_Format"); // <-- 중요: 클라이언트가 파싱할 고유 코드
-        body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
+        body.put("code", "Member_Id_Does_Not_Match");
+        body.put("message", e.getMessage());
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
@@ -103,8 +121,8 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
-        body.put("code", "Comment_Not_Found"); // <-- 중요: 클라이언트가 파싱할 고유 코드
-        body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
+        body.put("code", "Comment_Not_Found");
+        body.put("message", e.getMessage());
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
@@ -118,16 +136,13 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
-        body.put("code", "Comment_Status_Invalid"); // <-- 중요: 클라이언트가 파싱할 고유 코드
-        body.put("message", e.getMessage()); // 또는 고정 메시지 "요청한 사용자를 찾을 수 없습니다."
+        body.put("code", "Comment_Status_Invalid");
+        body.put("message", e.getMessage());
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
         return new ResponseEntity<>(body, status);
     }
-
-
-
 
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<Object> handleInsufficientStockException(InsufficientStockException e) {

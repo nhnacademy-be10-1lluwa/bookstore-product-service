@@ -23,13 +23,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -108,20 +106,17 @@ class AdminBookControllerTest {
                 "abc/def/g.jpg"
         );
 
-        Book book = new Book(
-                1L,
-                "어린 왕자",
-                "목차",
-                "description",
-                "author",
-                "출판사A",
-                LocalDate.of(2024, 6, 13),
-                "0100AF",
-                10000,
-                90000,
-                null,
-                new BookExtraInfo(Status.DELETED,true,3)
-        );
+        Book book =Book.builder()
+                .title("인어 공주")
+                .description("인어 공주는...")
+                .author("안데르센")
+                .publisher("스웨덴출판사")
+                .publishedDate(LocalDate.of(2016, 6, 16))
+                .isbn("123456789EE")
+                .regularPrice(15000)
+                .salePrice(13000)
+                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
+                .build();
 
         BookDetailResponse bookDetailResponse = new BookDetailResponse(
                 1L,
@@ -151,7 +146,7 @@ class AdminBookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(jsonPath("$.isbn").value("0100AF"))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         verify(bookService).registerBook(any(BookRegisterRequest.class));
     }

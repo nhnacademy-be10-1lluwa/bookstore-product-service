@@ -16,6 +16,7 @@ import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
+import com.nhnacademy.illuwa.d_book.book.repository.BookSearchRepository;
 import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
@@ -61,6 +62,9 @@ public class BookServiceTest {
 
     @Mock
     CategoryRepository categoryRepository;
+
+    @Mock
+    BookSearchRepository bookSearchRepository;
 
 
     @InjectMocks
@@ -140,20 +144,17 @@ public class BookServiceTest {
     @Test
     @DisplayName("도서 등록 성공")
     void registerBookTest_Success(){
-        Book mockBook = new Book(
-                null,
-                "어린 왕자",
-                "목차",
-                "description",
-                "author",
-                "publisher",
-                LocalDate.of(2012,10,12),
-                "012345",
-                10000,
-                9000,
-                null,
-                new BookExtraInfo(Status.DELETED,true,1)
-        );
+        Book mockBook = Book.builder()
+                .title("인어 공주")
+                .description("인어 공주는...")
+                .author("안데르센")
+                .publisher("스웨덴출판사")
+                .publishedDate(LocalDate.of(2016, 6, 16))
+                .isbn("123456789EE")
+                .regularPrice(15000)
+                .salePrice(13000)
+                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
+                .build();
 
         BookDetailResponse bookDetailResponse = new BookDetailResponse(
                 1L,
@@ -175,10 +176,12 @@ public class BookServiceTest {
 
 
         Category mockCategory = new Category("테스트 카테고리");
+
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(mockCategory));
         when(bookMapper.toBookEntity(bookRegisterRequest)).thenReturn(mockBook);
-        when(bookRepository.existsByIsbn("012345")).thenReturn(false);
+        when(bookRepository.existsByIsbn("123456789EE")).thenReturn(false);
         when(bookResponseMapper.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
+        when(bookRepository.save(any())).thenReturn(mockBook);
 
 
         BookDetailResponse result = bookService.registerBook(bookRegisterRequest);
@@ -196,20 +199,17 @@ public class BookServiceTest {
     @DisplayName("도서 등록 실패 - 이미 등록된 도서")
     void registerBookTest_Fail_AlreadyExists(){
 
-        Book book = new Book(
-                11L,
-                "어린 왕자",
-                "contents",
-                "des",
-                "작가1",
-                "출판사",
-                LocalDate.of(2024, 6, 13),
-                "isbn",
-                20000,
-                10000,
-                null,
-                null
-        );
+        Book book = Book.builder()
+                .title("인어 공주")
+                .description("인어 공주는...")
+                .author("안데르센")
+                .publisher("스웨덴출판사")
+                .publishedDate(LocalDate.of(2016, 6, 16))
+                .isbn("123456789EE")
+                .regularPrice(15000)
+                .salePrice(13000)
+                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
+                .build();
 
         Category category = new Category("name");
 
@@ -235,20 +235,18 @@ public class BookServiceTest {
     void deleteBook_Success() {
         //given
         Long id = 10L;
-        Book book = new Book(
-                10L,
-                "어린 왕자",
-                "contents",
-                "description",
-                "author",
-                "B출판사",
-                LocalDate.of(2024, 6, 13),
-                "00800ABZ",
-                20000,
-                10000,
-                null,
-                new BookExtraInfo(Status.DELETED,true,1)
-        );
+        Book book = Book.builder()
+                .id(id)
+                .title("인어 공주")
+                .description("인어 공주는...")
+                .author("안데르센")
+                .publisher("스웨덴출판사")
+                .publishedDate(LocalDate.of(2016, 6, 16))
+                .isbn("123456789EE")
+                .regularPrice(15000)
+                .salePrice(13000)
+                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
+                .build();
 
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
 
@@ -283,20 +281,17 @@ public class BookServiceTest {
     void searchBookByTitle_Success() {
         //given
         String title = "헨젤과 그레텔";
-        Book book = new Book(
-                0L,
-                "헨젤과 그레텔",
-                "목차1, 목차2, 목차3...",
-                "설명",
-                "그림형제",
-                "한국출판사",
-                LocalDate.of(1999, 9, 19),
-                "0070ABC",
-                10000,
-                6000,
-                null,
-                new BookExtraInfo(Status.DELETED,true,1)
-        );
+        Book book = Book.builder()
+                .title("인어 공주")
+                .description("인어 공주는...")
+                .author("안데르센")
+                .publisher("스웨덴출판사")
+                .publishedDate(LocalDate.of(2016, 6, 16))
+                .isbn("123456789EE")
+                .regularPrice(15000)
+                .salePrice(13000)
+                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
+                .build();
 
         BookDetailResponse bookDetailResponse = new BookDetailResponse(
                 0L,
@@ -351,20 +346,17 @@ public class BookServiceTest {
 
         Long id = 9L;
 
-        Book updatedBook = new Book(
-                9L,
-                "어린 왕자",
-                "contents",
-                "description",
-                "author",
-                "B출판사",
-                LocalDate.of(2024, 6, 13),
-                "00800ABZ",
-                20000,
-                10000,
-                null,
-                new BookExtraInfo(Status.DELETED,true,1)
-        );
+        Book updatedBook = Book.builder()
+                .title("인어 공주")
+                .description("인어 공주는...")
+                .author("안데르센")
+                .publisher("스웨덴출판사")
+                .publishedDate(LocalDate.of(2016, 6, 16))
+                .isbn("123456789EE")
+                .regularPrice(15000)
+                .salePrice(13000)
+                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
+                .build();
 
         BookUpdateRequest bookUpdateRequest = new BookUpdateRequest(
                 "수정된 목차",

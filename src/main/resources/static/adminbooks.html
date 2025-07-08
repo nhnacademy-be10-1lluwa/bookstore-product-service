@@ -41,7 +41,7 @@
 <div id="book-list">로딩 중...</div>
 
 <script>
-    fetch('/admin/books')
+    fetch('/books')
         .then(response => response.json())
         .then(data => {
             const container = document.getElementById('book-list');

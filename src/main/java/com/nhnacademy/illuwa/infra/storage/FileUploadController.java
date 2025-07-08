@@ -26,15 +26,13 @@ public class FileUploadController {
     // 다중 파일 업로드
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<UploadResponse>> upload(@RequestPart("file") List<MultipartFile> files,
-                                                       @RequestParam String domain,
-                                                       @RequestHeader("X-USER-ID") Long memberId) throws Exception {
+                                                       @RequestHeader("X-USER-ID") Long memberId){
 
         List<UploadResponse> responses = new ArrayList<>();
 
         for (MultipartFile file : files) {
-            String objectName = minioStorageService.uploadFile(domain, memberId, file);
-            String url = minioStorageService.getPreSignedUrl(objectName);
-            responses.add(new UploadResponse(objectName, url));
+            String url = minioStorageService.uploadReviewImage(memberId, file);
+            responses.add(new UploadResponse(file.getOriginalFilename(), url));
         }
 
         return ResponseEntity.ok(responses);
