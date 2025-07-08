@@ -133,7 +133,7 @@ public class BookService {
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
-        BookImage bookImage = new BookImage(bookEntity,bookRegisterRequest.getImgUrl(), ImageType.THUMBNAIL);
+        BookImage bookImage = new BookImage(bookEntity,bookRegisterRequest.getImageFile().getName(), ImageType.THUMBNAIL);
         bookEntity.addImage(bookImage);
 
         BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
@@ -207,12 +207,17 @@ public class BookService {
     }
 
 
-    public BookDetailResponse createBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
+    public BookDetailResponse registgerBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
+
         String savedImageName = minioStorageService.uploadBookImage(bookImageFile);
 
+        bookRegisterRequest.getParsedPubDate();
+
         Book bookEntity = bookMapper.toBookEntity(bookRegisterRequest);
+
         bookEntity.setBookImages(new ArrayList<>());
 
+        //카테고리
         Category categoryEntity = categoryRepository.findById(bookRegisterRequest.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
 
@@ -221,20 +226,26 @@ public class BookService {
         }
 
         log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
+
         if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
             log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
+        //이미지 MiniO 등록 예정
         BookImage bookImage = new BookImage(bookEntity,savedImageName, ImageType.THUMBNAIL);
         bookEntity.addImage(bookImage);
 
+        //도서 부가 정보
         BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
         bookEntity.setBookExtraInfo(bookExtraInfo);
 
-        bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));
+
 
         Book savedBook = bookRepository.save(bookEntity);
+
+        bookCategoryRepository.save(new BookCategory(savedBook,categoryEntity));
+
         syncBookToElasticsearch(savedBook);
 
 
