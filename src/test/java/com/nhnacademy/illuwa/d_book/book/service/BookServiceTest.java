@@ -172,7 +172,7 @@ public class BookServiceTest {
                 "imgUrl"
         );
 
-        Long categoryId = 2L;
+        Long categoryId = 1L;
 
 
 
