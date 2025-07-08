@@ -62,7 +62,7 @@ public class BookController {
 
 
     @Operation(summary = "등록된 도서 목록 페이징 조회", description = "DB에 등록된 도서 목록을 페이징하여 조회")
-    @GetMapping()
+    @GetMapping("/list")
     public ResponseEntity<Page<BookDetailResponse>> getRegisteredBooksByPaging(Pageable pageable){
         Page<BookDetailResponse> registeredBooks = bookService.getAllBooksByPaging(pageable);
         return ResponseEntity.ok(registeredBooks);
