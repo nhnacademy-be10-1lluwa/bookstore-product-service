@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elasticsearch 도서 검색 테스트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+<div class="container mx-auto p-8">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-4">📖 Elasticsearch 도서 검색 테스트</h1>
+
+        <div class="flex gap-2 mb-4">
+            <input type="text" id="keyword-input" class="flex-grow p-2 border border-gray-300 rounded-md" placeholder="검색어를 입력하세요 (예: 자바)">
+            <button id="search-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">검색</button>
+        </div>
+
+        <hr class="my-6">
+
+        <h2 class="text-xl font-semibold mb-2">검색 결과</h2>
+        <div id="results-container" class="space-y-4">
+            <p class="text-gray-500">검색을 시작해주세요.</p>
+        </div>
+
+        <nav class="mt-6 flex justify-center">
+            <ul id="pagination-container" class="inline-flex items-center -space-x-px">
+                <!-- 페이지 버튼들이 생성되는 곳 -->
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+    const keywordInput = document.getElementById('keyword-input');
+    const searchBtn = document.getElementById('search-btn');
+    const resultsContainer = document.getElementById('results-container');
+    const paginationContainer = document.getElementById('pagination-container');
+
+    let currentKeyword = '';
+
+    // 검색 버튼
+    searchBtn.addEventListener('click', () => {
+        currentKeyword = keywordInput.value;
+        if (currentKeyword) {
+            fetchBooks(currentKeyword, 0);
+        }
+    });
+
+    // 엔터 키
+    keywordInput.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+            searchBtn.click();
+        }
+    });
+
+    /**
+     * 백엔드 API를 호출하여 책 데이터를 가져오는 함수
+     * @param {string} keyword - 검색어
+     * @param {number} page - 요청할 페이지 번호 (0부터 시작)
+     */
+    async function fetchBooks(keyword, page) {
+        resultsContainer.innerHTML = '<p class="text-gray-500">검색 중...</p>';
+        paginationContainer.innerHTML = '';
+
+        const apiUrl = `http://localhost:10306/books/search/es?keyword=${encodeURIComponent(keyword)}&page=${page}&size=5`;
+
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const pageData = await response.json();
+
+            renderResults(pageData.content);
+            renderPagination(pageData);
+
+        } catch (error) {
+            console.error('API 호출 오류:', error);
+            resultsContainer.innerHTML = '<p class="text-red-500">검색 중 오류가 발생했습니다. 백엔드 서버가 실행 중인지 확인해주세요.</p>';
+        }
+    }
+
+    /**
+     * 검색 결과를 화면에 그리는 함수
+     * @param {Array} books - 책 데이터 배열
+     */
+    function renderResults(books) {
+        resultsContainer.innerHTML = ''; // 이전 결과 삭제
+
+        if (books.length === 0) {
+            resultsContainer.innerHTML = '<p class="text-gray-500">검색 결과가 없습니다.</p>';
+            return;
+        }
+
+        books.forEach(book => {
+            const bookDiv = document.createElement('div');
+            bookDiv.className = 'p-4 border rounded-md bg-gray-50';
+            bookDiv.innerHTML = `
+                <h3 class="font-bold text-lg">${book.title}</h3>
+                <p class="text-sm text-gray-600">저자: ${book.author} | 출판사: ${book.publisher}</p>
+                <p class="text-md font-semibold text-indigo-600 mt-1">${book.salePrice.toLocaleString()}원</p>
+                <p class="text-xs text-gray-400 mt-2">ID: ${book.id} / ISBN: ${book.isbn}</p>
+                <img src="${book.thumbnailUrl}" />
+            `;
+            resultsContainer.appendChild(bookDiv);
+        });
+    }
+
+    /**
+     * 페이지네이션 버튼을 화면에 그리는 함수
+     * @param {object} pageData - 백엔드에서 받은 Page 객체
+     */
+    function renderPagination(pageData) {
+        paginationContainer.innerHTML = ''; // 이전 버튼 삭제
+
+        // '이전' 버튼
+        if (!pageData.first) {
+            const prevLi = createPageButton('&lt; 이전', pageData.number - 1);
+            paginationContainer.appendChild(prevLi);
+        }
+
+        // 페이지 번호 버튼
+        for (let i = 0; i < pageData.totalPages; i++) {
+            const pageLi = createPageButton(i + 1, i, i === pageData.number);
+            paginationContainer.appendChild(pageLi);
+        }
+
+        // '다음' 버튼
+        if (!pageData.last) {
+            const nextLi = createPageButton('다음 &gt;', pageData.number + 1);
+            paginationContainer.appendChild(nextLi);
+        }
+    }
+
+    /**
+     * 클릭 가능한 페이지 버튼(li > a)을 생성하는 헬퍼 함수
+     * @param {string|number} text - 버튼에 표시될 텍스트
+     * @param {number} page - 이 버튼이 가리킬 페이지 번호
+     * @param {boolean} isActive - 현재 페이지인지 여부
+     */
+    function createPageButton(text, page, isActive = false) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#';
+        a.innerHTML = text; // HTML 엔티티(<, >)를 위해 innerHTML 사용
+
+        let baseStyle = 'px-3 py-2 leading-tight ';
+        if (isActive) {
+            a.className = baseStyle + 'text-indigo-600 bg-indigo-50 border border-indigo-300';
+            a.setAttribute('aria-current', 'page');
+        } else {
+            a.className = baseStyle + 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-100';
+        }
+
+        a.addEventListener('click', (e) => {
+            e.preventDefault();
+            fetchBooks(currentKeyword, page);
+        });
+
+        li.appendChild(a);
+        return li;
+    }
+</script>
+
+</body>
+</html>

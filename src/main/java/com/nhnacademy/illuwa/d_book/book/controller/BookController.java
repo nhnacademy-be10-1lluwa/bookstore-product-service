@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
+import com.nhnacademy.illuwa.d_book.book.document.BookDocument;
 import com.nhnacademy.illuwa.d_book.book.dto.*;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
@@ -61,7 +62,7 @@ public class BookController {
 
 
     @Operation(summary = "등록된 도서 목록 페이징 조회", description = "DB에 등록된 도서 목록을 페이징하여 조회")
-    @GetMapping()
+    @GetMapping("/list")
     public ResponseEntity<Page<BookDetailResponse>> getRegisteredBooksByPaging(Pageable pageable){
         Page<BookDetailResponse> registeredBooks = bookService.getAllBooksByPaging(pageable);
         return ResponseEntity.ok(registeredBooks);
@@ -94,6 +95,14 @@ public class BookController {
     }
 
 
+    @GetMapping("/search/es")
+    public ResponseEntity<Page<BookDocument>> searchBooksByKeyword(
+            @RequestParam String keyword,
+            Pageable pageable) {
+
+        Page<BookDocument> results = bookService.searchByKeyword(keyword, pageable);
+        return ResponseEntity.ok(results);
+    }
 
 
 }
