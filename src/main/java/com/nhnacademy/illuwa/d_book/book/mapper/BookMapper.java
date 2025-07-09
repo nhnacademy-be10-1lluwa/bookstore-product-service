@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.mapper;
 
+
 import com.nhnacademy.illuwa.d_book.book.dto.AladinBookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
@@ -21,6 +22,7 @@ public interface BookMapper {
     Book fromAladinResponse(BookExternalResponse response);
 
 
+
     @Mapping(source = "pubDate", target = "publishedDate")
     @Mapping(source = "regularPrice", target = "regularPrice")
     @Mapping(source = "salePrice", target = "salePrice")
@@ -31,4 +33,5 @@ public interface BookMapper {
     @Mapping(source = "publisher", target = "publisher")
     @Mapping(source = "isbn", target = "isbn")
     Book fromFinalAladinRequest(FinalAladinBookRegisterRequest request);
+
 }

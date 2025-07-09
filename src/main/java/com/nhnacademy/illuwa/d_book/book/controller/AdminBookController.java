@@ -33,6 +33,7 @@ public class AdminBookController {
         bookService.registgerBookDirectly(request, request.getImageFile());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+
     }
 
     // 외부 API 사용
