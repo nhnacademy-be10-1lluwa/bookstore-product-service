@@ -1,17 +1,14 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
-import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
-import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
-import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
+import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.enums.Status;
-import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.BookUpdateRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
-import com.nhnacademy.illuwa.d_book.book.mapper.BookExternalMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;

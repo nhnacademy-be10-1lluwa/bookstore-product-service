@@ -1,7 +1,8 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
 import com.nhnacademy.illuwa.d_book.book.document.BookDocument;
-import com.nhnacademy.illuwa.d_book.book.dto.*;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BestSellerResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
@@ -67,13 +68,6 @@ public class BookController {
         return ResponseEntity.ok(registeredBooks);
     }
 
-    @Operation(summary = "ISBN으로 외부 도서 검색", description = "알라딘 API를 사용하여 ISBN으로 도서를 검색")
-    @GetMapping("/isbn/{isbn}")
-    public ResponseEntity<BookExternalResponse> searchBookByIsbn(@PathVariable String isbn){
-        BookExternalResponse bookByIsbn = aladinBookApiService.findBookByIsbn(isbn);
-        return ResponseEntity.ok(bookByIsbn);
-    }
-
     @Operation(summary = "베스트셀러 목록 조회", description = "알라딘 API를 사용하여 베스트셀러 목록을 조회")
     @GetMapping("/bestseller")
     public ResponseEntity<List<BestSellerResponse>> getBestSeller(){
@@ -91,6 +85,13 @@ public class BookController {
         Page<BookDetailResponse> BooksByCriteria
                 = bookService.searchBooksByCriteria(categoryId, tagName, pageable);
         return ResponseEntity.ok(BooksByCriteria);
+    }
+
+    @Operation(summary = "ISBN으로 DB 도서 검색", description = "DB에서 ISBN으로 등록된 도서 검색")
+    @GetMapping("/isbn/{isbn}")
+    public ResponseEntity<BookDetailResponse> searchBookByIsbnInDB(@PathVariable String isbn){
+        BookDetailResponse bookByIsbn = bookService.searchBookByIsbn(isbn);
+        return ResponseEntity.ok(bookByIsbn);
     }
 
 

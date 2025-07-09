@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.book.dto;
+package com.nhnacademy.illuwa.d_book.book.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;

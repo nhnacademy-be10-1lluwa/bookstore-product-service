@@ -1,6 +1,10 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
-import com.nhnacademy.illuwa.d_book.book.dto.*;
+import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.request.FinalAladinBookRegisterRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

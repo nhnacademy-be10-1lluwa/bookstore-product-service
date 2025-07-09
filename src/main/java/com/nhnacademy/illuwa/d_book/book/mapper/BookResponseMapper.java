@@ -1,7 +1,7 @@
 package com.nhnacademy.illuwa.d_book.book.mapper;
 
-import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
 import com.nhnacademy.illuwa.d_book.book.enums.ImageType;

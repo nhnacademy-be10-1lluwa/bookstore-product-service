@@ -1,10 +1,9 @@
 package com.nhnacademy.illuwa.d_book.book.mapper;
 
 
-import com.nhnacademy.illuwa.d_book.book.dto.AladinBookRegisterRequest;
-import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
-import com.nhnacademy.illuwa.d_book.book.dto.FinalAladinBookRegisterRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.request.FinalAladinBookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
