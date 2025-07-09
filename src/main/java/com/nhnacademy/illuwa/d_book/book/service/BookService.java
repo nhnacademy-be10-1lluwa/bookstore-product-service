@@ -1,6 +1,10 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
-import com.nhnacademy.illuwa.d_book.book.dto.*;
+import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.request.FinalAladinBookRegisterRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
 import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
@@ -25,7 +29,6 @@ import org.springframework.data.domain.Pageable;
 import lombok.extern.slf4j.Slf4j;
 import com.nhnacademy.illuwa.d_book.book.document.BookDocument;
 import com.nhnacademy.illuwa.d_book.book.repository.BookSearchRepository;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -91,6 +94,21 @@ public class BookService {
 
         Book bookEntity = book.get();
         log.info("조회된 도서의 id : {}", bookEntity.getId());
+
+        return bookResponseMapper.toBookDetailResponse(bookEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public BookDetailResponse searchBookByIsbn(String isbn) {
+        Optional<Book> book = bookRepository.findByIsbn(isbn);
+
+        if (book.isEmpty()) {
+            throw new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다.");
+        }
+
+        Book bookEntity = book.get();
+
+        log.info("조회된 도서의 isbn : {}", bookEntity.getIsbn());
 
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
