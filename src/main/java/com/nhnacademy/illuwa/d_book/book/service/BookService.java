@@ -1,9 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
-import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
-import com.nhnacademy.illuwa.d_book.book.dto.BookUpdateRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.*;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
 import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
@@ -133,7 +130,44 @@ public class BookService {
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
-        BookImage bookImage = new BookImage(bookEntity,bookRegisterRequest.getImgUrl(), ImageType.THUMBNAIL);
+        BookImage bookImage = new BookImage(bookEntity,bookRegisterRequest.getImageFile().getName(), ImageType.THUMBNAIL);
+        bookEntity.addImage(bookImage);
+
+        BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
+        bookEntity.setBookExtraInfo(bookExtraInfo);
+
+        bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));
+
+        Book savedBook = bookRepository.save(bookEntity);
+        syncBookToElasticsearch(savedBook);
+
+        return bookResponseMapper.toBookDetailResponse(bookEntity);
+    }
+
+    @Transactional
+    public BookDetailResponse registerBookByAladin(FinalAladinBookRegisterRequest bookRegisterRequest) {
+
+        Book bookEntity = bookMapper.fromFinalAladinRequest(bookRegisterRequest);
+
+        bookEntity.setBookImages(new ArrayList<>());
+
+        Category categoryEntity = categoryRepository.findById(bookRegisterRequest.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
+
+
+        if (bookEntity == null) {
+            throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
+        }
+
+
+        log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
+        if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
+            log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
+            throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
+        }
+
+        BookImage bookImage = new BookImage(bookEntity,bookRegisterRequest.getImageFileUrl(), ImageType.THUMBNAIL);
+
         bookEntity.addImage(bookImage);
 
         BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
@@ -207,12 +241,17 @@ public class BookService {
     }
 
 
-    public BookDetailResponse createBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
+    public BookDetailResponse registgerBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
+
         String savedImageName = minioStorageService.uploadBookImage(bookImageFile);
 
+        bookRegisterRequest.getParsedPubDate();
+
         Book bookEntity = bookMapper.toBookEntity(bookRegisterRequest);
+
         bookEntity.setBookImages(new ArrayList<>());
 
+        //카테고리
         Category categoryEntity = categoryRepository.findById(bookRegisterRequest.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
 
@@ -221,20 +260,26 @@ public class BookService {
         }
 
         log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
+
         if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
             log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
+        //이미지 MiniO 등록 예정
         BookImage bookImage = new BookImage(bookEntity,savedImageName, ImageType.THUMBNAIL);
         bookEntity.addImage(bookImage);
 
+        //도서 부가 정보
         BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
         bookEntity.setBookExtraInfo(bookExtraInfo);
 
-        bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));
+
 
         Book savedBook = bookRepository.save(bookEntity);
+
+        bookCategoryRepository.save(new BookCategory(savedBook,categoryEntity));
+
         syncBookToElasticsearch(savedBook);
 
 

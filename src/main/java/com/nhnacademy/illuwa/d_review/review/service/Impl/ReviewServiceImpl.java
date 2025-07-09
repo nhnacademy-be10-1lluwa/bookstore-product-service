@@ -1,5 +1,7 @@
 package com.nhnacademy.illuwa.d_review.review.service.Impl;
 
+import com.nhnacademy.illuwa.common.client.member.MemberServiceClient;
+import com.nhnacademy.illuwa.common.client.order.OrderServiceClient;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
@@ -8,6 +10,7 @@ import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
 import com.nhnacademy.illuwa.d_review.review.entity.ReviewImage;
 import com.nhnacademy.illuwa.d_review.review.exception.MemberIdDoesNotMatchWithReviewException;
+import com.nhnacademy.illuwa.d_review.review.exception.CannotWriteReviewException;
 import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewImageRepository;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewRepository;
@@ -33,10 +36,16 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final MinioStorageService minioStorageService;
+    private final MemberServiceClient memberServiceClient;
+    private final OrderServiceClient orderServiceClient;
 
     @Override
     @Transactional
     public ReviewResponse createReview(Long bookId, ReviewRequest request, Long memberId, List<MultipartFile> images) throws Exception {
+        if(Boolean.FALSE.equals(orderServiceClient.isConfirmedOrder(memberId, bookId).getBody())){
+            throw new CannotWriteReviewException("구매가 확정되지 않아서 리뷰를 작성하실 수 없습니다!");
+        }
+
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new NotFoundBookException("도서를 찾을 수 없습니다."));
 
         Review review = Review.of(
@@ -49,18 +58,19 @@ public class ReviewServiceImpl implements ReviewService {
         );
         Review saved = reviewRepository.save(review);
 
+        String rewardType = "REVIEW";
         List<String> imageUrls = new ArrayList<>();
         if(images != null) {
             for(MultipartFile image : images){
-                String uploadedUrl = minioStorageService.uploadReviewImage(memberId, image);
+                String uploadedUrl = minioStorageService.uploadReviewImage(memberId, image).getUrl();
                 imageUrls.add(uploadedUrl);
                 ReviewImage reviewImage = ReviewImage.of(uploadedUrl, saved);
                 reviewImageRepository.save(reviewImage);
             }
+            rewardType = "PHOTO_REVIEW";
         }
 
-        // TODO: 포인트 적립 로직 추후 추가
-        // feign client API 요청: /members/{memberId}/points/event?reason=REVIEW 또는 PHOTO_REVIEW
+        memberServiceClient.earnEventPoint(memberId, rewardType);
 
         return ReviewResponse.from(saved, imageUrls, false, 0L);
     }
@@ -117,7 +127,7 @@ public class ReviewServiceImpl implements ReviewService {
         List<String> updateImages = new ArrayList<>();
         if(images != null) {
             for(MultipartFile newImage : images){
-                String uploadedUrl = minioStorageService.uploadReviewImage(memberId, newImage);
+                String uploadedUrl = minioStorageService.uploadReviewImage(memberId, newImage).getUrl();
                 updateImages.add(uploadedUrl);
                 ReviewImage reviewImage = ReviewImage.of(uploadedUrl, review);
                 reviewImageRepository.save(reviewImage);
