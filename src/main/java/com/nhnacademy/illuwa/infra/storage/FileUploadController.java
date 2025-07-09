@@ -31,8 +31,8 @@ public class FileUploadController {
         List<UploadResponse> responses = new ArrayList<>();
 
         for (MultipartFile file : files) {
-            String url = minioStorageService.uploadReviewImage(memberId, file);
-            responses.add(new UploadResponse(file.getOriginalFilename(), url));
+            UploadResponse response = minioStorageService.uploadReviewImage(memberId, file);
+            responses.add(response);
         }
 
         return ResponseEntity.ok(responses);

@@ -9,4 +9,5 @@ import lombok.Getter;
 public class UploadResponse {
     private String objectName;
     private String url;
+    private String changedName;
 }
