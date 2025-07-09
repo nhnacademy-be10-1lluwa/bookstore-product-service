@@ -1,6 +1,5 @@
-package com.nhnacademy.illuwa.d_book.book.dto;
+package com.nhnacademy.illuwa.d_book.book.dto.response;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;

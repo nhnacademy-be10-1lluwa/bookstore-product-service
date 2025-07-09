@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.book.dto;
+package com.nhnacademy.illuwa.d_book.book.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
@@ -11,7 +11,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BookExternalResponse {
-
     private String title;
     private String description;
     private String author;
@@ -20,8 +19,6 @@ public class BookExternalResponse {
     private String isbn;
     private Integer priceStandard;
     private Integer priceSales;
-    //이미지 url
     private String cover;
     private String categoryName;
-
 }
