@@ -50,12 +50,58 @@ public class MinioStorageService {
     }
 
     public String uploadBookImage(MultipartFile file) {
-        return uploadImage("Book", file);
+        try {
+            validateImageExtension(file);
+            validateImageContentType(file);
+
+            String changedName = changeName("Book", file);
+
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(changedName)
+                            .stream(file.getInputStream(), file.getSize(), -1)
+                            .contentType(file.getContentType())
+                            .build()
+            );
+
+            String url = getPreSignedUrl(changedName);
+
+            log.info("이미지 '{}' 을(를) 성공적으로 업로드 했습니다.", file.getOriginalFilename());
+
+            return url;
+        }
+        catch (Exception e) {
+            throw new FileUploadFailedException("파일 업로드에 실패했습니다.", e);
+        }
     }
 
-    public String uploadReviewImage(Long memberId, MultipartFile file){
-        String path = String.format("Review/%s", memberId);
-        return uploadImage(path, file);
+    public UploadResponse uploadReviewImage(Long memberId, MultipartFile file){
+        try {
+            validateImageExtension(file);
+            validateImageContentType(file);
+
+            String path = String.format("Review/%s", memberId);
+            String changedName = changeName(path, file);
+
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(changedName)
+                            .stream(file.getInputStream(), file.getSize(), -1)
+                            .contentType(file.getContentType())
+                            .build()
+            );
+
+            String url = getPreSignedUrl(changedName);
+
+            log.info("이미지 '{}' 을(를) 성공적으로 업로드 했습니다.", file.getOriginalFilename());
+
+            return new UploadResponse(file.getOriginalFilename(), url, changedName);
+        }
+        catch (Exception e) {
+            throw new FileUploadFailedException("파일 업로드에 실패했습니다.", e);
+        }
     }
 
     public void deleteFile(String objectName) throws Exception {
@@ -99,32 +145,8 @@ public class MinioStorageService {
         }
     }
 
-    private String uploadImage(String path, MultipartFile file) {
-        try {
-            validateImageExtension(file);
-            validateImageContentType(file);
-
-            // 도메인별로 분리해서 저장
-            String extension = getExtension(file.getOriginalFilename());
-            String objectName = String.format("%s/%s_%s.%s", path, UUID.randomUUID(), file.getOriginalFilename(), extension);
-
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucket)
-                            .object(objectName)
-                            .stream(file.getInputStream(), file.getSize(), -1)
-                            .contentType(file.getContentType())
-                            .build()
-            );
-
-            String url = getPreSignedUrl(objectName);
-
-            log.info("이미지 '{}' 을(를) 성공적으로 업로드 했습니다.", file.getOriginalFilename());
-
-            return url;
-        }
-        catch (Exception e) {
-            throw new FileUploadFailedException("파일 업로드에 실패했습니다.", e);
-        }
+    // 도메인별로 저장
+    private String changeName(String path, MultipartFile file ) {
+        return  String.format("%s/%s_%s", path, UUID.randomUUID(), file.getOriginalFilename());
     }
 }
