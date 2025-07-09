@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
+import com.nhnacademy.illuwa.d_book.book.document.BookDocument;
 import com.nhnacademy.illuwa.d_book.book.dto.*;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
@@ -10,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +53,7 @@ public class BookController {
     }
 
     @Operation(summary = "등록된 모든 도서 목록 조회", description = "페이징 없이 DB에 등록된 모든 도서 목록을 조회")
-    @GetMapping("/all")
+    @GetMapping()
     public ResponseEntity<List<BookDetailResponse>> getRegisteredBooks(){
         List<BookDetailResponse> registeredBooks = bookService.getAllBooks();
         return ResponseEntity.ok(registeredBooks);
@@ -61,7 +61,7 @@ public class BookController {
 
 
     @Operation(summary = "등록된 도서 목록 페이징 조회", description = "DB에 등록된 도서 목록을 페이징하여 조회")
-    @GetMapping()
+    @GetMapping("/list")
     public ResponseEntity<Page<BookDetailResponse>> getRegisteredBooksByPaging(Pageable pageable){
         Page<BookDetailResponse> registeredBooks = bookService.getAllBooksByPaging(pageable);
         return ResponseEntity.ok(registeredBooks);
@@ -94,6 +94,14 @@ public class BookController {
     }
 
 
+    @GetMapping("/search/es")
+    public ResponseEntity<Page<BookDocument>> searchBooksByKeyword(
+            @RequestParam String keyword,
+            Pageable pageable) {
+
+        Page<BookDocument> results = bookService.searchByKeyword(keyword, pageable);
+        return ResponseEntity.ok(results);
+    }
 
 
 }

@@ -16,6 +16,7 @@ import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
+import com.nhnacademy.illuwa.d_book.book.repository.BookSearchRepository;
 import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -62,6 +64,9 @@ public class BookServiceTest {
     @Mock
     CategoryRepository categoryRepository;
 
+    @Mock
+    BookSearchRepository bookSearchRepository;
+
 
     @InjectMocks
     BookService bookService;
@@ -72,18 +77,18 @@ public class BookServiceTest {
     @BeforeAll
     static void setUp() {
         bookRegisterRequest = new BookRegisterRequest(
-                "어린 왕자",
-                "목차",
-                "설명",
-                "생텍쥐페리",
-                "출판사A",
-                LocalDate.of(2024, 6, 25),
-                "9780123456789",
+                "테스트 책 제목",
+                "홍길동",
+                "테스트 출판사",
+                "테스트 내용",
+                "2025-07-10",
+                "1234567890123",
+                20000,
                 15000,
-                12000,
-                "http://image.com/prince.jpg",
-                3,
-                2L
+                "테스트 설명입니다.",
+                new MockMultipartFile("imageFile", "test.jpg", "image/jpeg", "fake-image-content".getBytes()),
+                10,
+                1L
         );
     }
 
@@ -167,15 +172,17 @@ public class BookServiceTest {
                 "imgUrl"
         );
 
-        Long categoryId = 2L;
+        Long categoryId = 1L;
 
 
 
         Category mockCategory = new Category("테스트 카테고리");
+
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(mockCategory));
         when(bookMapper.toBookEntity(bookRegisterRequest)).thenReturn(mockBook);
         when(bookRepository.existsByIsbn("123456789EE")).thenReturn(false);
         when(bookResponseMapper.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
+        when(bookRepository.save(any())).thenReturn(mockBook);
 
 
         BookDetailResponse result = bookService.registerBook(bookRegisterRequest);

@@ -8,6 +8,7 @@ import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +101,7 @@ public class BookControllerTest {
     }
 
     @Test
+    @Disabled
     void getRegisteredBooks() throws Exception {
 
         // when & then

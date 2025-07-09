@@ -3,13 +3,6 @@ spring:
     name: product-service
   config:
     import: optional:configserver:https://book1lluwa.store/config/
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
 
 logging:
   level:
