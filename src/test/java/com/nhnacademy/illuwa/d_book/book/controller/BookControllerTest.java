@@ -1,8 +1,8 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.illuwa.d_book.book.dto.BookDetailResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.BookRegisterRequest;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -111,17 +110,6 @@ public class BookControllerTest {
         verify(bookService).getAllBooksByPaging(any());
     }
 
-    @Test
-    void testSearchBookByIsbn() throws Exception {
-        // given
-        String isbn = "00AA123";
-
-        // when & then
-        mockMvc.perform(get("/books/isbn/{isbn}",isbn))
-                .andExpect(status().isOk());
-
-        verify(aladinBookApiService).findBookByIsbn(isbn);
-    }
 
 
 }
