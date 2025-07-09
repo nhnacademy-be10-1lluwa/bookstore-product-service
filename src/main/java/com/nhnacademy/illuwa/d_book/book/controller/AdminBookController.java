@@ -54,4 +54,13 @@ public class AdminBookController {
         bookService.updateBook(id,requestDto);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping(value = "/register/api")
+    public ResponseEntity<Void> registerBookByAladin(
+            @RequestBody FinalAladinBookRegisterRequest request) {
+
+        bookService.registerBookByAladin(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }
