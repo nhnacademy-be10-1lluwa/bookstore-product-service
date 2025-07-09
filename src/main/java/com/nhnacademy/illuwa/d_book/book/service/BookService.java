@@ -167,6 +167,7 @@ public class BookService {
         }
 
         BookImage bookImage = new BookImage(bookEntity,bookRegisterRequest.getImageFileUrl(), ImageType.THUMBNAIL);
+
         bookEntity.addImage(bookImage);
 
         BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
