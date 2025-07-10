@@ -81,7 +81,7 @@ class CartServiceImplTest {
         CartResponse resp = cartService.getCart(new CartRequest(memberId));
 
         assertNotNull(resp);
-        assertTrue(resp.getBooks().isEmpty());
+        assertTrue(resp.getBookCarts().isEmpty());
     }
 
     @Test
@@ -100,8 +100,8 @@ class CartServiceImplTest {
 
         CartResponse resp = cartService.getCart(new CartRequest(memberId));
 
-        assertEquals(1, resp.getBooks().size());
-        assertEquals("T", resp.getBooks().get(0).getTitle());
+        assertEquals(1, resp.getBookCarts().size());
+        assertEquals("T", resp.getBookCarts().get(0).getTitle());
     }
 
     @Test
