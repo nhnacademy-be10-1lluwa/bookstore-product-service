@@ -28,7 +28,7 @@ class CategoryControllerTest {
     void getAllCategories() throws Exception {
 
         // when & then
-        mockMvc.perform(get("/categories"))
+        mockMvc.perform(get("/api/categories"))
                 .andExpect(status().isOk());
 
         verify(categoryService).getAllCategories();
