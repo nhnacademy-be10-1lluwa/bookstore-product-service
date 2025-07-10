@@ -5,34 +5,41 @@ import com.nhnacademy.illuwa.d_book.category.dto.CategoryResponse;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.exception.CategoryNotAllowedException;
 import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CategoryService {
 
-    CategoryRepository categoryRepository;
-
-    public CategoryService(CategoryRepository categoryRepository){
-        this.categoryRepository = categoryRepository;
-    }
+    private final CategoryRepository categoryRepository;
 
     public List<CategoryResponse> getAllCategories(){
         List<Category> categories = categoryRepository.findAll();
-        List<CategoryResponse> categoryResponseList = categories.stream().map(c -> new CategoryResponse(
-                        c.getId(),
-                        c.getParentCategory() != null ? c.getParentCategory().getId() : null,
-                        c.getCategoryName()
-                ))
+        List<CategoryResponse> categoryResponseList = categories.stream().map(CategoryResponse::new)
                 .toList();
         return categoryResponseList;
     }
+
+
+    public List<CategoryResponse> getCategoryTree() {
+        List<Category> rootCategories = categoryRepository.findByParentCategoryIsNull();
+        return rootCategories.stream()
+                .map(CategoryResponse::new)
+                .collect(Collectors.toList());
+    }
+
 
     public CategoryResponse getCategoryInfo(Long categoryId) {
         Optional<Category> categoryById = categoryRepository.findById(categoryId);
@@ -43,16 +50,14 @@ public class CategoryService {
 
         Category category = categoryById.get();
 
-        return new CategoryResponse(category.getId(),
-                category.getParentCategory() != null ? category.getParentCategory().getId() : null,
-                category.getCategoryName());
+        return new CategoryResponse(category);
     }
 
     public Page<CategoryResponse> getAllCategoriesByPaging(Pageable pageable) {
         Page<Category> categoryPage = categoryRepository.findAll(pageable);
 
         Page<CategoryResponse> categoryPageMap = categoryPage.map(category ->
-                new CategoryResponse(category.getId(), category.getParentCategory().getId(), category.getCategoryName())
+                new CategoryResponse(category)
         );
 
         return categoryPageMap;
