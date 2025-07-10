@@ -23,7 +23,6 @@ public interface CartService {
     // 도서 수량 수정
     BookCartResponse updateBookCart(BookCartRequest request);
 
-    //당일 ㅈ
     void removeBookCart(BookCartRequest request);
 
     void cleanCart(CartRequest request);
