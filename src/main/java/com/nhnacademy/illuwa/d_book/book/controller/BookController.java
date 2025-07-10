@@ -3,6 +3,7 @@ package com.nhnacademy.illuwa.d_book.book.controller;
 import com.nhnacademy.illuwa.d_book.book.document.BookDocument;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BestSellerResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
@@ -92,6 +93,17 @@ public class BookController {
     public ResponseEntity<BookDetailResponse> searchBookByIsbnInDB(@PathVariable String isbn){
         BookDetailResponse bookByIsbn = bookService.searchBookByIsbn(isbn);
         return ResponseEntity.ok(bookByIsbn);
+    }
+
+    @GetMapping("/external/isbn/{isbn}")
+    public ResponseEntity<BookExternalResponse> getBookByIsbnFromExternalApi(@PathVariable String isbn){
+        BookExternalResponse bookDetail = aladinBookApiService.findBookByIsbn(isbn);
+
+        if (bookDetail == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(bookDetail);
     }
 
 
