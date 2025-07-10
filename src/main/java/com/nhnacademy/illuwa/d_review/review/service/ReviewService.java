@@ -13,5 +13,7 @@ public interface ReviewService {
 
     Page<ReviewResponse> getReviewPages(Long bookId, Pageable pageable, Long memberId);
 
-    ReviewResponse updateReview(Long bookId, Long reviewId, ReviewRequest request, Long memberId, List<MultipartFile> images) throws Exception;
+    ReviewResponse getReviewDetails(Long bookId, Long reviewId, Long memberId);
+
+    ReviewResponse updateReview(Long bookId, Long reviewId, ReviewRequest request, Long memberId, List<MultipartFile> images, List<String> keepImageUrls) throws Exception;
 }
