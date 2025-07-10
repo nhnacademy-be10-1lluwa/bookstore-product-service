@@ -21,7 +21,7 @@ import java.util.List;
 
 @Tag(name = "📖 도서 API", description = "도서 조회 및 검색 관련 API")
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/api/books")
 public class BookController {
 
     BookService bookService;

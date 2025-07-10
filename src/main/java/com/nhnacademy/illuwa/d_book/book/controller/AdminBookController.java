@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/books")
+@RequestMapping("/api/admin/books")
 public class AdminBookController {
 
     private final BookService bookService;

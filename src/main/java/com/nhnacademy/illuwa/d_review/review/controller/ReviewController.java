@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/books/{bookId}/reviews")
+@RequestMapping("/api/books/{bookId}/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
 
