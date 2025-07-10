@@ -77,7 +77,7 @@ public class BookControllerTest {
 
 
         //when & then
-        mockMvc.perform(get("/books/search")
+        mockMvc.perform(get("/api/books/search")
                         .param("title","어린 왕자")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -93,7 +93,7 @@ public class BookControllerTest {
         Long id = 11L;
 
         // when & then
-        mockMvc.perform(get("/books/{id}",id))
+        mockMvc.perform(get("/api/books/{id}",id))
                 .andExpect(status().isOk());
 
         verify(bookService).searchBookById(id);
