@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "order-service")
 public interface OrderServiceClient {
-    @GetMapping("/order/member/confirmed")
+    @GetMapping("/api/order/member/confirmed")
     ResponseEntity<Boolean> isConfirmedOrder(@RequestHeader("X-USER-ID") Long memberId, @RequestParam Long bookId);
 }
