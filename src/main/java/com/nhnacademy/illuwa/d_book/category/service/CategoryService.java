@@ -76,11 +76,33 @@ public class CategoryService {
 
         parentCategory.addChildCategory(newCategory);
 
-
-
-
-
         return new CategoryResponse(newCategory);
     }
+
+    @Transactional
+    public void createCategory(CategoryCreateRequest request) {
+        Category newCategory = new Category(request.getCategoryName());
+
+        if (request.getParentId() != null) {
+            Category parent = categoryRepository.findById(request.getParentId())
+                    .orElseThrow(() -> new IllegalArgumentException("상위 카테고리가 존재하지 않습니다."));
+            parent.addChildCategory(newCategory);
+        }
+
+        categoryRepository.save(newCategory);
+    }
+
+    @Transactional
+    public void deleteCategory(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리"));
+
+        if (!category.getChildrenCategory().isEmpty()) {
+            throw new IllegalStateException("하위 카테고리를 포함한 경우 삭제 불가");
+        }
+
+        categoryRepository.delete(category);
+    }
+
 
 }
