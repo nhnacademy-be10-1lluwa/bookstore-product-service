@@ -3,7 +3,7 @@ package com.nhnacademy.illuwa.d_book.book.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.nhnacademy.illuwa.d_book.book.dto.BookExternalResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;

@@ -6,8 +6,12 @@ import com.nhnacademy.illuwa.cart.dto.CartRequest;
 import com.nhnacademy.illuwa.cart.dto.CartResponse;
 import com.nhnacademy.illuwa.cart.service.CartService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
+@Slf4j
 @RestController
 @RequestMapping("/cart")
 @RequiredArgsConstructor
@@ -21,10 +25,10 @@ public class CartController {
         return cartService.getCart(cartRequest);
     }
 
-    @PostMapping("/books")
-    public BookCartResponse addBook(@RequestHeader("X-USER-ID") long memberId,
-                                    @RequestBody BookCartRequest request){
-
+    @PostMapping("/book")
+    public BookCartResponse addBookCart(@RequestHeader("X-USER-ID") long memberId,
+                                        @RequestBody BookCartRequest request){
+        log.info("Received request to add book to cart. X-USER-ID: {}, BookId: {}, Amount: {}", memberId, request.getBookId(), request.getAmount());
         request.setMemberId(memberId);
         return cartService.addBook(request);
     }
