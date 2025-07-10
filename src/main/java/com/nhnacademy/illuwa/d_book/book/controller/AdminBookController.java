@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
+import com.nhnacademy.illuwa.d_book.book.dto.request.BookApiRegisterRequest;
 import jakarta.ws.rs.core.SecurityContext;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
@@ -41,10 +42,18 @@ public class AdminBookController {
 
     }
 
-    // 외부 API 사용
+//    // 외부 API 사용
+//    @PostMapping("register/aladin")
+//    public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest bookRegisterRequest){
+//        BookDetailResponse detailResponse = bookService.registerBook(bookRegisterRequest);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(detailResponse);
+//    }
+
+    // 외부 API 사용 (front)
     @PostMapping("register/aladin")
-    public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest bookRegisterRequest){
-        BookDetailResponse detailResponse = bookService.registerBook(bookRegisterRequest);
+    public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookApiRegisterRequest bookApiRegisterRequest){
+        // apiDTO -> bookRegisterDTO
+        BookDetailResponse detailResponse = bookService.registerBookByApi(bookApiRegisterRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(detailResponse);
     }
 
