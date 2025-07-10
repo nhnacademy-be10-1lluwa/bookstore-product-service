@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
+import jakarta.ws.rs.core.SecurityContext;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.FinalAladinBookRegisterRequest;
