@@ -45,4 +45,12 @@ public class CategoryController {
         return ResponseEntity.created(location).body(categoryResponse);
     }
 
+
+    @GetMapping("/tree")
+    public List<CategoryResponse> getCategoryTree() {
+        List<CategoryResponse> categoryTree = categoryService.getCategoryTree();
+        return categoryTree;
+    }
+
+
 }
