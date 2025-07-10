@@ -41,7 +41,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewResponse createReview(Long bookId, ReviewRequest request, Long memberId, List<MultipartFile> images) throws Exception {
+    public ReviewResponse createReview(Long bookId, ReviewRequest request, Long memberId, List<MultipartFile> images){
         if(Boolean.FALSE.equals(orderServiceClient.isConfirmedOrder(memberId, bookId).getBody())){
             throw new CannotWriteReviewException("구매가 확정되지 않아서 리뷰를 작성하실 수 없습니다!");
         }
@@ -110,8 +110,23 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public ReviewResponse getReviewDetails(Long bookId, Long reviewId, Long memberId) {
+        Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다. Review ID: " + reviewId));
+
+        List<String> imageUrls = reviewImageRepository.findAllByReview_ReviewId(reviewId).stream()
+                .map(ReviewImage::getImageUrl)
+                .toList();
+
+        boolean likedByMe = reviewLikeRepository.existsByReview_ReviewIdAndMemberId(reviewId, memberId);
+        long likeCount = reviewLikeRepository.countByReview_ReviewId(reviewId);
+
+        return ReviewResponse.from(review, imageUrls, likedByMe, likeCount);
+    }
+
+    @Override
     @Transactional
-    public ReviewResponse updateReview(Long bookId, Long reviewId, ReviewRequest request, Long memberId, List<MultipartFile> images) throws Exception {
+    public ReviewResponse updateReview(Long bookId, Long reviewId, ReviewRequest request, Long memberId, List<MultipartFile> images, List<String> keepImageUrls) throws Exception {
         Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다. Review ID: " + reviewId));
         if(!Objects.equals(memberId, review.getMemberId())){
             throw new MemberIdDoesNotMatchWithReviewException("해당글의 작성자가 아닙니다. 현재 유저 ID: " + memberId + " 글 작성자 ID: " + review.getMemberId());
@@ -124,18 +139,16 @@ public class ReviewServiceImpl implements ReviewService {
         );
 
         List<ReviewImage> existingImages = reviewImageRepository.findAllByReview_ReviewId(reviewId);
-        List<String> updateImages = new ArrayList<>();
         if(images != null) {
             for(MultipartFile newImage : images){
                 String uploadedUrl = minioStorageService.uploadReviewImage(memberId, newImage).getUrl();
-                updateImages.add(uploadedUrl);
                 ReviewImage reviewImage = ReviewImage.of(uploadedUrl, review);
                 reviewImageRepository.save(reviewImage);
             }
         }
-
+        Set<String> keepImageSet = keepImageUrls == null ? Set.of() : new HashSet<>(keepImageUrls);
         for(ReviewImage image : existingImages){
-            if(!updateImages.contains(image.getImageUrl())){
+            if(!keepImageSet.contains(image.getImageUrl())){
                 reviewImageRepository.delete(image);
                 minioStorageService.deleteFile(image.getImageUrl());
             }

@@ -42,14 +42,23 @@ public class ReviewController {
         return ResponseEntity.ok(responsePage);
     }
 
+    @GetMapping(value = "/{reviewId}")
+    public ResponseEntity<ReviewResponse> getReviewDetails(@PathVariable Long bookId,
+                                                           @PathVariable Long reviewId,
+                                                           @RequestHeader("X-USER-ID") Long memberId) {
+        ReviewResponse response = reviewService.getReviewDetails(bookId, reviewId, memberId);
+        return ResponseEntity.ok(response);
+    }
+
     @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ReviewResponse> updateReview(@PathVariable Long bookId,
                                                        @PathVariable Long reviewId,
                                                        @RequestPart("review") @Valid ReviewRequest request,
                                                        @RequestHeader("X-USER-ID") Long memberId,
-                                                       @RequestPart(name = "images", required = false) List<MultipartFile> images) throws Exception {
+                                                       @RequestPart(name = "images", required = false) List<MultipartFile> images,
+                                                       @RequestPart(name = "keepImageUrls", required = false) List<String> keepImageUrls) throws Exception {
 
-        ReviewResponse response = reviewService.updateReview(bookId, reviewId, request, memberId, images);
+        ReviewResponse response = reviewService.updateReview(bookId, reviewId, request, memberId, images, keepImageUrls);
         return ResponseEntity.ok(response);
     }
 }
