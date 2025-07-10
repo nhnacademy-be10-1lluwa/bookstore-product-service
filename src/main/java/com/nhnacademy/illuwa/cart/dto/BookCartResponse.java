@@ -22,7 +22,7 @@ public class BookCartResponse {
         this.bookId = bookCart.getBook().getId();
         this.title = bookCart.getBook().getTitle();
         this.amount = bookCart.getAmount();
-        this.salePrice = bookCart.getAmount();
+        this.salePrice = bookCart.getBook().getSalePrice();
         this.imgUrl = bookCart.getBook().getBookImages().stream()
                 .findFirst()
                 .map(bookImage -> bookImage.getImageUrl())
