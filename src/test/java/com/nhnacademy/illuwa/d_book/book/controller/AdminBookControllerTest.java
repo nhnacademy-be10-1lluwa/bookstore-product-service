@@ -147,7 +147,7 @@ class AdminBookControllerTest {
 
 
         //when & then
-        mockMvc.perform(post("/admin/books")
+        mockMvc.perform(post("/api/admin/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(jsonPath("$.isbn").value("0100AF"))
@@ -192,7 +192,7 @@ class AdminBookControllerTest {
                 .given(bookService)
                 .registgerBookDirectly(any(BookRegisterRequest.class), any(MultipartFile.class));
 
-        mockMvc.perform(multipart("/admin/books")
+        mockMvc.perform(multipart("/api/admin/books")
                         .file(requestPart)
                         .file(imageFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -211,7 +211,7 @@ class AdminBookControllerTest {
         Long id = 11L;
 
         // when & then
-        mockMvc.perform(delete("/admin/books/{id}",id))
+        mockMvc.perform(delete("/api/admin/books/{id}",id))
                 .andExpect(status().isNoContent());
 
         verify(bookService).deleteBook(id);
@@ -227,7 +227,7 @@ class AdminBookControllerTest {
 
         // when & then
 
-        mockMvc.perform(patch("/admin/books/{id}",id)
+        mockMvc.perform(patch("/api/admin/books/{id}",id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(bookUpdateRequest)))
                 .andExpect(status().isNoContent());

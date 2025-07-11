@@ -23,5 +23,5 @@ public class ReviewRequest {
 
     @NotNull
     @Min(1) @Max(5)
-    private Integer reviewRating;
+    private int reviewRating;
 }

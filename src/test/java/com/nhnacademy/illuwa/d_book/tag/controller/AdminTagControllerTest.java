@@ -54,7 +54,7 @@ class AdminTagControllerTest {
 
 
         //when & then
-        mockMvc.perform(post("/tags")
+        mockMvc.perform(post("/api/tags")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andDo(print())
@@ -68,7 +68,7 @@ class AdminTagControllerTest {
         Long id = 1L;
 
         //when & then
-        mockMvc.perform(delete("/tags/{id}", 11L))
+        mockMvc.perform(delete("/api/tags/{id}", 11L))
                 .andExpect(status().isNoContent());
 
     }

@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "user-service")
 public interface MemberServiceClient {
-    @PostMapping("/members/points/event")
+    @PostMapping("/api/members/points/event")
     ResponseEntity<Void> earnEventPoint(@RequestHeader("X-USER-ID") Long memberId, @RequestParam String reason);
 }

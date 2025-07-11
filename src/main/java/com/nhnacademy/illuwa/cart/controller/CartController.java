@@ -13,7 +13,7 @@ import java.security.Principal;
 
 @Slf4j
 @RestController
-@RequestMapping("/cart")
+@RequestMapping("/api/cart")
 @RequiredArgsConstructor
 public class CartController {
 

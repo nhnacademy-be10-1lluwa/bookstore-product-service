@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
+import com.nhnacademy.illuwa.d_book.book.dto.request.BookApiRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.FinalAladinBookRegisterRequest;
@@ -23,6 +24,10 @@ import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryReposit
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import com.nhnacademy.illuwa.infra.storage.MinioStorageService;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -34,10 +39,13 @@ import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.StringQuery;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -128,6 +136,7 @@ public class BookService {
         return bookDetailList;
     }
 
+
     @Transactional
     public BookDetailResponse registerBook(BookRegisterRequest bookRegisterRequest) {
 
@@ -152,6 +161,40 @@ public class BookService {
         bookEntity.addImage(bookImage);
 
         BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
+        bookEntity.setBookExtraInfo(bookExtraInfo);
+
+        bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));
+
+        Book savedBook = bookRepository.save(bookEntity);
+        syncBookToElasticsearch(savedBook);
+
+        return bookResponseMapper.toBookDetailResponse(bookEntity);
+    }
+
+    @Transactional
+    public BookDetailResponse registerBookByApi(BookApiRegisterRequest bookApiRegisterRequest) {
+
+        Book bookEntity = bookMapper.fromApiRequest(bookApiRegisterRequest);
+        bookEntity.setBookImages(new ArrayList<>());
+
+        Category categoryEntity = categoryRepository.findById(bookApiRegisterRequest.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
+
+
+        if (bookEntity == null) {
+            throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
+        }
+
+        log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
+        if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
+            log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
+            throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
+        }
+
+        BookImage bookImage = new BookImage(bookEntity,bookApiRegisterRequest.getCover(), ImageType.THUMBNAIL);
+        bookEntity.addImage(bookImage);
+
+        BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookApiRegisterRequest.getCount());
         bookEntity.setBookExtraInfo(bookExtraInfo);
 
         bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));
