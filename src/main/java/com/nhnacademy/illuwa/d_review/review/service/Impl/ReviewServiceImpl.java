@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URI;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,7 +43,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewResponse createReview(Long bookId, Long memberId, ReviewRequest request, List<MultipartFile> images){
+    public ReviewResponse createReview(Long bookId, Long memberId, ReviewRequest request){
 //        if(Boolean.FALSE.equals(orderServiceClient.isConfirmedOrder(memberId, bookId).getBody())){
 //            throw new CannotWriteReviewException("구매가 확정되지 않아서 리뷰를 작성하실 수 없습니다!");
 //        }
@@ -63,8 +65,13 @@ public class ReviewServiceImpl implements ReviewService {
 
         String rewardType = "REVIEW";
         List<String> imageUrls = new ArrayList<>();
+        List<MultipartFile> images = request.getImages();
         if(images != null) {
             for(MultipartFile image : images){
+                if (image.getName().isBlank()) {
+                    continue;
+                }
+
                 String uploadedUrl = minioStorageService.uploadReviewImage(memberId, image).getUrl();
                 imageUrls.add(uploadedUrl);
                 ReviewImage reviewImage = ReviewImage.of(uploadedUrl, saved);
@@ -129,7 +136,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewResponse updateReview(Long bookId, Long reviewId, Long memberId, ReviewRequest request, List<MultipartFile> images, List<String> keepImageUrls) throws Exception {
+    public ReviewResponse updateReview(Long bookId, Long reviewId, Long memberId, ReviewRequest request) throws Exception {
         Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다. Review ID: " + reviewId));
         if(!Objects.equals(memberId, review.getMemberId())){
             throw new MemberIdDoesNotMatchWithReviewException("해당글의 작성자가 아닙니다. 현재 유저 ID: " + memberId + " 글 작성자 ID: " + review.getMemberId());
@@ -141,19 +148,30 @@ public class ReviewServiceImpl implements ReviewService {
                 request.getReviewRating()
         );
 
-        List<ReviewImage> existingImages = reviewImageRepository.findAllByReview_ReviewId(reviewId);
-        if(images != null) {
-            for(MultipartFile newImage : images){
+        List<MultipartFile> newImages = request.getImages();
+        // 새 이미지 업로드
+        if (newImages != null) {
+            for (MultipartFile newImage : newImages) {
+                if (Objects.requireNonNull(newImage.getOriginalFilename()).isBlank()) {
+                    continue;
+                }
+
                 String uploadedUrl = minioStorageService.uploadReviewImage(memberId, newImage).getUrl();
                 ReviewImage reviewImage = ReviewImage.of(uploadedUrl, review);
                 reviewImageRepository.save(reviewImage);
             }
         }
-        Set<String> keepImageSet = keepImageUrls == null ? Set.of() : new HashSet<>(keepImageUrls);
-        for(ReviewImage image : existingImages){
-            if(!keepImageSet.contains(image.getImageUrl())){
+
+        // 이미지 삭제
+        List<ReviewImage> existingImages = reviewImageRepository.findAllByReview_ReviewId(reviewId);
+        Set<String> deleteImageSet = request.getDeleteImageUrls() == null ? Set.of() : new HashSet<>(request.getDeleteImageUrls());
+
+        for (ReviewImage image : existingImages) {
+            if (deleteImageSet.contains(image.getImageUrl())) {
                 reviewImageRepository.delete(image);
-                minioStorageService.deleteFile(image.getImageUrl());
+                String path = URI.create(image.getImageUrl()).getPath();
+                String storageName = path.substring(path.lastIndexOf('/') + 1);
+                minioStorageService.deleteFile(storageName);
             }
         }
 
