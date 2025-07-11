@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,14 +17,14 @@ public class BookCartResponse {
     private String title;
     private int amount;
 
-    private int salePrice;
+    private BigDecimal salePrice;
     private String imgUrl;
 
     public BookCartResponse(BookCart bookCart) {
         this.bookId = bookCart.getBook().getId();
         this.title = bookCart.getBook().getTitle();
         this.amount = bookCart.getAmount();
-        this.salePrice = bookCart.getBook().getSalePrice();
+        this.salePrice = BigDecimal.valueOf(bookCart.getBook().getSalePrice());
         this.imgUrl = bookCart.getBook().getBookImages().stream()
                 .findFirst()
                 .map(bookImage -> bookImage.getImageUrl())
