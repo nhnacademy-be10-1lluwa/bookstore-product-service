@@ -7,4 +7,6 @@ import org.springframework.data.domain.Pageable;
 public interface BookRepositoryCustom {
 
     Page<Book> findBooksByCriteria(Long categoryId, String tagName, Pageable pageable);
+
+    void deleteBookAndRelatedEntities(Long bookId);
 }

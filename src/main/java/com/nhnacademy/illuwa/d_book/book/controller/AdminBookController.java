@@ -1,9 +1,11 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
+import com.nhnacademy.illuwa.cart.service.impl.CartServiceImpl;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookApiRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.service.BookImageService;
 import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.service.BookCategoryService;
+import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
 import jakarta.ws.rs.core.SecurityContext;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
@@ -28,8 +30,6 @@ import java.util.List;
 public class AdminBookController {
 
     private final BookService bookService;
-    private final BookCategoryService bookCategoryService;
-    private final BookImageService bookImageService;
 
     @GetMapping("/external")
     public ResponseEntity<List<BookExternalResponse>> searchBooksByExternalApi(@RequestParam("title") String title){
@@ -46,13 +46,6 @@ public class AdminBookController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-//    // 외부 API 사용
-//    @PostMapping("register/aladin")
-//    public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookRegisterRequest bookRegisterRequest){
-//        BookDetailResponse detailResponse = bookService.registerBook(bookRegisterRequest);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(detailResponse);
-//    }
-
     // 외부 API 사용 (front)
     @PostMapping("register/aladin")
     public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookApiRegisterRequest bookApiRegisterRequest){
@@ -64,9 +57,8 @@ public class AdminBookController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id){
 
-        bookImageService.deleteByBookId(id);
-        bookCategoryService.deleteByBookId(id);
-        bookService.deleteBook(id);
+        bookService.deleteBookAndRelatedEntities(id);
+
         return ResponseEntity.noContent().build();
     }
 
@@ -84,4 +76,6 @@ public class AdminBookController {
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+
 }
