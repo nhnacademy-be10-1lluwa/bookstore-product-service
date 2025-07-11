@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -67,8 +68,8 @@ public class BookControllerTest {
                 "출판사",
                 LocalDate.of(2024, 6, 13),
                 "010000",
-                10000,
-                9000,
+                new BigDecimal(10000),
+                new BigDecimal(9000),
                 true,
                 "img/path.jpg"
         );

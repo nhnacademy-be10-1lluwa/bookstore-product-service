@@ -113,8 +113,8 @@ class AdminBookControllerTest {
                 "출판사A",
                 LocalDate.of(2024, 6, 13),
                 "0100AF",
-                10000,
-                90000,
+                new BigDecimal(10000),
+                new BigDecimal(9000),
                 true,
                 "abc/def/g.jpg"
         );
@@ -140,8 +140,8 @@ class AdminBookControllerTest {
                 "출판사A",
                 LocalDate.of(2024, 6, 13),
                 "0100AF",
-                10000,
-                90000,
+                new BigDecimal(10000),
+        new BigDecimal(9000),
                 true,
                 "image/url"
         );
