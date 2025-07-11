@@ -11,7 +11,9 @@ import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
+import com.nhnacademy.illuwa.d_book.book.service.BookImageService;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
+import com.nhnacademy.illuwa.d_book.category.service.BookCategoryService;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
@@ -25,6 +27,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -49,12 +52,17 @@ class AdminBookControllerTest {
     @MockBean
     private AladinBookApiService aladinBookApiService;
 
+    @MockBean
+    BookService bookService;
+    @MockBean
+    BookCategoryService bookCategoryService;
+    @MockBean
+    BookImageService bookImageService;
+
 
     @Autowired
     ObjectMapper objectMapper;
 
-    @MockBean
-    private BookService bookService;
 
 
 
@@ -118,8 +126,8 @@ class AdminBookControllerTest {
                 .publisher("스웨덴출판사")
                 .publishedDate(LocalDate.of(2016, 6, 16))
                 .isbn("123456789EE")
-                .regularPrice(15000)
-                .salePrice(13000)
+                .regularPrice(new BigDecimal(15000))
+                .salePrice(new BigDecimal(13000))
                 .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
                 .build();
 

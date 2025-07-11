@@ -28,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -149,8 +150,8 @@ public class BookServiceTest {
                 .publisher("스웨덴출판사")
                 .publishedDate(LocalDate.of(2016, 6, 16))
                 .isbn("123456789EE")
-                .regularPrice(15000)
-                .salePrice(13000)
+                .regularPrice(new BigDecimal(15000))
+                .salePrice(new BigDecimal(13000))
                 .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
                 .build();
 
@@ -204,8 +205,8 @@ public class BookServiceTest {
                 .publisher("스웨덴출판사")
                 .publishedDate(LocalDate.of(2016, 6, 16))
                 .isbn("123456789EE")
-                .regularPrice(15000)
-                .salePrice(13000)
+                .regularPrice(new BigDecimal(15000))
+                .salePrice(new BigDecimal(13000))
                 .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
                 .build();
 
@@ -241,8 +242,8 @@ public class BookServiceTest {
                 .publisher("스웨덴출판사")
                 .publishedDate(LocalDate.of(2016, 6, 16))
                 .isbn("123456789EE")
-                .regularPrice(15000)
-                .salePrice(13000)
+                .regularPrice(new BigDecimal(15000))
+                .salePrice(new BigDecimal(13000))
                 .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
                 .build();
 
@@ -286,8 +287,8 @@ public class BookServiceTest {
                 .publisher("스웨덴출판사")
                 .publishedDate(LocalDate.of(2016, 6, 16))
                 .isbn("123456789EE")
-                .regularPrice(15000)
-                .salePrice(13000)
+                .regularPrice(new BigDecimal(15000))
+                .salePrice(new BigDecimal(13000))
                 .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
                 .build();
 
@@ -351,8 +352,8 @@ public class BookServiceTest {
                 .publisher("스웨덴출판사")
                 .publishedDate(LocalDate.of(2016, 6, 16))
                 .isbn("123456789EE")
-                .regularPrice(15000)
-                .salePrice(13000)
+                .regularPrice(new BigDecimal(15000))
+                .salePrice(new BigDecimal(13000))
                 .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
                 .build();
 

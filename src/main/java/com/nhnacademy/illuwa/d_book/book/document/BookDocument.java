@@ -10,6 +10,8 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.Setting;
 
+import java.math.BigDecimal;
+
 @Document(indexName = "books-v1")
 @Setting(settingPath = "elasticsearch/nori-settings.json")
 @Getter
@@ -36,7 +38,7 @@ public class BookDocument {
     private String isbn;
 
     @Field(type = FieldType.Integer)
-    private int salePrice;
+    private BigDecimal salePrice;
 
     @Field(type = FieldType.Text)
     private String thumbnailUrl;
