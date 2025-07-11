@@ -1,12 +1,7 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
-import com.nhnacademy.illuwa.cart.service.impl.CartServiceImpl;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookApiRegisterRequest;
-import com.nhnacademy.illuwa.d_book.book.service.BookImageService;
-import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
-import com.nhnacademy.illuwa.d_book.category.service.BookCategoryService;
-import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
-import jakarta.ws.rs.core.SecurityContext;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailWithExtraInfoResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.FinalAladinBookRegisterRequest;
@@ -62,9 +57,12 @@ public class AdminBookController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody BookUpdateRequest requestDto){
-        bookService.updateBook(id,requestDto);
+    @PostMapping("/{id}/update")
+    public ResponseEntity<Void> updateBook(
+            @PathVariable Long id,
+            @RequestBody BookUpdateRequest requestDto
+    ) {
+        bookService.updateBook(id, requestDto);
         return ResponseEntity.noContent().build();
     }
 
@@ -76,6 +74,23 @@ public class AdminBookController {
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @GetMapping("/{id}/detail")
+    public ResponseEntity<BookDetailWithExtraInfoResponse> getBookDetailWithExtra(@PathVariable Long id) {
+        BookDetailWithExtraInfoResponse response = bookService.getBookDetailWithExtraInfo(id);
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/extra_info")
+    public ResponseEntity<List<BookDetailWithExtraInfoResponse>> getBooksWithExtraInfo() {
+        List<BookDetailWithExtraInfoResponse> response = bookService.getAllBooksWithExtraInfo();
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
 
 
 }

@@ -342,10 +342,10 @@ public class BookServiceTest {
     @Test
     @DisplayName("도서 수정 - 성공")
     void updateBook_Success() {
-
         Long id = 9L;
 
         Book updatedBook = Book.builder()
+                .id(9L)
                 .title("인어 공주")
                 .description("인어 공주는...")
                 .author("안데르센")
@@ -358,17 +358,40 @@ public class BookServiceTest {
                 .build();
 
         BookUpdateRequest bookUpdateRequest = new BookUpdateRequest(
-                "수정된 목차",
-                "수정된 제목",
-                10900,
-                false
+                1L,
+                "테스트 도서 제목",
+                "테스트 저자",
+                "테스트 출판사",
+                "2024-01-01",
+                "1234567890123",
+                new BigDecimal("15000"),
+                new BigDecimal("12000"),
+                "이것은 설명입니다.",
+                "이것은 목차입니다.",
+                "http://example.com/image.jpg",
+                10,
+                "NORMAL",
+                true,
+                1L,
+                2L,
+                3L
         );
 
         when(bookRepository.findById(id)).thenReturn(Optional.of(updatedBook));
 
-        bookService.updateBook(id,bookUpdateRequest);
+        when(categoryRepository.findById(bookUpdateRequest.getCategoryId()))
+                .thenReturn(Optional.of(mock(Category.class)));
 
+        when(bookCategoryRepository.findByBookId(id))
+                .thenReturn(Optional.of(mock(BookCategory.class)));
+
+        // 실행
+        bookService.updateBook(id, bookUpdateRequest);
+
+        // 검증
         verify(bookRepository, times(1)).findById(id);
+        verify(categoryRepository, times(1)).findById(bookUpdateRequest.getCategoryId());
+        verify(bookCategoryRepository, times(1)).findByBookId(id);
     }
 
     @Test
@@ -381,7 +404,7 @@ public class BookServiceTest {
 
         assertThatThrownBy(() -> bookService.updateBook(id,mockBookUpdateRequest))
                 .isInstanceOf(NotFoundBookException.class)
-                .hasMessage("해당 도서는 존재하지 않아서 수정이 불가능합니다.");
+                .hasMessage("해당 도서를 찾을 수 없습니다. id: "+id);
 
         verify(bookRepository, times(1)).findById(id);
         verify(bookRepository, never()).save(any(Book.class));

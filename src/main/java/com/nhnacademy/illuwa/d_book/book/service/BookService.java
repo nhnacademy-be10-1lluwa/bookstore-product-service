@@ -5,6 +5,7 @@ import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.FinalAladinBookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailWithExtraInfoResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
@@ -49,6 +50,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -251,31 +253,6 @@ public class BookService {
 
 
     @Transactional
-    public void updateBook(Long id, BookUpdateRequest requestDto) {
-        Optional<Book> bookById = bookRepository.findById(id);
-
-        if(bookById.isEmpty()){
-            log.info("해당 도서를 찾을 수 없습니다. id : {}", id);
-            throw new NotFoundBookException("해당 도서는 존재하지 않아서 수정이 불가능합니다.");
-        }
-
-        Book book = bookById.get();
-        String description = requestDto.getDescription();
-        String contents = requestDto.getContents();
-        Integer price = requestDto.getPrice();
-
-        if(description != null){
-            book.setDescription(description);
-        }
-        if(contents != null) {
-            book.setContents(contents);
-        }
-        if(price != null){
-            book.setRegularPrice(BigDecimal.valueOf(requestDto.getPrice()));
-        }
-    }
-
-    @Transactional
     public void deleteBook(Long id) {
         Optional<Book> book = bookRepository.findById(id);
 
@@ -395,6 +372,120 @@ public class BookService {
     @Transactional
     public void deleteBookAndRelatedEntities(Long bookId) {
         bookRepository.deleteBookAndRelatedEntities(bookId);
+    }
+
+
+    @Transactional
+    public BookDetailWithExtraInfoResponse getBookDetailWithExtraInfo(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("도서를 찾을 수 없습니다."));
+
+        BookCategory bookCategory = bookCategoryRepository.findByBookId(bookId)
+                .orElseThrow(() -> new RuntimeException("도서에 연결된 카테고리를 찾을 수 없습니다."));
+
+        Category category = bookCategory.getCategory();
+
+        Long categoryId = category.getId();
+        Long level1 = null;
+        Long level2 = null;
+
+        if (category.getParentCategory() != null) {
+            level2 = category.getParentCategory().getId();
+
+            if (category.getParentCategory().getParentCategory() != null) {
+                level1 = category.getParentCategory().getParentCategory().getId();
+            }
+        }
+
+        BookDetailWithExtraInfoResponse response = BookDetailWithExtraInfoResponse.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .contents(book.getContents())
+                .description(book.getDescription())
+                .author(book.getAuthor())
+                .publisher(book.getPublisher())
+                .publishedDate(book.getPublishedDate().toString())
+                .isbn(book.getIsbn())
+                .regularPrice(book.getRegularPrice())
+                .salePrice(book.getSalePrice())
+                .imgUrl(book.getBookImages().isEmpty() ? null : book.getBookImages().get(0).getImageUrl())
+                .giftwrap(book.getBookExtraInfo().isGiftwrap())
+                .count(book.getBookExtraInfo().getCount())
+                .status(book.getBookExtraInfo().getStatus())
+                .categoryId(categoryId)
+                .level1(level1)
+                .level2(level2)
+                .build();
+
+        log.info("BookDetailWithExtraInfoResponse 생성: categoryId={}, level1={}, level2={}", categoryId, level1, level2);
+
+        return response;
+    }
+
+    @Transactional
+    public void updateBook(Long id, BookUpdateRequest requestDto) {
+        Optional<Book> bookById = bookRepository.findById(id);
+        if (bookById.isEmpty()) {
+            throw new NotFoundBookException("해당 도서를 찾을 수 없습니다. id: " + id);
+        }
+
+        Book book = bookById.get();
+
+        if (requestDto.getTitle() != null) {
+            book.setTitle(requestDto.getTitle());
+        }
+        if (requestDto.getAuthor() != null) {
+            book.setAuthor(requestDto.getAuthor());
+        }
+        if (requestDto.getPublisher() != null) {
+            book.setPublisher(requestDto.getPublisher());
+        }
+        if (requestDto.getDescription() != null) {
+            book.setDescription(requestDto.getDescription());
+        }
+        if (requestDto.getContents() != null) {
+            book.setContents(requestDto.getContents());
+        }
+        if (requestDto.getRegularPrice() != null) {
+            book.setRegularPrice(requestDto.getRegularPrice());
+        }
+        if (requestDto.getSalePrice() != null) {
+            book.setSalePrice(requestDto.getSalePrice());
+        }
+
+        if (requestDto.getCount() != null) {
+            book.getBookExtraInfo().setCount(requestDto.getCount());
+        }
+        if (requestDto.getGiftwrap() != null) {
+            book.getBookExtraInfo().setGiftwrap(requestDto.getGiftwrap());
+        }
+        if (requestDto.getStatus() != null) {
+            book.getBookExtraInfo().setStatus(Status.valueOf(requestDto.getStatus()));
+        }
+
+        if (requestDto.getCategoryId() != null) {
+            Category newCategory = categoryRepository.findById(requestDto.getCategoryId())
+                    .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
+
+            // 기존 BookCategory 찾아서 교체
+            BookCategory bookCategory = bookCategoryRepository.findByBookId(book.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("카테고리 정보가 없습니다."));
+            bookCategory.setCategory(newCategory);
+        }
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<BookDetailWithExtraInfoResponse> getAllBooksWithExtraInfo() {
+        List<Book> books = bookRepository.findAll();
+
+        return books.stream()
+                .map(book -> {
+                    BookCategory bookCategory = bookCategoryRepository.findByBookId(book.getId())
+                            .orElseThrow(() -> new RuntimeException("도서에 연결된 카테고리를 찾을 수 없습니다."));
+                    return new BookDetailWithExtraInfoResponse().toDto(book, bookCategory);
+                })
+                .toList();
     }
 
 

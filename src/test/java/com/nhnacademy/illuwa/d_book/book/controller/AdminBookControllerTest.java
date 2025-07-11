@@ -230,18 +230,32 @@ class AdminBookControllerTest {
         // given
         Long id = 11L;
 
-        BookUpdateRequest bookUpdateRequest = new BookUpdateRequest("contents","des",100,true);
-
+        BookUpdateRequest bookUpdateRequest = new BookUpdateRequest(
+                1L,
+                "테스트 도서 제목",
+                "테스트 저자",
+                "테스트 출판사",
+                "2024-01-01",
+                "1234567890123",
+                new BigDecimal("15000"),
+                new BigDecimal("12000"),
+                "이것은 설명입니다.",
+                "이것은 목차입니다.",
+                "http://example.com/image.jpg",
+                10,
+                "NORMAL",
+                true,
+                1L,
+                2L,
+                3L
+        );
 
         // when & then
-
-        mockMvc.perform(patch("/api/admin/books/{id}",id)
+        mockMvc.perform(post("/api/admin/books/{id}/update", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(bookUpdateRequest)))
                 .andExpect(status().isNoContent());
 
-
-        verify(bookService).updateBook(any(),any());
-
+        verify(bookService).updateBook(any(), any());
     }
 }
