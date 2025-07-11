@@ -44,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -270,7 +271,7 @@ public class BookService {
             book.setContents(contents);
         }
         if(price != null){
-            book.setRegularPrice(price);
+            book.setRegularPrice(BigDecimal.valueOf(requestDto.getPrice()));
         }
     }
 
