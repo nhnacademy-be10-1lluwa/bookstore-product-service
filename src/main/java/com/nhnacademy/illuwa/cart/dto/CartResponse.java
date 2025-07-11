@@ -20,7 +20,7 @@ public class CartResponse {
         this.cartId = cartId;
         this.bookCarts = bookCarts;
         this.totalPrice = bookCarts.stream()
-                .map(item -> BigDecimal.valueOf(item.getSalePrice()).multiply(BigDecimal.valueOf(item.getAmount())))
+                .map(item -> item.getSalePrice().multiply(BigDecimal.valueOf(item.getAmount())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
