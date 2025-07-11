@@ -40,7 +40,7 @@ public class CartController {
         return cartService.updateBookCart(request);
     }
 
-    @DeleteMapping("/books")
+    @DeleteMapping("/book")
     public void removeBook(@RequestHeader("X-USER-ID") long memberId,
                            @RequestBody BookCartRequest request) {
         request.setMemberId(memberId);
