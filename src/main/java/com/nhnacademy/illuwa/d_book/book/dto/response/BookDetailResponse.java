@@ -2,6 +2,7 @@ package com.nhnacademy.illuwa.d_book.book.dto.response;
 
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -17,8 +18,8 @@ public class BookDetailResponse {
     private String publisher;
     private LocalDate publishedDate;
     private String isbn;
-    private int regularPrice;
-    private int salePrice;
+    private BigDecimal regularPrice;
+    private BigDecimal salePrice;
     private boolean isGiftWrap;
     private String imgUrl;
 }
