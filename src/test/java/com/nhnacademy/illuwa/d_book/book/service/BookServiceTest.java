@@ -164,8 +164,8 @@ public class BookServiceTest {
                 "출판사A",
                 LocalDate.of(2012,12,21),
                 "012345",
-                10000,
-                9000,
+                new BigDecimal(10000),
+                new BigDecimal(9000),
                 true,
                 "imgUrl"
         );
@@ -301,8 +301,8 @@ public class BookServiceTest {
                 "한국출판사",
                 LocalDate.of(1999, 9, 19),
                 "0070ABC",
-                10000,
-                6000,
+                new BigDecimal(10000),
+                new BigDecimal(6000),
                 false,
                 "imgUrl"
         );
