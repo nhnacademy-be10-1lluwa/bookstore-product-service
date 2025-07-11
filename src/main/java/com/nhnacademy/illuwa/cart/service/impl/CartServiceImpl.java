@@ -52,7 +52,7 @@ public class CartServiceImpl implements CartService {
                 .toList();
 
         BigDecimal totalCalculatedPrice = books.stream()
-                .map(item -> BigDecimal.valueOf(item.getSalePrice()).multiply(BigDecimal.valueOf(item.getAmount())))
+                .map(item -> item.getSalePrice().multiply(BigDecimal.valueOf(item.getAmount())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return new CartResponse(cart.getCartId(), books, totalCalculatedPrice);
