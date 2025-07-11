@@ -30,5 +30,5 @@ public class ReviewRequest {
 
     private List<MultipartFile> images;
 
-    private List<String> keepImageUrls;
+    private List<String> deleteImageUrls;
 }
