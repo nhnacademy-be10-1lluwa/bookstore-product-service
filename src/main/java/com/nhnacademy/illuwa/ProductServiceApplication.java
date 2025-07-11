@@ -17,10 +17,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableFeignClients
 @SpringBootApplication
-public class  IlluwaApplication {
+public class ProductServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(IlluwaApplication.class, args);
+        SpringApplication.run(ProductServiceApplication.class, args);
     }
 
 }
