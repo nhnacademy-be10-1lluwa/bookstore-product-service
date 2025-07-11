@@ -392,4 +392,10 @@ public class BookService {
     }
 
 
+    @Transactional
+    public void deleteBookAndRelatedEntities(Long bookId) {
+        bookRepository.deleteBookAndRelatedEntities(bookId);
+    }
+
+
 }

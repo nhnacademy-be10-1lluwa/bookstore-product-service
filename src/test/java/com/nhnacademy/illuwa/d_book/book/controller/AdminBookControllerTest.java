@@ -222,7 +222,7 @@ class AdminBookControllerTest {
         mockMvc.perform(delete("/api/admin/books/{id}",id))
                 .andExpect(status().isNoContent());
 
-        verify(bookService).deleteBook(id);
+        verify(bookService).deleteBookAndRelatedEntities(id);
     }
 
     @Test
