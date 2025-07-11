@@ -28,4 +28,15 @@ public class CustomizedBookCategoryRepositoryImpl implements CustomizedBookCateg
                 .fetch();
     }
 
+
+    @Override
+    public long deleteByBookId(Long bookId) {
+        QBookCategory bookCategory = QBookCategory.bookCategory;
+
+        return queryFactory
+                .delete(bookCategory)
+                .where(bookCategory.book.id.eq(bookId))
+                .execute();
+    }
+
 }
