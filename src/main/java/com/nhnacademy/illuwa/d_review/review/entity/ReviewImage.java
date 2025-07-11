@@ -16,7 +16,7 @@ public class ReviewImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long imageId;
 
-    @Column
+    @Column(length = 1000)
     String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)

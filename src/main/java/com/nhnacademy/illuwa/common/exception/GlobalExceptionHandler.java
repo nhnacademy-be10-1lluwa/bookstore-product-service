@@ -9,6 +9,7 @@ import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_review.comment.exception.CommentNotFoundException;
 import com.nhnacademy.illuwa.d_review.comment.exception.InvalidCommentStatusException;
+import com.nhnacademy.illuwa.d_review.review.exception.CannotWriteReviewException;
 import com.nhnacademy.illuwa.d_review.review.exception.MemberIdDoesNotMatchWithReviewException;
 import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
 import com.nhnacademy.illuwa.infra.storage.exception.FileUploadFailedException;
@@ -86,6 +87,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ReviewNotFoundException.class)
     public ResponseEntity<Object> handleReviewNotFoundException(ReviewNotFoundException e) {
+        status = HttpStatus.NOT_FOUND;
+
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("code", "Review_Not_Found");
+        body.put("message", e.getMessage());
+
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(CannotWriteReviewException.class)
+    public ResponseEntity<Object> handleCannotWriteReviewException(CannotWriteReviewException e) {
         status = HttpStatus.NOT_FOUND;
 
         body.put("timestamp", LocalDateTime.now());
