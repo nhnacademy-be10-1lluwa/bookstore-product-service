@@ -14,9 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -27,9 +25,9 @@ public class ReviewController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ReviewResponse> createReview(@PathVariable long bookId,
                                                        @RequestHeader("X-USER-ID") long memberId,
-                                                       @ModelAttribute ReviewRequest request) throws Exception {
+                                                       @ModelAttribute @Valid ReviewRequest request) throws Exception {
         log.info("{} // {} // {} // {}", bookId, request.getReviewTitle(), request.getReviewContent(), request.getReviewRating());
-        ReviewResponse response = reviewService.createReview(bookId, memberId, request, request.getImages());
+        ReviewResponse response = reviewService.createReview(bookId, memberId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -50,15 +48,14 @@ public class ReviewController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // 프론트에서 feign 으로 수정요청 받으려면 어쩔수 없이 써야함 (feign 은 patch 미지원)
+    @PostMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ReviewResponse> updateReview(@PathVariable long bookId,
                                                        @PathVariable long reviewId,
                                                        @RequestHeader("X-USER-ID") Long memberId,
-                                                       @ModelAttribute ReviewRequest request,
-                                                       @RequestPart(name = "images", required = false) List<MultipartFile> images,
-                                                       @RequestPart(name = "keepImageUrls", required = false) List<String> keepImageUrls) throws Exception {
+                                                       @ModelAttribute @Valid ReviewRequest request) throws Exception {
         log.info("{} // {} // {} // {}", bookId, request.getReviewTitle(), request.getReviewContent(), request.getReviewRating());
-        ReviewResponse response = reviewService.updateReview(bookId, reviewId, memberId, request, images, keepImageUrls);
+        ReviewResponse response = reviewService.updateReview(bookId, reviewId, memberId, request);
         return ResponseEntity.ok(response);
     }
 }
