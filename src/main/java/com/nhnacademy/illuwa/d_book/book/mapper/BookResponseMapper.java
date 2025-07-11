@@ -40,8 +40,8 @@ public interface BookResponseMapper {
                 book.getPublisher(),
                 book.getPublishedDate(),
                 book.getIsbn(),
-                book.getRegularPrice().intValue(),
-                book.getSalePrice().intValue(),
+                book.getRegularPrice(),
+                book.getSalePrice(),
                 book.getBookExtraInfo() != null && book.getBookExtraInfo().isGiftwrap(),
                 thumbnailUrl
         );
