@@ -1,6 +1,7 @@
 package com.nhnacademy.illuwa.d_book.book.mapper;
 
 
+import com.nhnacademy.illuwa.d_book.book.dto.request.BookApiRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.FinalAladinBookRegisterRequest;
@@ -32,5 +33,13 @@ public interface BookMapper {
     @Mapping(source = "publisher", target = "publisher")
     @Mapping(source = "isbn", target = "isbn")
     Book fromFinalAladinRequest(FinalAladinBookRegisterRequest request);
+
+
+    @Mapping(source = "pubDate", target = "publishedDate")
+    @Mapping(source = "count", target = "bookExtraInfo.count")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "bookImages", ignore = true)
+    @Mapping(target = "bookTags", ignore = true)
+    Book fromApiRequest(BookApiRegisterRequest request);
 
 }

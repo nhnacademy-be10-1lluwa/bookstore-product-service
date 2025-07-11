@@ -3,6 +3,7 @@ package com.nhnacademy.illuwa.d_book.category.controller;
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryCreateRequest;
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryResponse;
 import com.nhnacademy.illuwa.d_book.category.service.CategoryService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
@@ -35,14 +36,27 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getCategoryInfo(categoryId));
     }
 
-    @PostMapping()
-    public ResponseEntity<CategoryResponse> registerCategory(@RequestBody CategoryCreateRequest categoryCreateRequest) {
-        CategoryResponse categoryResponse = categoryService.registerCategory(categoryCreateRequest);
-
-
-        URI location = URI.create("/categories/" + categoryResponse.getId());
-
-        return ResponseEntity.created(location).body(categoryResponse);
+    @PostMapping
+    public ResponseEntity<Void> createCategory(@RequestBody CategoryCreateRequest request) {
+        categoryService.createCategory(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+
+    @GetMapping("/tree")
+    public List<CategoryResponse> getCategoryTree() {
+        List<CategoryResponse> categoryTree = categoryService.getCategoryTree();
+        return categoryTree;
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
 
 }

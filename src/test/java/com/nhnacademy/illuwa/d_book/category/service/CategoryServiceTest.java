@@ -49,11 +49,11 @@ class CategoryServiceTest {
         CategoryResponse parentResponse = result.get(0);
         assertEquals(1L, parentResponse.getId());
         assertEquals("부모카테고리", parentResponse.getCategoryName());
-        assertNull(parentResponse.getParentCategoryId());
+        assertNull(parentResponse.getParentId());
 
         CategoryResponse childResponse = result.get(1);
         assertEquals(2L, childResponse.getId());
         assertEquals("자식카테고리", childResponse.getCategoryName());
-        assertEquals(1L, childResponse.getParentCategoryId());
+        assertEquals(1L, childResponse.getParentId());
     }
 }
