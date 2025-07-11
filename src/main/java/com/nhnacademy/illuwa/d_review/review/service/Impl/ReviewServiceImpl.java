@@ -41,12 +41,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewResponse createReview(Long bookId, ReviewRequest request, Long memberId, List<MultipartFile> images){
-        if(Boolean.FALSE.equals(orderServiceClient.isConfirmedOrder(memberId, bookId).getBody())){
-            throw new CannotWriteReviewException("구매가 확정되지 않아서 리뷰를 작성하실 수 없습니다!");
+    public ReviewResponse createReview(Long bookId, Long memberId, ReviewRequest request, List<MultipartFile> images){
+//        if(Boolean.FALSE.equals(orderServiceClient.isConfirmedOrder(memberId, bookId).getBody())){
+//            throw new CannotWriteReviewException("구매가 확정되지 않아서 리뷰를 작성하실 수 없습니다!");
+//        }
+        if(reviewRepository.findByBook_IdAndMemberId(bookId, memberId).isPresent()){
+            throw new CannotWriteReviewException("리뷰 중복 작성은 불가능합니다!");
         }
 
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new NotFoundBookException("도서를 찾을 수 없습니다."));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new NotFoundBookException("리뷰를 작성할 도서를 찾을 수 없습니다."));
 
         Review review = Review.of(
                 request.getReviewTitle(),
@@ -126,7 +129,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewResponse updateReview(Long bookId, Long reviewId, ReviewRequest request, Long memberId, List<MultipartFile> images, List<String> keepImageUrls) throws Exception {
+    public ReviewResponse updateReview(Long bookId, Long reviewId, Long memberId, ReviewRequest request, List<MultipartFile> images, List<String> keepImageUrls) throws Exception {
         Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다. Review ID: " + reviewId));
         if(!Objects.equals(memberId, review.getMemberId())){
             throw new MemberIdDoesNotMatchWithReviewException("해당글의 작성자가 아닙니다. 현재 유저 ID: " + memberId + " 글 작성자 ID: " + review.getMemberId());
