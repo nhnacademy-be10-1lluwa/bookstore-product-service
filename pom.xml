@@ -29,8 +29,9 @@
     <properties>
         <java.version>21</java.version>
         <querydsl.version>5.1.0</querydsl.version>
-        <org.mapstruct.version>1.6.3</org.mapstruct.version>
+        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
         <spring-cloud.version>2023.0.1</spring-cloud.version>
+        <lombok.version>1.18.32</lombok.version>
     </properties>
     <dependencies>
         <dependency>
@@ -52,8 +53,10 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version> <!-- 버전 참조 -->
             <scope>provided</scope>
         </dependency>
+
 
         <dependency>
             <groupId>com.mysql</groupId>
@@ -205,7 +208,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.32</version>
+                            <version>${lombok.version}</version> <!-- 버전 참조 -->
                         </path>
                         <path>
                             <groupId>org.mapstruct</groupId>
@@ -225,6 +228,25 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/annotations</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <finalName>1lluwa-product-service</finalName>

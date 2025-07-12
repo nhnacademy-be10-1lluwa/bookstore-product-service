@@ -263,26 +263,26 @@ public class BookService {
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
-    @Transactional(readOnly = true)
-    public List<BookDetailResponse> getAllBooks(){
-        List<Book> bookEntityList = bookRepository.findAll();
-        return bookResponseMapper.toBookDetailListResponse(bookEntityList);
-    }
+//    @Transactional(readOnly = true)
+//    public List<BookDetailResponse> getAllBooks(){
+//        List<Book> bookEntityList = bookRepository.findAll();
+//        return bookResponseMapper.toBookDetailListResponse(bookEntityList);
+//    }
 
 
-    @Transactional
-    public void deleteBook(Long id) {
-        Optional<Book> book = bookRepository.findById(id);
-
-        if(book.isEmpty()){
-            log.warn("도서를 찾을 수 없습니다. id : {}",id);
-            throw new NotFoundBookException("id : " + id + "에 해당하는 도서를 찾을 수 없습니다.");
-        }
-
-        bookSearchRepository.deleteById(id);
-
-        return bookResponseMapper.toBookDetailResponse(bookEntity);
-    }
+//    @Transactional
+//    public void deleteBook(Long id) {
+//        Optional<Book> book = bookRepository.findById(id);
+//
+//        if(book.isEmpty()){
+//            log.warn("도서를 찾을 수 없습니다. id : {}",id);
+//            throw new NotFoundBookException("id : " + id + "에 해당하는 도서를 찾을 수 없습니다.");
+//        }
+//
+//        bookSearchRepository.deleteById(id);
+//
+//        return bookResponseMapper.toBookDetailResponse(bookEntity);
+//    }
 
     // 도서 직접 등록 (폼+파일 업로드)
     public BookDetailResponse registgerBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
@@ -451,118 +451,104 @@ public class BookService {
         }
     }
 
-    @Transactional
-    public BookDetailWithExtraInfoResponse getBookDetailWithExtraInfo(Long bookId) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("도서를 찾을 수 없습니다."));
+//    @Transactional
+//    public BookDetailWithExtraInfoResponse getBookDetailWithExtraInfo(Long bookId) {
+//        Book book = bookRepository.findById(bookId)
+//                .orElseThrow(() -> new RuntimeException("도서를 찾을 수 없습니다."));
+//
+//        BookCategory bookCategory = bookCategoryRepository.findByBookId(bookId)
+//                .orElseThrow(() -> new RuntimeException("도서에 연결된 카테고리를 찾을 수 없습니다."));
+//
+//        Category category = bookCategory.getCategory();
+//
+//        Long categoryId = category.getId();
+//        Long level1 = null;
+//        Long level2 = null;
+//
+//        if (category.getParentCategory() != null) {
+//            level2 = category.getParentCategory().getId();
+//
+//            if (category.getParentCategory().getParentCategory() != null) {
+//                level1 = category.getParentCategory().getParentCategory().getId();
+//            }
+//        }
+//
+//        BookDetailWithExtraInfoResponse response = BookDetailWithExtraInfoResponse.builder()
+//                .id(book.getId())
+//                .title(book.getTitle())
+//                .contents(book.getContents())
+//                .description(book.getDescription())
+//                .author(book.getAuthor())
+//                .publisher(book.getPublisher())
+//                .publishedDate(book.getPublishedDate().toString())
+//                .isbn(book.getIsbn())
+//                .regularPrice(book.getRegularPrice())
+//                .salePrice(book.getSalePrice())
+//                .imgUrl(book.getBookImages().isEmpty() ? null : book.getBookImages().get(0).getImageUrl())
+//                .giftwrap(book.getBookExtraInfo().isGiftwrap())
+//                .count(book.getBookExtraInfo().getCount())
+//                .status(book.getBookExtraInfo().getStatus())
+//                .categoryId(categoryId)
+//                .level1(level1)
+//                .level2(level2)
+//                .build();
+//
+//        log.info("BookDetailWithExtraInfoResponse 생성: categoryId={}, level1={}, level2={}", categoryId, level1, level2);
+//
+//        return response;
+//    }
 
-        BookCategory bookCategory = bookCategoryRepository.findByBookId(bookId)
-                .orElseThrow(() -> new RuntimeException("도서에 연결된 카테고리를 찾을 수 없습니다."));
-
-        Category category = bookCategory.getCategory();
-
-        Long categoryId = category.getId();
-        Long level1 = null;
-        Long level2 = null;
-
-        if (category.getParentCategory() != null) {
-            level2 = category.getParentCategory().getId();
-
-            if (category.getParentCategory().getParentCategory() != null) {
-                level1 = category.getParentCategory().getParentCategory().getId();
-            }
-        }
-
-        BookDetailWithExtraInfoResponse response = BookDetailWithExtraInfoResponse.builder()
-                .id(book.getId())
-                .title(book.getTitle())
-                .contents(book.getContents())
-                .description(book.getDescription())
-                .author(book.getAuthor())
-                .publisher(book.getPublisher())
-                .publishedDate(book.getPublishedDate().toString())
-                .isbn(book.getIsbn())
-                .regularPrice(book.getRegularPrice())
-                .salePrice(book.getSalePrice())
-                .imgUrl(book.getBookImages().isEmpty() ? null : book.getBookImages().get(0).getImageUrl())
-                .giftwrap(book.getBookExtraInfo().isGiftwrap())
-                .count(book.getBookExtraInfo().getCount())
-                .status(book.getBookExtraInfo().getStatus())
-                .categoryId(categoryId)
-                .level1(level1)
-                .level2(level2)
-                .build();
-
-        log.info("BookDetailWithExtraInfoResponse 생성: categoryId={}, level1={}, level2={}", categoryId, level1, level2);
-
-        return response;
-    }
-
-    @Transactional
-    public void updateBook(Long id, BookUpdateRequest requestDto) {
-        Optional<Book> bookById = bookRepository.findById(id);
-        if (bookById.isEmpty()) {
-            throw new NotFoundBookException("해당 도서를 찾을 수 없습니다. id: " + id);
-        }
-
-        Book book = bookById.get();
-
-        if (requestDto.getTitle() != null) {
-            book.setTitle(requestDto.getTitle());
-        }
-        if (requestDto.getAuthor() != null) {
-            book.setAuthor(requestDto.getAuthor());
-        }
-        if (requestDto.getPublisher() != null) {
-            book.setPublisher(requestDto.getPublisher());
-        }
-        if (requestDto.getDescription() != null) {
-            book.setDescription(requestDto.getDescription());
-        }
-        if (requestDto.getContents() != null) {
-            book.setContents(requestDto.getContents());
-        }
-        if (requestDto.getRegularPrice() != null) {
-            book.setRegularPrice(requestDto.getRegularPrice());
-        }
-        if (requestDto.getSalePrice() != null) {
-            book.setSalePrice(requestDto.getSalePrice());
-        }
-
-        if (requestDto.getCount() != null) {
-            book.getBookExtraInfo().setCount(requestDto.getCount());
-        }
-        if (requestDto.getGiftwrap() != null) {
-            book.getBookExtraInfo().setGiftwrap(requestDto.getGiftwrap());
-        }
-        if (requestDto.getStatus() != null) {
-            book.getBookExtraInfo().setStatus(Status.valueOf(requestDto.getStatus()));
-        }
-
-        if (requestDto.getCategoryId() != null) {
-            Category newCategory = categoryRepository.findById(requestDto.getCategoryId())
-                    .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
-
-            // 기존 BookCategory 찾아서 교체
-            BookCategory bookCategory = bookCategoryRepository.findByBookId(book.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("카테고리 정보가 없습니다."));
-            bookCategory.setCategory(newCategory);
-        }
-    }
-
-
-    @Transactional(readOnly = true)
-    public List<BookDetailWithExtraInfoResponse> getAllBooksWithExtraInfo() {
-        List<Book> books = bookRepository.findAll();
-
-        return books.stream()
-                .map(book -> {
-                    BookCategory bookCategory = bookCategoryRepository.findByBookId(book.getId())
-                            .orElseThrow(() -> new RuntimeException("도서에 연결된 카테고리를 찾을 수 없습니다."));
-                    return new BookDetailWithExtraInfoResponse().toDto(book, bookCategory);
-                })
-                .toList();
-    }
+//    @Transactional
+//    public void updateBook(Long id, BookUpdateRequest requestDto) {
+//        Optional<Book> bookById = bookRepository.findById(id);
+//        if (bookById.isEmpty()) {
+//            throw new NotFoundBookException("해당 도서를 찾을 수 없습니다. id: " + id);
+//        }
+//
+//        Book book = bookById.get();
+//
+//        if (requestDto.getTitle() != null) {
+//            book.setTitle(requestDto.getTitle());
+//        }
+//        if (requestDto.getAuthor() != null) {
+//            book.setAuthor(requestDto.getAuthor());
+//        }
+//        if (requestDto.getPublisher() != null) {
+//            book.setPublisher(requestDto.getPublisher());
+//        }
+//        if (requestDto.getDescription() != null) {
+//            book.setDescription(requestDto.getDescription());
+//        }
+//        if (requestDto.getContents() != null) {
+//            book.setContents(requestDto.getContents());
+//        }
+//        if (requestDto.getRegularPrice() != null) {
+//            book.setRegularPrice(requestDto.getRegularPrice());
+//        }
+//        if (requestDto.getSalePrice() != null) {
+//            book.setSalePrice(requestDto.getSalePrice());
+//        }
+//
+//        if (requestDto.getCount() != null) {
+//            book.getBookExtraInfo().setCount(requestDto.getCount());
+//        }
+//        if (requestDto.getGiftwrap() != null) {
+//            book.getBookExtraInfo().setGiftwrap(requestDto.getGiftwrap());
+//        }
+//        if (requestDto.getStatus() != null) {
+//            book.getBookExtraInfo().setStatus(Status.valueOf(requestDto.getStatus()));
+//        }
+//
+//        if (requestDto.getCategoryId() != null) {
+//            Category newCategory = categoryRepository.findById(requestDto.getCategoryId())
+//                    .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
+//
+//            // 기존 BookCategory 찾아서 교체
+//            BookCategory bookCategory = bookCategoryRepository.findByBookId(book.getId())
+//                    .orElseThrow(() -> new IllegalArgumentException("카테고리 정보가 없습니다."));
+//            bookCategory.setCategory(newCategory);
+//        }
+//    }
 
 
 }
