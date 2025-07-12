@@ -42,7 +42,7 @@ public class AdminBookController {
     }
 
     // 외부 API 사용 (front)
-    @PostMapping("register/aladin")
+    @PostMapping("/register/aladin")
     public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookApiRegisterRequest bookApiRegisterRequest){
         // apiDTO -> bookRegisterDTO
         BookDetailResponse detailResponse = bookService.registerBookByApi(bookApiRegisterRequest);
@@ -51,7 +51,6 @@ public class AdminBookController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id){
-
         bookService.deleteBookAndRelatedEntities(id);
 
         return ResponseEntity.noContent().build();
@@ -66,15 +65,6 @@ public class AdminBookController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping(value = "/register/api")
-    public ResponseEntity<Void> registerBookByAladin(
-            @RequestBody FinalAladinBookRegisterRequest request) {
-
-        bookService.registerBookByAladin(request);
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
     @GetMapping("/{id}/detail")
     public ResponseEntity<BookDetailWithExtraInfoResponse> getBookDetailWithExtra(@PathVariable Long id) {
         BookDetailWithExtraInfoResponse response = bookService.getBookDetailWithExtraInfo(id);
@@ -82,11 +72,13 @@ public class AdminBookController {
     }
 
 
+
     @GetMapping("/extra_info")
     public ResponseEntity<List<BookDetailWithExtraInfoResponse>> getBooksWithExtraInfo() {
         List<BookDetailWithExtraInfoResponse> response = bookService.getAllBooksWithExtraInfo();
         return ResponseEntity.ok(response);
     }
+
 
 
 

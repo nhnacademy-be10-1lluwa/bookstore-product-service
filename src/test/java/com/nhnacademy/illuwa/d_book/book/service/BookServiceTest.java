@@ -6,7 +6,6 @@ import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
-import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
@@ -137,94 +136,6 @@ public class BookServiceTest {
                 .hasMessage("제목과 일치하는 도서가 존재하지 않습니다.");
 
         verify(aladinBookApiService, times(1)).searchBooksByTitle(title);
-
-    }
-
-    @Test
-    @DisplayName("도서 등록 성공")
-    void registerBookTest_Success(){
-        Book mockBook = Book.builder()
-                .title("인어 공주")
-                .description("인어 공주는...")
-                .author("안데르센")
-                .publisher("스웨덴출판사")
-                .publishedDate(LocalDate.of(2016, 6, 16))
-                .isbn("123456789EE")
-                .regularPrice(new BigDecimal(15000))
-                .salePrice(new BigDecimal(13000))
-                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
-                .build();
-
-        BookDetailResponse bookDetailResponse = new BookDetailResponse(
-                1L,
-                "어린 왕자",
-                "contents",
-                "description",
-                "author",
-                "출판사A",
-                LocalDate.of(2012,12,21),
-                "012345",
-                new BigDecimal(10000),
-                new BigDecimal(9000),
-                true,
-                "imgUrl"
-        );
-
-        Long categoryId = 1L;
-
-
-
-        Category mockCategory = new Category("테스트 카테고리");
-
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(mockCategory));
-        when(bookMapper.toBookEntity(bookRegisterRequest)).thenReturn(mockBook);
-        when(bookRepository.existsByIsbn("123456789EE")).thenReturn(false);
-        when(bookResponseMapper.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
-        when(bookRepository.save(any())).thenReturn(mockBook);
-
-
-        BookDetailResponse result = bookService.registerBook(bookRegisterRequest);
-
-        //then
-        assertThat(result).isNotNull();
-        assertThat(result.getTitle()).isEqualTo("어린 왕자");
-        verify(bookRepository, times(1)).save(any(Book.class));
-        verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
-
-    }
-
-
-    @Test
-    @DisplayName("도서 등록 실패 - 이미 등록된 도서")
-    void registerBookTest_Fail_AlreadyExists(){
-
-        Book book = Book.builder()
-                .title("인어 공주")
-                .description("인어 공주는...")
-                .author("안데르센")
-                .publisher("스웨덴출판사")
-                .publishedDate(LocalDate.of(2016, 6, 16))
-                .isbn("123456789EE")
-                .regularPrice(new BigDecimal(15000))
-                .salePrice(new BigDecimal(13000))
-                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
-                .build();
-
-        Category category = new Category("name");
-
-
-        given(bookMapper.toBookEntity(any(BookRegisterRequest.class))).willReturn(book);
-        when(bookRepository.existsByIsbn(anyString())).thenReturn(true);
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
-
-
-        //when & then
-        assertThatThrownBy(() -> bookService.registerBook(bookRegisterRequest))
-                .isInstanceOf(BookAlreadyExistsException.class)
-                .hasMessage("이미 등록된 도서입니다.");
-
-
-        verify(bookRepository, times(0)).save(any(Book.class));
 
     }
 

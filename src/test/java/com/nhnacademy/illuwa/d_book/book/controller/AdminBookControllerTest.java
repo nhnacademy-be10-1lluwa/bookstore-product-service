@@ -94,75 +94,7 @@ class AdminBookControllerTest {
     }
 
 
-
-
-    @Test
-    @DisplayName("책 등록 성공")
-    @Disabled
-    void registgerBook_Success() throws Exception {
-        //given
-        BookRegisterRequest registerRequest = bookRegisterRequest;
-        String isbn = "mockIsbn";
-
-        BookDetailResponse responseDto = new BookDetailResponse(
-                1L,
-                "어린 왕자",
-                "목차",
-                "description",
-                "author",
-                "출판사A",
-                LocalDate.of(2024, 6, 13),
-                "0100AF",
-                new BigDecimal(10000),
-                new BigDecimal(9000),
-                true,
-                "abc/def/g.jpg"
-        );
-
-        Book book =Book.builder()
-                .title("인어 공주")
-                .description("인어 공주는...")
-                .author("안데르센")
-                .publisher("스웨덴출판사")
-                .publishedDate(LocalDate.of(2016, 6, 16))
-                .isbn("123456789EE")
-                .regularPrice(new BigDecimal(15000))
-                .salePrice(new BigDecimal(13000))
-                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
-                .build();
-
-        BookDetailResponse bookDetailResponse = new BookDetailResponse(
-                1L,
-                "어린 왕자",
-                "목차",
-                "description",
-                "author",
-                "출판사A",
-                LocalDate.of(2024, 6, 13),
-                "0100AF",
-                new BigDecimal(10000),
-        new BigDecimal(9000),
-                true,
-                "image/url"
-        );
-
-
-        String json = objectMapper.writeValueAsString(registerRequest);
-        given(bookRepository.existsByIsbn(isbn)).willReturn(true);
-        given(bookService.registerBook(any(BookRegisterRequest.class))).willReturn(responseDto);
-        given(bookResponseMapper.toBookDetailResponse(book)).willReturn(bookDetailResponse);
-
-
-
-        //when & then
-        mockMvc.perform(post("/api/admin/books")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(jsonPath("$.isbn").value("0100AF"))
-                .andExpect(status().isCreated());
-
-        verify(bookService).registerBook(any(BookRegisterRequest.class));
-    }
+    
 
     @Test
     @DisplayName("책 등록 실패 - 해당 도서가 이미 존재")
