@@ -21,6 +21,8 @@ import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
 import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
+import com.nhnacademy.illuwa.d_book.tag.dto.TagResponse;
+import com.nhnacademy.illuwa.d_book.tag.repository.BookTagRepository;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import com.nhnacademy.illuwa.infra.storage.MinioStorageService;
@@ -50,7 +52,7 @@ public class BookService {
     private final AladinBookApiService aladinBookApiService;
     private final BookRepository bookRepository;
     private final BookResponseMapper bookResponseMapper;
-    private final TagRepository tagRepository;
+    private final BookTagRepository bookTagRepository;
     private final BookImageRepository bookImageRepository;
     private final BookMapper bookMapper;
     private final CategoryRepository categoryRepository;
@@ -60,11 +62,12 @@ public class BookService {
     private final ElasticsearchOperations elasticsearchOperations;
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, MinioStorageService minioStorageService, BookSearchRepository bookSearchRepository, ElasticsearchOperations elasticsearchOperations) {
+
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookTagRepository bookTagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, MinioStorageService minioStorageService, BookSearchRepository bookSearchRepository, ElasticsearchOperations elasticsearchOperations) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
         this.bookResponseMapper = bookResponseMapper;
-        this.tagRepository = tagRepository;
+        this.bookTagRepository = bookTagRepository;
         this.bookImageRepository = bookImageRepository;
         this.bookMapper = bookMapper;
         this.categoryRepository = categoryRepository;
@@ -188,13 +191,20 @@ public class BookService {
     // 모든 도서 조회 (부가정보 포함)
     @Transactional(readOnly = true)
     public Page<BookDetailWithExtraInfoResponse> getAllBooksWithExtraInfo(Pageable pageable) {
-        Page<Book> books = bookRepository.findAll(pageable);
+        Page<Book> all = bookRepository.findAll(pageable);
+        return all
+                .map(book -> {
+                    // 카테고리 조회
+                    BookCategory bookCategory = bookCategoryRepository.findByBookId(book.getId())
+                            .orElseThrow(() -> new RuntimeException("카테고리 없음"));
 
-        return books.map(book -> {
-            BookCategory bookCategory = bookCategoryRepository.findByBookId(book.getId())
-                    .orElseThrow(() -> new RuntimeException("도서에 연결된 카테고리를 찾을 수 없습니다."));
-            return new BookDetailWithExtraInfoResponse().toDto(book, bookCategory);
-        });
+                    // 태그 조회
+                    List<TagResponse> tags = book.getBookTags().stream()
+                            .map(bookTag -> new TagResponse(bookTag.getTag().getId(), bookTag.getTag().getName()))
+                            .toList();
+
+                    return new BookDetailWithExtraInfoResponse().toDto(book, bookCategory, tags);
+                });
     }
 
 
