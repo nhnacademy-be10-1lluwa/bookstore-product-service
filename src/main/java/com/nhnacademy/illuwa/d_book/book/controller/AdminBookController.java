@@ -71,6 +71,23 @@ public class AdminBookController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}/detail")
+    public ResponseEntity<BookDetailWithExtraInfoResponse> getBookDetailWithExtra(@PathVariable Long id) {
+        BookDetailWithExtraInfoResponse response = bookService.getBookDetailWithExtraInfo(id);
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/extra_info")
+    public ResponseEntity<List<BookDetailWithExtraInfoResponse>> getBooksWithExtraInfo() {
+        List<BookDetailWithExtraInfoResponse> response = bookService.getAllBooksWithExtraInfo();
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
+
 
     @GetMapping("/extra_info")
     public ResponseEntity<List<BookDetailWithExtraInfoResponse>> getBooksWithExtraInfo() {
