@@ -4,13 +4,14 @@ import com.nhnacademy.illuwa.d_book.book.dto.request.BookApiRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailWithExtraInfoResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
-import com.nhnacademy.illuwa.d_book.book.dto.request.FinalAladinBookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -74,8 +75,8 @@ public class AdminBookController {
 
 
     @GetMapping("/extra_info")
-    public ResponseEntity<List<BookDetailWithExtraInfoResponse>> getBooksWithExtraInfo() {
-        List<BookDetailWithExtraInfoResponse> response = bookService.getAllBooksWithExtraInfo();
+    public ResponseEntity<Page<BookDetailWithExtraInfoResponse>> getBooksWithExtraInfo(Pageable pageable) {
+        Page<BookDetailWithExtraInfoResponse> response = bookService.getAllBooksWithExtraInfo(pageable);
         return ResponseEntity.ok(response);
     }
 

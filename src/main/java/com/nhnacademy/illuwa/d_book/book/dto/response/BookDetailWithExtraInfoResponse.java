@@ -22,7 +22,7 @@ public class BookDetailWithExtraInfoResponse {
     private String description;
     private String author;
     private String publisher;
-    private String publishedDate; // 문자열로 유지
+    private String publishedDate;
     private String isbn;
     private BigDecimal regularPrice;
     private BigDecimal salePrice;
@@ -35,24 +35,22 @@ public class BookDetailWithExtraInfoResponse {
     private Long categoryId;
     private Long level1;
     private Long level2;
+    private String level1Name;
+    private String level2Name;
+    private String categoryName;
 
     public BookDetailWithExtraInfoResponse toDto(Book book, BookCategory bookCategory) {
         Category category = bookCategory.getCategory();
 
-        Long categoryIdToUse = null;
-        Long level1 = null;
-        Long level2 = null;
+        String categoryName = category.getCategoryName();
+        String level2Name = null;
+        String level1Name = null;
 
-        // 3단계 트리인지 체크
-        if (category.getParentCategory() != null && category.getParentCategory().getParentCategory() != null) {
-            categoryIdToUse = category.getId();
-            level1 = category.getParentCategory().getParentCategory().getId();
-            level2 = category.getParentCategory().getId();
-        } else if (category.getParentCategory() != null) {
-            categoryIdToUse = category.getId();
-            level1 = category.getParentCategory().getId();
-        } else {
-            categoryIdToUse = category.getId();
+        if (category.getParentCategory() != null) {
+            level2Name = category.getParentCategory().getCategoryName();
+            if (category.getParentCategory().getParentCategory() != null) {
+                level1Name = category.getParentCategory().getParentCategory().getCategoryName();
+            }
         }
 
         return BookDetailWithExtraInfoResponse.builder()
@@ -69,9 +67,13 @@ public class BookDetailWithExtraInfoResponse {
                 .giftwrap(book.getBookExtraInfo().isGiftwrap())
                 .count(book.getBookExtraInfo().getCount())
                 .status(book.getBookExtraInfo().getStatus())
-                .categoryId(categoryIdToUse)
-                .level1(level1)
-                .level2(level2)
+                .categoryId(category.getId())
+                .level1(category.getParentCategory() != null && category.getParentCategory().getParentCategory() != null
+                        ? category.getParentCategory().getParentCategory().getId() : null)
+                .level2(category.getParentCategory() != null ? category.getParentCategory().getId() : null)
+                .level1Name(level1Name)
+                .level2Name(level2Name)
+                .categoryName(categoryName)
                 .build();
     }
 
