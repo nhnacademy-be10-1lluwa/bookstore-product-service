@@ -1,6 +1,7 @@
 package com.nhnacademy.illuwa.d_book.category.controller;
 
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryCreateRequest;
+import com.nhnacademy.illuwa.d_book.category.dto.CategoryFlatResponse;
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryResponse;
 import com.nhnacademy.illuwa.d_book.category.service.CategoryService;
 import org.springframework.http.HttpStatus;
@@ -55,6 +56,10 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/flat_paged")
+    public ResponseEntity<Page<CategoryFlatResponse>> getFlatCategoriesPaged(Pageable pageable) {
+        return ResponseEntity.ok(categoryService.getAllCategoriesFlatPaged(pageable));
+    }
 
 
 
