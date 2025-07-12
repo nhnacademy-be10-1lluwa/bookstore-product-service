@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -75,8 +77,22 @@ public class AdminBookController {
 
 
     @GetMapping("/extra_info")
-    public ResponseEntity<Page<BookDetailWithExtraInfoResponse>> getBooksWithExtraInfo(Pageable pageable) {
+    public ResponseEntity<Page<BookDetailWithExtraInfoResponse>> getBooksWithExtraInfo(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String sort
+    ) {
+        String[] sortParams = sort.split(",");
+        String property = sortParams[0];
+        Sort.Direction direction = Sort.Direction.ASC; // 기본값
+
+        if (sortParams.length > 1) {
+            direction = Sort.Direction.fromString(sortParams[1]);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
         Page<BookDetailWithExtraInfoResponse> response = bookService.getAllBooksWithExtraInfo(pageable);
+
         return ResponseEntity.ok(response);
     }
 
