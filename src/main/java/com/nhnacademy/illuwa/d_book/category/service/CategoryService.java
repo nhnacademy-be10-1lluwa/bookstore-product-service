@@ -1,6 +1,7 @@
 package com.nhnacademy.illuwa.d_book.category.service;
 
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryCreateRequest;
+import com.nhnacademy.illuwa.d_book.category.dto.CategoryFlatResponse;
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryResponse;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.exception.CategoryNotAllowedException;
@@ -8,13 +9,13 @@ import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryReposit
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -53,15 +54,6 @@ public class CategoryService {
         return new CategoryResponse(category);
     }
 
-    public Page<CategoryResponse> getAllCategoriesByPaging(Pageable pageable) {
-        Page<Category> categoryPage = categoryRepository.findAll(pageable);
-
-        Page<CategoryResponse> categoryPageMap = categoryPage.map(category ->
-                new CategoryResponse(category)
-        );
-
-        return categoryPageMap;
-    }
 
     public CategoryResponse registerCategory(CategoryCreateRequest categoryCreateRequest){
         Optional<Category> categoryById = categoryRepository.findById(categoryCreateRequest.getParentId());
@@ -103,6 +95,46 @@ public class CategoryService {
 
         categoryRepository.delete(category);
     }
+
+    @Transactional(readOnly = true)
+    public Page<CategoryResponse> getAllCategoriesByPaging(Pageable pageable) {
+        return categoryRepository.findAll(pageable)
+                .map(CategoryResponse::fromEntity);
+    }
+    private void flattenCategory(Category category, int depth, List<CategoryFlatResponse> flatList) {
+        flatList.add(new CategoryFlatResponse(
+                category.getId(),
+                category.getParentCategory() != null ? category.getParentCategory().getId() : null,
+                category.getParentCategory() != null ? category.getParentCategory().getCategoryName() : null,
+                category.getCategoryName(),
+                depth
+        ));
+        for (Category child : category.getChildrenCategory()) {
+            flattenCategory(child, depth + 1, flatList);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CategoryFlatResponse> getAllCategoriesFlatPaged(Pageable pageable) {
+        // 1) 모든 카테고리 가져오기
+        List<Category> allCategories = categoryRepository.findAll();
+
+        // 2) 계층 평면화
+        List<CategoryFlatResponse> flatList = new ArrayList<>();
+        for (Category category : allCategories) {
+            if (category.getParentCategory() == null) {
+                flattenCategory(category, 0, flatList);
+            }
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), flatList.size());
+        List<CategoryFlatResponse> pageContent = flatList.subList(start, end);
+
+        return new PageImpl<>(pageContent, pageable, flatList.size());
+    }
+
+
 
 
 }
