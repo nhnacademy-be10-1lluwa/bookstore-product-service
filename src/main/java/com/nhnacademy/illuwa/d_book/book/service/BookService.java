@@ -292,12 +292,13 @@ public class BookService {
 
         //도서 부가 정보
         BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
-        bookImageRepository.save(bookImage);
         bookEntity.setBookExtraInfo(bookExtraInfo);
 
 
 
         Book savedBook = bookRepository.save(bookEntity);
+
+        bookImageRepository.save(bookImage);
 
         bookCategoryRepository.save(new BookCategory(savedBook,categoryEntity));
 
