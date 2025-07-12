@@ -249,7 +249,6 @@ public class BookService {
 
         BookImage bookImage = new BookImage(bookEntity,bookApiRegisterRequest.getCover(), ImageType.THUMBNAIL);
         bookEntity.addImage(bookImage);
-        bookImageRepository.save(bookImage);
 
         BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookApiRegisterRequest.getCount());
         bookEntity.setBookExtraInfo(bookExtraInfo);
@@ -257,7 +256,9 @@ public class BookService {
         bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));
 
         Book savedBook = bookRepository.save(bookEntity);
+        bookImageRepository.save(bookImage);
         syncBookToElasticsearch(savedBook);
+
 
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
@@ -294,6 +295,7 @@ public class BookService {
 
         //도서 부가 정보
         BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
+        bookImageRepository.save(bookImage);
         bookEntity.setBookExtraInfo(bookExtraInfo);
 
 
