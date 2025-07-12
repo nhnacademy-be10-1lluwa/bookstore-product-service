@@ -47,8 +47,9 @@ public class Book {
     @Column(nullable = false)
     private BigDecimal salePrice;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.PERSIST)
-    private List<BookImage> bookImages;
+    @Builder.Default
+    @OneToMany(mappedBy = "book", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<BookImage> bookImages = new ArrayList<>();
 
     @Embedded
     private BookExtraInfo bookExtraInfo;
