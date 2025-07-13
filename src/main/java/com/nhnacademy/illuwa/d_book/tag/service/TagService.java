@@ -4,21 +4,17 @@ import com.nhnacademy.illuwa.d_book.tag.dto.TagRegisterRequest;
 import com.nhnacademy.illuwa.d_book.tag.dto.TagResponse;
 import com.nhnacademy.illuwa.d_book.tag.entity.Tag;
 import com.nhnacademy.illuwa.d_book.tag.exception.TagAlreadyExistsException;
-import com.nhnacademy.illuwa.d_book.tag.exception.TagNotFoundException;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 
 @Service
 public class TagService {
 
     TagRepository tagRepository;
-
-
 
     public TagService(TagRepository tagRepository){
         this.tagRepository = tagRepository;
@@ -41,20 +37,30 @@ public class TagService {
         return new TagResponse(registeredTag.getId(),registeredTag.getName());
     }
 
-    @Transactional
-    public void deleteTag(Long tagId) {
 
-        Optional<Tag> tagById = tagRepository.findById(tagId);
-
-        if(tagById.isEmpty()){
-            throw new TagNotFoundException("존재하지 않는 태그입니다.");
-        }
-
-        Tag targetTag = tagById.get();
-        tagRepository.delete(targetTag);
+    @Transactional(readOnly = true)
+    public Page<TagResponse> getAllTags(Pageable pageable) {
+        return tagRepository.findAll(pageable)
+                .map(tag -> TagResponse.builder()
+                        .id(tag.getId())
+                        .name(tag.getName())
+                        .build());
     }
 
-    public Page<Tag> getAllTags(Pageable pageable) {
-        return tagRepository.findAll(pageable);
+    @Transactional
+    public TagResponse registerTag(String name) {
+        if (tagRepository.existsByName(name)) {
+            throw new IllegalArgumentException("이미 존재하는 태그입니다.");
+        }
+        Tag saved = tagRepository.save(new Tag(name));
+        return TagResponse.builder()
+                .id(saved.getId())
+                .name(saved.getName())
+                .build();
+    }
+
+    @Transactional
+    public void deleteTag(Long id) {
+        tagRepository.deleteById(id);
     }
 }
