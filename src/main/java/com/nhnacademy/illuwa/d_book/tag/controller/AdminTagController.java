@@ -1,6 +1,7 @@
 package com.nhnacademy.illuwa.d_book.tag.controller;
 
 import com.nhnacademy.illuwa.common.dto.PageResponse;
+import com.nhnacademy.illuwa.d_book.tag.dto.TagRegisterRequest;
 import com.nhnacademy.illuwa.d_book.tag.dto.TagResponse;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import com.nhnacademy.illuwa.d_book.tag.service.TagService;
@@ -57,7 +58,7 @@ public class AdminTagController {
     }
 
     @PostMapping("/tags")
-    public ResponseEntity<TagResponse> createTag(@RequestBody TagResponse request) {
+    public ResponseEntity<TagResponse> createTag(@RequestBody TagRegisterRequest request) {
         TagResponse tag = tagService.registerTag(request.getName());
         return ResponseEntity.ok(tag);
     }
