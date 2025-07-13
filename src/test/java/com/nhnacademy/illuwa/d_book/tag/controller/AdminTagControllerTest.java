@@ -14,7 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,27 +42,20 @@ class AdminTagControllerTest {
 
     @Test
     void registerTag() throws Exception {
-        Tag registerTag = new Tag("태그이름1");
-
         TagRegisterRequest tagRegisterRequest = new TagRegisterRequest("태그 이름");
-        TagResponse tagResponse = new TagResponse(11L,"태그 이름");
 
+        TagResponse tagResponse = new TagResponse(11L, "태그 이름");
 
-        //메소드 호출의 인자(registerTag)까지 정확히 일치하는지 확인
-        //내용은 같지만 메모리 주소가 다른 별개의 객체
-        given(tagService.registerTag(any(TagRegisterRequest.class))).willReturn(tagResponse);
+        given(tagService.registerTag(anyString())).willReturn(tagResponse);
 
         String json = objectMapper.writeValueAsString(tagRegisterRequest);
 
-
-        //when & then
-        mockMvc.perform(post("/api/tags")
+        mockMvc.perform(post("/api/admin/tags")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andDo(print())
-                .andExpect(jsonPath("$.name").value("태그 이름"))
-                .andExpect(status().isOk());
-
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("태그 이름"));
     }
 
     @Test
@@ -68,7 +63,7 @@ class AdminTagControllerTest {
         Long id = 1L;
 
         //when & then
-        mockMvc.perform(delete("/api/tags/{id}", 11L))
+        mockMvc.perform(delete("/api/admin/tags/{id}", 11L))
                 .andExpect(status().isNoContent());
 
     }
