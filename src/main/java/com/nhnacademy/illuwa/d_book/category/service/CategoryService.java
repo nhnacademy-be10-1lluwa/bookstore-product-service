@@ -3,8 +3,10 @@ package com.nhnacademy.illuwa.d_book.category.service;
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryCreateRequest;
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryFlatResponse;
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryResponse;
+import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.exception.CategoryNotAllowedException;
+import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
 import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final BookCategoryRepository bookCategoryRepository;
 
     public List<CategoryResponse> getAllCategories(){
         List<Category> categories = categoryRepository.findAll();
@@ -86,11 +89,18 @@ public class CategoryService {
 
     @Transactional
     public void deleteCategory(Long categoryId) {
+
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리"));
 
         if (!category.getChildrenCategory().isEmpty()) {
             throw new IllegalStateException("하위 카테고리를 포함한 경우 삭제 불가");
+        }
+
+        List<BookCategory> bookCategories = bookCategoryRepository.findByCategoryId(categoryId);
+
+        if (!bookCategories.isEmpty()) {
+            bookCategoryRepository.deleteAll(bookCategories);
         }
 
         categoryRepository.delete(category);
