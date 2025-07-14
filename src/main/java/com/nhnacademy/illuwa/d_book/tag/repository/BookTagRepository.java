@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface BookTagRepository extends JpaRepository<BookTag, Long> {
     List<BookTag> findByBookId(Long bookId);
+    List<BookTag> findByTagId(Long tagId);
 }
