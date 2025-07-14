@@ -1,14 +1,15 @@
 package com.nhnacademy.illuwa.d_book.tag.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
+
 @Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class TagResponse {
     private Long id;
     private String name;
-
 }
+

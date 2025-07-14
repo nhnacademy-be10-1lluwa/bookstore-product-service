@@ -6,6 +6,7 @@ import com.nhnacademy.illuwa.d_book.tag.entity.BookTag;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,13 +42,14 @@ public class Book {
     private String isbn;
 
     @Column(nullable = false)
-    private int regularPrice;
+    private BigDecimal regularPrice;
 
     @Column(nullable = false)
-    private int salePrice;
+    private BigDecimal salePrice;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.PERSIST)
-    private List<BookImage> bookImages;
+    @Builder.Default
+    @OneToMany(mappedBy = "book", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<BookImage> bookImages = new ArrayList<>();
 
     @Embedded
     private BookExtraInfo bookExtraInfo;

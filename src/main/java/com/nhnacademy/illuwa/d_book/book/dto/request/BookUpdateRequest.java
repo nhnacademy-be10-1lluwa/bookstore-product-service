@@ -1,22 +1,39 @@
 package com.nhnacademy.illuwa.d_book.book.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.math.BigDecimal;
+
 
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class BookUpdateRequest {
+    private Long id;
 
-    private String contents;
+    private String title;
+    private String author;
+    private String publisher;
+    private String pubDate;
+    private String isbn;
+
+    private BigDecimal regularPrice;
+    private BigDecimal salePrice;
 
     private String description;
+    private String contents;
 
-    private Integer price;
+    private String cover;
 
-    private Boolean giftWrap;
+    private Integer count;
+
+    private String status;
+
+    private Boolean giftwrap;
+
+    private Long level1;
+    private Long level2;
+    private Long categoryId;
 }

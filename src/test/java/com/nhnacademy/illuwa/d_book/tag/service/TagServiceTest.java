@@ -54,13 +54,10 @@ class TagServiceTest {
     void deleteTag() {
 
         Long tagId = 11L;
-        Tag tag = new Tag("tag");
-
-        given(tagRepository.findById(any())).willReturn(Optional.of(tag));
 
         tagService.deleteTag(tagId);
 
-        verify(tagRepository).delete((any(Tag.class)));
+        verify(tagRepository).deleteById(tagId);
 
     }
 }

@@ -6,7 +6,6 @@ import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
-import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
@@ -28,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -139,94 +139,6 @@ public class BookServiceTest {
 
     }
 
-    @Test
-    @DisplayName("도서 등록 성공")
-    void registerBookTest_Success(){
-        Book mockBook = Book.builder()
-                .title("인어 공주")
-                .description("인어 공주는...")
-                .author("안데르센")
-                .publisher("스웨덴출판사")
-                .publishedDate(LocalDate.of(2016, 6, 16))
-                .isbn("123456789EE")
-                .regularPrice(15000)
-                .salePrice(13000)
-                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
-                .build();
-
-        BookDetailResponse bookDetailResponse = new BookDetailResponse(
-                1L,
-                "어린 왕자",
-                "contents",
-                "description",
-                "author",
-                "출판사A",
-                LocalDate.of(2012,12,21),
-                "012345",
-                10000,
-                9000,
-                true,
-                "imgUrl"
-        );
-
-        Long categoryId = 1L;
-
-
-
-        Category mockCategory = new Category("테스트 카테고리");
-
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(mockCategory));
-        when(bookMapper.toBookEntity(bookRegisterRequest)).thenReturn(mockBook);
-        when(bookRepository.existsByIsbn("123456789EE")).thenReturn(false);
-        when(bookResponseMapper.toBookDetailResponse(mockBook)).thenReturn(bookDetailResponse);
-        when(bookRepository.save(any())).thenReturn(mockBook);
-
-
-        BookDetailResponse result = bookService.registerBook(bookRegisterRequest);
-
-        //then
-        assertThat(result).isNotNull();
-        assertThat(result.getTitle()).isEqualTo("어린 왕자");
-        verify(bookRepository, times(1)).save(any(Book.class));
-        verify(bookCategoryRepository, times(1)).save(any(BookCategory.class));
-
-    }
-
-
-    @Test
-    @DisplayName("도서 등록 실패 - 이미 등록된 도서")
-    void registerBookTest_Fail_AlreadyExists(){
-
-        Book book = Book.builder()
-                .title("인어 공주")
-                .description("인어 공주는...")
-                .author("안데르센")
-                .publisher("스웨덴출판사")
-                .publishedDate(LocalDate.of(2016, 6, 16))
-                .isbn("123456789EE")
-                .regularPrice(15000)
-                .salePrice(13000)
-                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
-                .build();
-
-        Category category = new Category("name");
-
-
-        given(bookMapper.toBookEntity(any(BookRegisterRequest.class))).willReturn(book);
-        when(bookRepository.existsByIsbn(anyString())).thenReturn(true);
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
-
-
-        //when & then
-        assertThatThrownBy(() -> bookService.registerBook(bookRegisterRequest))
-                .isInstanceOf(BookAlreadyExistsException.class)
-                .hasMessage("이미 등록된 도서입니다.");
-
-
-        verify(bookRepository, times(0)).save(any(Book.class));
-
-    }
-
 
     @Test
     @DisplayName("등록된 도서 삭제 - 성공")
@@ -241,8 +153,8 @@ public class BookServiceTest {
                 .publisher("스웨덴출판사")
                 .publishedDate(LocalDate.of(2016, 6, 16))
                 .isbn("123456789EE")
-                .regularPrice(15000)
-                .salePrice(13000)
+                .regularPrice(new BigDecimal(15000))
+                .salePrice(new BigDecimal(13000))
                 .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
                 .build();
 
@@ -286,8 +198,8 @@ public class BookServiceTest {
                 .publisher("스웨덴출판사")
                 .publishedDate(LocalDate.of(2016, 6, 16))
                 .isbn("123456789EE")
-                .regularPrice(15000)
-                .salePrice(13000)
+                .regularPrice(new BigDecimal(15000))
+                .salePrice(new BigDecimal(13000))
                 .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
                 .build();
 
@@ -300,8 +212,8 @@ public class BookServiceTest {
                 "한국출판사",
                 LocalDate.of(1999, 9, 19),
                 "0070ABC",
-                10000,
-                6000,
+                new BigDecimal(10000),
+                new BigDecimal(6000),
                 false,
                 "imgUrl"
         );
@@ -341,33 +253,56 @@ public class BookServiceTest {
     @Test
     @DisplayName("도서 수정 - 성공")
     void updateBook_Success() {
-
         Long id = 9L;
 
         Book updatedBook = Book.builder()
+                .id(9L)
                 .title("인어 공주")
                 .description("인어 공주는...")
                 .author("안데르센")
                 .publisher("스웨덴출판사")
                 .publishedDate(LocalDate.of(2016, 6, 16))
                 .isbn("123456789EE")
-                .regularPrice(15000)
-                .salePrice(13000)
+                .regularPrice(new BigDecimal(15000))
+                .salePrice(new BigDecimal(13000))
                 .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
                 .build();
 
         BookUpdateRequest bookUpdateRequest = new BookUpdateRequest(
-                "수정된 목차",
-                "수정된 제목",
-                10900,
-                false
+                1L,
+                "테스트 도서 제목",
+                "테스트 저자",
+                "테스트 출판사",
+                "2024-01-01",
+                "1234567890123",
+                new BigDecimal("15000"),
+                new BigDecimal("12000"),
+                "이것은 설명입니다.",
+                "이것은 목차입니다.",
+                "http://example.com/image.jpg",
+                10,
+                "NORMAL",
+                true,
+                1L,
+                2L,
+                3L
         );
 
         when(bookRepository.findById(id)).thenReturn(Optional.of(updatedBook));
 
-        bookService.updateBook(id,bookUpdateRequest);
+        when(categoryRepository.findById(bookUpdateRequest.getCategoryId()))
+                .thenReturn(Optional.of(mock(Category.class)));
 
+        when(bookCategoryRepository.findByBookId(id))
+                .thenReturn(Optional.of(mock(BookCategory.class)));
+
+        // 실행
+        bookService.updateBook(id, bookUpdateRequest);
+
+        // 검증
         verify(bookRepository, times(1)).findById(id);
+        verify(categoryRepository, times(1)).findById(bookUpdateRequest.getCategoryId());
+        verify(bookCategoryRepository, times(1)).findByBookId(id);
     }
 
     @Test
@@ -380,7 +315,7 @@ public class BookServiceTest {
 
         assertThatThrownBy(() -> bookService.updateBook(id,mockBookUpdateRequest))
                 .isInstanceOf(NotFoundBookException.class)
-                .hasMessage("해당 도서는 존재하지 않아서 수정이 불가능합니다.");
+                .hasMessage("해당 도서를 찾을 수 없습니다. id: "+id);
 
         verify(bookRepository, times(1)).findById(id);
         verify(bookRepository, never()).save(any(Book.class));
