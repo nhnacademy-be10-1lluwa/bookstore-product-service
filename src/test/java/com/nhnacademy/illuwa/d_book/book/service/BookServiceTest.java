@@ -1,6 +1,8 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
+import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
+import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
 import com.nhnacademy.illuwa.d_book.book.enums.Status;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
@@ -222,7 +224,9 @@ public class BookServiceTest {
         when(bookRepository.findByTitleContaining(title)).thenReturn(List.of(book));
         when(bookResponseMapper.toBookDetailResponse(any())).thenReturn(bookDetailResponse);
 
+
         List<BookDetailResponse> bookDetailResponses = bookService.searchBookByTitle(title);
+
         assertThat(bookDetailResponses).hasSize(1);
         assertThat(bookDetailResponses.getFirst().getTitle()).isEqualTo("헨젤과 그레텔");
 
@@ -295,6 +299,8 @@ public class BookServiceTest {
 
         when(bookCategoryRepository.findByBookId(id))
                 .thenReturn(Optional.of(mock(BookCategory.class)));
+        when(bookImageRepository.findByBookIdAndImageType(9L, ImageType.THUMBNAIL))
+                .thenReturn(Optional.of(mock(BookImage.class)));
 
         // 실행
         bookService.updateBook(id, bookUpdateRequest);
