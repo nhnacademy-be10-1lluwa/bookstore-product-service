@@ -2,22 +2,28 @@ package com.nhnacademy.illuwa.d_book.tag.service;
 
 import com.nhnacademy.illuwa.d_book.tag.dto.TagRegisterRequest;
 import com.nhnacademy.illuwa.d_book.tag.dto.TagResponse;
+import com.nhnacademy.illuwa.d_book.tag.entity.BookTag;
 import com.nhnacademy.illuwa.d_book.tag.entity.Tag;
 import com.nhnacademy.illuwa.d_book.tag.exception.TagAlreadyExistsException;
+import com.nhnacademy.illuwa.d_book.tag.repository.BookTagRepository;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Service
 public class TagService {
 
     TagRepository tagRepository;
+    BookTagRepository bookTagRepository;
 
-    public TagService(TagRepository tagRepository){
+    public TagService(TagRepository tagRepository,BookTagRepository bookTagRepository ){
         this.tagRepository = tagRepository;
+        this.bookTagRepository = bookTagRepository;
     }
 
     @Transactional
@@ -52,6 +58,7 @@ public class TagService {
         if (tagRepository.existsByName(name)) {
             throw new IllegalArgumentException("이미 존재하는 태그입니다.");
         }
+
         Tag saved = tagRepository.save(new Tag(name));
         return TagResponse.builder()
                 .id(saved.getId())
@@ -60,7 +67,16 @@ public class TagService {
     }
 
     @Transactional
-    public void deleteTag(Long id) {
-        tagRepository.deleteById(id);
+    public void deleteTag(Long tagId) {
+        Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 태그입니다."));
+
+        List<BookTag> bookTags = bookTagRepository.findByTagId(tagId);
+
+        if (!bookTags.isEmpty()) {
+            bookTagRepository.deleteAll(bookTags);
+        }
+
+        tagRepository.delete(tag);
     }
 }
