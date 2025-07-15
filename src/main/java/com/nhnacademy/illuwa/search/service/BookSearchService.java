@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -17,8 +18,8 @@ import org.springframework.data.elasticsearch.core.query.StringQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -35,28 +36,22 @@ public class BookSearchService {
     }
 
 
-    public Page<BookDocument> searchByManyKeyword(String keyword, Pageable pageable) {
-        return bookSearchRepository
-                .findByTitleContainingOrAuthorContainingOrDescriptionContaining(keyword, keyword, keyword, pageable);
-    }
-
     public Page<BookDocument> searchByKeyword(String keyword, Pageable pageable) {
-        String[] searchFields = {"title", "description", "author"};
-
-        Query query = new StringQuery(
-                String.format(
-                        "{\"multi_match\": {\"query\": \"%s\", \"fields\": [\"%s\"]}}",
-                        keyword,
-                        String.join("\", \"", searchFields)
+        NativeQuery query = NativeQuery.builder()
+                .withQuery(q -> q
+                        .multiMatch(m -> m
+                                .query(keyword)
+                                .fields("title", "title.jaso", "title.icu", "description", "author")
+                        )
                 )
-        );
-        query.setPageable(pageable);
+                .withPageable(pageable)
+                .build();
 
         SearchHits<BookDocument> searchHits = elasticsearchOperations.search(query, BookDocument.class);
 
         List<BookDocument> content = searchHits.getSearchHits().stream()
                 .map(SearchHit::getContent)
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(content, pageable, searchHits.getTotalHits());
     }
@@ -71,6 +66,7 @@ public class BookSearchService {
                 .publisher(book.getPublisher())
                 .isbn(book.getIsbn())
                 .salePrice(book.getSalePrice())
+                .publishedDate(book.getPublishedDate())
                 .thumbnailUrl(
                         book.getBookImages() != null && !book.getBookImages().isEmpty()
                                 ? book.getBookImages().get(0).getImageUrl()
@@ -103,6 +99,7 @@ public class BookSearchService {
                         .publisher(book.getPublisher())
                         .isbn(book.getIsbn())
                         .salePrice(book.getSalePrice())
+                        .publishedDate(book.getPublishedDate())
                         .thumbnailUrl(book.getBookImages() != null && !book.getBookImages().isEmpty()
                                 ? book.getBookImages().get(0).getImageUrl()
                                 : null)
