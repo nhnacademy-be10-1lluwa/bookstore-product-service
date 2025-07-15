@@ -1,0 +1,20 @@
+{
+  "properties": {
+    "title": {
+      "type": "text",
+      "analyzer": "nori_analyzer",
+      "fields": {
+        "jaso": { "type": "text", "analyzer": "jaso_analyzer" },
+        "icu": { "type": "text", "analyzer": "icu_analyzer" }
+      }
+    },
+    "description": {
+      "type": "text",
+      "analyzer": "nori_analyzer",
+      "fields": {
+        "jaso": { "type": "text", "analyzer": "jaso_analyzer" },
+        "icu": { "type": "text", "analyzer": "icu_analyzer" }
+      }
+    }
+  }
+}
