@@ -99,7 +99,7 @@ public class AdminBookController {
 
 
 
-    @PatchMapping("/update/bookCount")
+    @PutMapping("/update/bookCount")
     public ResponseEntity<Void> deductBooksCount(
             @RequestBody List<BookCountUpdateRequest> requests
     ) {
