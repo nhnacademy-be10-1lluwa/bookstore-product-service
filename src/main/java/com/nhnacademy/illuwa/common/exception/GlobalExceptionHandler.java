@@ -3,6 +3,7 @@ package com.nhnacademy.illuwa.common.exception;
 import com.nhnacademy.illuwa.cart.exception.BookCartNotFoundException;
 import com.nhnacademy.illuwa.cart.exception.InsufficientStockException;
 import com.nhnacademy.illuwa.cart.exception.NotFoundMemberIdException;
+import com.nhnacademy.illuwa.common.dto.ErrorResponse;
 import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
@@ -14,191 +15,250 @@ import com.nhnacademy.illuwa.d_review.review.exception.MemberIdDoesNotMatchWithR
 import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
 import com.nhnacademy.illuwa.infra.storage.exception.FileUploadFailedException;
 import com.nhnacademy.illuwa.infra.storage.exception.InvalidFileFormatException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private final Map<String, Object> body = new LinkedHashMap<>();
-    private HttpStatus status;
 
     @ExceptionHandler(InvalidFileFormatException.class)
-    public ResponseEntity<Object> handleInvalidFileFormatException(InvalidFileFormatException e) {
-        status = HttpStatus.BAD_REQUEST;
+    public ResponseEntity<ErrorResponse> handleInvalidFileFormatException(InvalidFileFormatException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
 
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("code", "Invalid_File_Format");
-        body.put("message", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase()
+                ,"INVALID_FILE_FORMAT",
+                e.getMessage(),
+                request.getRequestURI()
+        );
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
-        return new ResponseEntity<>(body, status);
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(FileUploadFailedException.class)
-    public ResponseEntity<Object> handleFileUploadFailedException(FileUploadFailedException e) {
-        status = HttpStatus.INTERNAL_SERVER_ERROR;
+    public ResponseEntity<ErrorResponse> handleFileUploadFailedException(FileUploadFailedException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("code", "File_Upload_Failed");
-        body.put("message", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase()
+                ,"FILE_UPLOAD_FAILED",
+                e.getMessage(),
+                request.getRequestURI()
+        );
 
         log.error("MinIO에 업로드 중 에러가 발생했습니다.", e);
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
-        return new ResponseEntity<>(body, status);
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(NotFoundBookException.class)
-    public ResponseEntity<String> handleNotFoundBookException(NotFoundBookException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleNotFoundBookException(NotFoundBookException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase()
+                ,"BOOK_NOT_FOUND",
+                e.getMessage(),
+                request.getRequestURI()
+        );
+
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(BookAlreadyExistsException.class)
-    public ResponseEntity<String> handleAlreadyExistsBookException(BookAlreadyExistsException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleAlreadyExistsBookException(BookAlreadyExistsException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase(),
+                "DUPLICATE_BOOK",
+                e.getMessage(),
+                request.getRequestURI()
+        );
+
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(BookApiParsingException.class)
-    public ResponseEntity<String> handleApiParsingException(BookApiParsingException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleApiParsingException(BookApiParsingException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase(),
+                "API_PARSING_ERROR",
+                e.getMessage(),
+                request.getRequestURI()
+        );
+
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(BookApiException.class)
-    public ResponseEntity<String> handleAladinApiException(BookApiException ex) {
-        return ResponseEntity.status(ex.getStatus())
-                .body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleAladinApiException(BookApiException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase(),
+                "ALADIN_API_ERROR",
+                e.getMessage(),
+                request.getRequestURI()
+        );
+
+        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(ReviewNotFoundException.class)
-    public ResponseEntity<Object> handleReviewNotFoundException(ReviewNotFoundException e) {
-        status = HttpStatus.NOT_FOUND;
+    public ResponseEntity<ErrorResponse> handleReviewNotFoundException(ReviewNotFoundException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
 
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("code", "Review_Not_Found");
-        body.put("message", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase()
+                ,"REVIEW_NOT_FOUND",
+                e.getMessage(),
+                request.getRequestURI()
+        );
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
-        return new ResponseEntity<>(body, status);
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(CannotWriteReviewException.class)
-    public ResponseEntity<Object> handleCannotWriteReviewException(CannotWriteReviewException e) {
-        status = HttpStatus.NOT_FOUND;
+    public ResponseEntity<ErrorResponse> handleCannotWriteReviewException(CannotWriteReviewException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
 
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("code", "Review_Not_Found");
-        body.put("message", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase()
+                ,"CANNOT_WRITE_REVIEW",
+                e.getMessage(),
+                request.getRequestURI()
+        );
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
-        return new ResponseEntity<>(body, status);
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(MemberIdDoesNotMatchWithReviewException.class)
-    public ResponseEntity<Object> handleMemberIdDoesNotMatchWithReviewException(MemberIdDoesNotMatchWithReviewException e) {
-        status = HttpStatus.FORBIDDEN;
+    public ResponseEntity<ErrorResponse> handleMemberIdDoesNotMatchWithReviewException(MemberIdDoesNotMatchWithReviewException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
 
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("code", "Member_Id_Does_Not_Match");
-        body.put("message", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase()
+                ,"MEMBERID_DOES_NOT_MATCH",
+                e.getMessage(),
+                request.getRequestURI()
+        );
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
-        return new ResponseEntity<>(body, status);
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(CommentNotFoundException.class)
-    public ResponseEntity<Object> handleCommentNotFoundException(CommentNotFoundException e) {
-        status = HttpStatus.NOT_FOUND;
+    public ResponseEntity<ErrorResponse> handleCommentNotFoundException(CommentNotFoundException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
 
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("code", "Comment_Not_Found");
-        body.put("message", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase()
+                ,"COMMENT_NOT_FOUND",
+                e.getMessage(),
+                request.getRequestURI()
+        );
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
-        return new ResponseEntity<>(body, status);
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(InvalidCommentStatusException.class)
-    public ResponseEntity<Object> handleCommentStatusInvalidException(InvalidCommentStatusException e) {
-        status = HttpStatus.CONFLICT;
+    public ResponseEntity<ErrorResponse> handleCommentStatusInvalidException(InvalidCommentStatusException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
 
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("code", "Comment_Status_Invalid");
-        body.put("message", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase(),
+                "INVALID_COMMENT_STATUS",
+                e.getMessage(),
+                request.getRequestURI()
+        );
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
-        return new ResponseEntity<>(body, status);
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(InsufficientStockException.class)
-    public ResponseEntity<Object> handleInsufficientStockException(InsufficientStockException e) {
-        status = HttpStatus.CONFLICT;
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("code", "Insufficient_Stock");
-        body.put("message", e.getMessage());
+    public ResponseEntity<ErrorResponse> handleInsufficientStockException(InsufficientStockException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase(),
+                "INSUFFICIENT_STOCK",
+                e.getMessage(),
+                request.getRequestURI()
+        );
 
         log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
 
-        return new ResponseEntity<>(body, status);
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(NotFoundMemberIdException.class)
-    public ResponseEntity<Object> handleNotFoundMemberIdException(NotFoundMemberIdException e) {
-        status = HttpStatus.NOT_FOUND;
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("code", "Member_Not_Found");
-        body.put("message", e.getMessage());
+    public ResponseEntity<ErrorResponse> handleNotFoundMemberIdException(NotFoundMemberIdException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
 
-        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase(),
+                "MEMBER_NOT_FOUND",
+                e.getMessage(),
+                request.getRequestURI()
+        );
 
-        return new ResponseEntity<>(body, status);
+        return new ResponseEntity<>(response, status);
     }
 
     @ExceptionHandler(BookCartNotFoundException.class)
-    public ResponseEntity<Object> handleBookCartNotFoundException(BookCartNotFoundException e) {
-        status = HttpStatus.NOT_FOUND;
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
-        body.put("code", "Book_Cart_Not_Found");
-        body.put("message", e.getMessage());
+    public ResponseEntity<Object> handleBookCartNotFoundException(BookCartNotFoundException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
 
-        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
+        ErrorResponse response = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase(),
+                "BOOKCART_NOT_FOUND",
+                e.getMessage(),
+                request.getRequestURI()
+        );
 
-        return new ResponseEntity<>(body, status);
+        return new ResponseEntity<>(response, status);
     }
 }
