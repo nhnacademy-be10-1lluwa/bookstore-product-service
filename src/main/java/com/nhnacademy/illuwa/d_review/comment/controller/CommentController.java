@@ -35,7 +35,8 @@ public class CommentController {
         return ResponseEntity.ok(responseList);
     }
 
-    @PatchMapping("/{commentId}")
+    // 프론트에서 feign 으로 수정요청 받으려면 어쩔수 없이 Post 써야함 (feign 은 patch 미지원)
+    @PostMapping("/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable Long bookId,
                                                          @PathVariable Long reviewId,
                                                          @PathVariable Long commentId,
