@@ -37,6 +37,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -186,7 +188,7 @@ public class BookService {
                 .map(book -> {
                     // 카테고리 조회
                     BookCategory bookCategory = bookCategoryRepository.findByBookId(book.getId())
-                            .orElseThrow(() -> new RuntimeException("카테고리 없음"));
+                            .orElse(null);
 
                     // 태그 조회
                     List<TagResponse> tags = book.getBookTags().stream()
@@ -397,6 +399,30 @@ public class BookService {
         bookSearchService.syncBookToElasticsearch(book);
 
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<Book> findBooksByCategoryAndSubCategories(String categoryName) {
+
+        Category parentCategory = categoryRepository.findByCategoryName(categoryName)
+                .orElseThrow(() -> new IllegalArgumentException("해당 카테고리를 찾을 수 없습니다: " + categoryName));
+
+
+        List<Long> allCategoryIds = new ArrayList<>();
+        Queue<Category> categoriesToVisit = new LinkedList<>();
+
+        categoriesToVisit.add(parentCategory);
+
+        while (!categoriesToVisit.isEmpty()) {
+
+            Category currentCategory = categoriesToVisit.poll();
+            allCategoryIds.add(currentCategory.getId());
+            if (currentCategory.getChildrenCategory() != null) {
+                categoriesToVisit.addAll(currentCategory.getChildrenCategory());
+            }
+        }
+
+        return bookRepository.findBooksByCategories(allCategoryIds);
     }
 
 
