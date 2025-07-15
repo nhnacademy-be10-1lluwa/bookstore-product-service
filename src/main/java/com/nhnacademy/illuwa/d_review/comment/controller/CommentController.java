@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/books/{bookId}/reviews/{reviewId}/comments")
+@RequestMapping("/api/book-reviews/{bookId}/reviews/{reviewId}/comments")
 public class CommentController {
     private final CommentService commentService;
 

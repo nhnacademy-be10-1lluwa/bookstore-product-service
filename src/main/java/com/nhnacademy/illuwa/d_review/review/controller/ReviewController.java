@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/books/{bookId}/reviews")
+@RequestMapping("/api/book-reviews/{bookId}/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
 
