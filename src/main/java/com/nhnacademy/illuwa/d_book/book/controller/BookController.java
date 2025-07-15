@@ -119,8 +119,8 @@ public class BookController {
         return ResponseEntity.ok(results);
     }
 
-    @GetMapping("/search/by-category-name")
-    public ResponseEntity<List<BookOrderResponse>> getBooksByCategoryName(@RequestParam("name") String categoryName) {
+    @GetMapping("/by-category")
+    public ResponseEntity<List<BookOrderResponse>> getBooksByCategoryName(@RequestParam("categoryName") String categoryName) {
         List<Book> books = bookService.findBooksByCategoryAndSubCategories(categoryName);
 
         List<BookOrderResponse> response = books.stream()
