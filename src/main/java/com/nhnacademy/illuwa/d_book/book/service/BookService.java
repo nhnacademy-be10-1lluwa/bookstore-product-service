@@ -27,21 +27,17 @@ import com.nhnacademy.illuwa.d_book.tag.repository.BookTagRepository;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import com.nhnacademy.illuwa.infra.storage.MinioStorageService;
+import com.nhnacademy.illuwa.search.service.BookSearchService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import lombok.extern.slf4j.Slf4j;
-import com.nhnacademy.illuwa.d_book.book.document.BookDocument;
-import com.nhnacademy.illuwa.d_book.book.repository.BookSearchRepository;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.Query;
-import org.springframework.data.elasticsearch.core.query.StringQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,12 +53,11 @@ public class BookService {
     private final CategoryRepository categoryRepository;
     private final BookCategoryRepository bookCategoryRepository;
     private final MinioStorageService minioStorageService;
-    private final BookSearchRepository bookSearchRepository;
-    private final ElasticsearchOperations elasticsearchOperations;
+    private final BookSearchService bookSearchService;
 
 
 
-    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookTagRepository bookTagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, MinioStorageService minioStorageService, BookSearchRepository bookSearchRepository, ElasticsearchOperations elasticsearchOperations) {
+    public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookTagRepository bookTagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, MinioStorageService minioStorageService, BookSearchService bookSearchService) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
         this.bookResponseMapper = bookResponseMapper;
@@ -72,8 +67,7 @@ public class BookService {
         this.categoryRepository = categoryRepository;
         this.bookCategoryRepository = bookCategoryRepository;
         this.minioStorageService = minioStorageService;
-        this.bookSearchRepository = bookSearchRepository;
-        this.elasticsearchOperations = elasticsearchOperations;
+        this.bookSearchService = bookSearchService;
     }
 
     // 외부 API에서 도서 검색
@@ -93,7 +87,7 @@ public class BookService {
         Optional<Book> book = bookRepository.findById(id);
 
         if (book.isEmpty()) {
-            throw new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다.");
+            throw new NotFoundBookException("해당 ID(" + id + ")의 도서가 존재하지 않습니다.");
         }
 
         Book bookEntity = book.get();
@@ -109,7 +103,7 @@ public class BookService {
         Optional<Book> book = bookRepository.findByIsbn(isbn);
 
         if (book.isEmpty()) {
-            throw new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다.");
+            throw new NotFoundBookException("해당 isbn(" + isbn + ")의 도서가 존재하지 않습니다.");
         }
 
         Book bookEntity = book.get();
@@ -264,7 +258,7 @@ public class BookService {
 
         Book savedBook = bookRepository.save(bookEntity);
         bookImageRepository.save(bookImage);
-        syncBookToElasticsearch(savedBook);
+        bookSearchService.syncBookToElasticsearch(savedBook);
 
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
@@ -311,7 +305,7 @@ public class BookService {
 
         bookCategoryRepository.save(new BookCategory(savedBook,categoryEntity));
 
-        syncBookToElasticsearch(savedBook);
+        bookSearchService.syncBookToElasticsearch(savedBook);
 
 
         return bookResponseMapper.toBookDetailResponse(bookEntity); // Entity -> DTO
@@ -328,7 +322,7 @@ public class BookService {
             throw new NotFoundBookException("id : " + id + "에 해당하는 도서를 찾을 수 없습니다.");
         }
 
-        bookSearchRepository.deleteById(id);
+        bookSearchService.deleteById(id);
 
         Book targetBook = book.get();
         bookRepository.delete(targetBook);
@@ -342,46 +336,6 @@ public class BookService {
         bookRepository.deleteBookAndRelatedEntities(bookId);
     }
 
-    // 엘라스틱서치에 동기화
-    private void syncBookToElasticsearch(Book book) {
-        BookDocument bookDocument = BookDocument.builder()
-                .id(book.getId())
-                .title(book.getTitle())
-                .description(book.getDescription())
-                .author(book.getAuthor())
-                .publisher(book.getPublisher())
-                .isbn(book.getIsbn())
-                .salePrice(book.getSalePrice())
-                .thumbnailUrl(book.getBookImages() != null && !book.getBookImages().isEmpty() ? book.getBookImages().get(0).getImageUrl() : null)
-                .build();
-        bookSearchRepository.save(bookDocument);
-    }
-
-
-    // 키워드로 엘라스틱서치 검색
-    @Transactional(readOnly = true)
-    public Page<BookDocument> searchByKeyword(String keyword, Pageable pageable) {
-
-        String[] searchFields = {"title", "description", "author"};
-
-        Query query = new StringQuery(
-                String.format("{\"multi_match\": {\"query\": \"%s\", \"fields\": [\"%s\"]}}",
-                        keyword,
-                        String.join("\", \"", searchFields))
-        );
-        query.setPageable(pageable);
-
-        SearchHits<BookDocument> searchHits = elasticsearchOperations.search(query, BookDocument.class);
-
-        List<BookDocument> content = searchHits.getSearchHits().stream()
-                .map(SearchHit::getContent)
-                .collect(Collectors.toList());
-
-        // 5. 최종 결과를 Page 객체로 포장해서 Controller에게 돌려줌
-        return new PageImpl<>(content, pageable, searchHits.getTotalHits());
-    }
-
-
 
 
     // 도서 수정
@@ -389,7 +343,7 @@ public class BookService {
     public void updateBook(Long id, BookUpdateRequest requestDto) {
         Optional<Book> bookById = bookRepository.findById(id);
         if (bookById.isEmpty()) {
-            throw new NotFoundBookException("해당 도서를 찾을 수 없습니다. id: " + id);
+            throw new NotFoundBookException("해당 ID(" + id + ")의 도서가 존재하지 않습니다.");
         }
 
         Book book = bookById.get();
@@ -442,6 +396,8 @@ public class BookService {
 
             bookImage.setImageUrl(requestDto.getCover());
         }
+
+        bookSearchService.syncBookToElasticsearch(book);
 
 
     }

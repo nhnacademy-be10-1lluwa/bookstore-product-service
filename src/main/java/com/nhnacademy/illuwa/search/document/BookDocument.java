@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.book.document;
+package com.nhnacademy.illuwa.search.document;
 
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.data.elasticsearch.annotations.Setting;
 
 import java.math.BigDecimal;
 
-@Document(indexName = "books-v1")
+@Document(indexName = "books-v2")
 @Setting(settingPath = "elasticsearch/nori-settings.json")
 @Getter
 @Builder
