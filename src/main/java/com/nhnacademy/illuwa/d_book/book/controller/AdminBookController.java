@@ -80,7 +80,7 @@ public class AdminBookController {
     public ResponseEntity<Page<BookDetailWithExtraInfoResponse>> getBooksWithExtraInfo(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id,asc") String sort
+            @RequestParam(defaultValue = "id,desc") String sort
     ) {
         String[] sortParams = sort.split(",");
         String property = sortParams[0];
