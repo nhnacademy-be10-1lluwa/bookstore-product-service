@@ -436,6 +436,15 @@ public class BookService {
                     .orElseThrow(() -> new IllegalArgumentException("카테고리 정보가 없습니다."));
             bookCategory.setCategory(newCategory);
         }
+
+        if (requestDto.getCover() != null && !requestDto.getCover().isBlank()) {
+            BookImage bookImage = bookImageRepository.findByBookIdAndImageType(book.getId(), ImageType.THUMBNAIL)
+                    .orElseThrow(() -> new IllegalArgumentException("대표 이미지 정보가 없습니다."));
+
+            bookImage.setImageUrl(requestDto.getCover());
+        }
+
+
     }
 
 

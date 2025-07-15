@@ -1,9 +1,8 @@
 package com.nhnacademy.illuwa.d_book.category.dto;
 
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +10,8 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CategoryResponse {
     private Long id;
     private Long parentId;
@@ -30,4 +31,14 @@ public class CategoryResponse {
                     .collect(Collectors.toList());
         }
     }
+
+    public static CategoryResponse fromEntity(Category category) {
+        return CategoryResponse.builder()
+                .id(category.getId())
+                .categoryName(category.getCategoryName())
+                .parentId(category.getParentCategory() != null ? category.getParentCategory().getId() : null)
+                .build();
+    }
+
+
 }
