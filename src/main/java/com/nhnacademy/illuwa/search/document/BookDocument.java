@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.d_book.book.document;
+package com.nhnacademy.illuwa.search.document;
 
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
