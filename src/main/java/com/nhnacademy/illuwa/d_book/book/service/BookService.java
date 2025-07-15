@@ -194,7 +194,7 @@ public class BookService {
                 .map(book -> {
                     // 카테고리 조회
                     BookCategory bookCategory = bookCategoryRepository.findByBookId(book.getId())
-                            .orElseThrow(() -> new RuntimeException("카테고리 없음"));
+                            .orElse(null);
 
                     // 태그 조회
                     List<TagResponse> tags = book.getBookTags().stream()
