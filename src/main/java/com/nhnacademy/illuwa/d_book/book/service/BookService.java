@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
+import com.nhnacademy.illuwa.cart.dto.BookCountUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookApiRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
@@ -467,6 +468,28 @@ public class BookService {
         }
 
         return bookRepository.findBooksByCategories(allCategoryIds);
+    }
+
+    @Transactional
+    public void updateBooksCount(List<BookCountUpdateRequest> requests) {
+        for (BookCountUpdateRequest request : requests) {
+            Book book = bookRepository.findById(request.getBookId())
+                    .orElseThrow(() -> new NotFoundBookException("ID " + request.getBookId() + "에 해당하는 도서를 찾을 수 없습니다."));
+
+            if (book.getBookExtraInfo() == null) {
+                throw new IllegalStateException("도서에 부가 정보가 존재하지 않습니다.");
+            }
+
+            int currentCount = Optional.ofNullable(book.getBookExtraInfo().getCount()).orElse(0);
+
+            int updatedCount = currentCount - request.getBookCount();
+
+            if (updatedCount < 0) {
+                throw new IllegalArgumentException("재고 부족: 현재 재고=" + currentCount + ", 요청 차감=" + request.getBookCount());
+            }
+
+            book.getBookExtraInfo().setCount(updatedCount);
+        }
     }
 
 
