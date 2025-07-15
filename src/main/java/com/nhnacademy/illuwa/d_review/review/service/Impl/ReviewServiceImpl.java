@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
@@ -176,5 +177,18 @@ public class ReviewServiceImpl implements ReviewService {
         long likeCount = reviewLikeRepository.countByReview_ReviewId(reviewId);
 
         return ReviewResponse.from(review, imageUrls, likedByMe, likeCount);
+    }
+
+    @Override
+    @Transactional
+    public Map<Long, Boolean> areReviewsWritten(List<Long> bookIds, Long memberId) {
+        Map<Long, Boolean> result = new HashMap<>();
+
+        for (Long bookId : bookIds) {
+            boolean exists = reviewRepository.findByBook_IdAndMemberId(bookId, memberId).isPresent();
+            result.put(bookId, exists);
+        }
+
+        return result;
     }
 }
