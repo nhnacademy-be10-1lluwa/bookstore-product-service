@@ -131,4 +131,23 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
                 .where(book.id.eq(bookId))
                 .execute();
     }
+
+    @Override
+    public List<Book> findBooksByCategories(List<Long> categoryIds) {
+
+        QBook book = QBook.book;
+        QBookCategory bookCategory = QBookCategory.bookCategory;
+
+        return queryFactory
+                // SELECT b
+                .select(bookCategory.book)
+                // FROM BookCategory bc
+                .from(bookCategory)
+                // JOIN bc.book b (BookCategory 엔티티의 book 필드를 통해 Book 엔티티와 조인)
+                .join(bookCategory.book, book)
+                // WHERE bc.category.id IN :categoryIds
+                .where(bookCategory.category.id.in(categoryIds))
+                .distinct() // 중복된 책이 조회될 수 있으므로 distinct() 추가
+                .fetch();
+    }
 }

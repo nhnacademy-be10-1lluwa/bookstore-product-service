@@ -41,9 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -445,6 +443,30 @@ public class BookService {
         }
 
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<Book> findBooksByCategoryAndSubCategories(String categoryName) {
+
+        Category parentCategory = categoryRepository.findByCategoryName(categoryName)
+                .orElseThrow(() -> new IllegalArgumentException("해당 카테고리를 찾을 수 없습니다: " + categoryName));
+
+
+        List<Long> allCategoryIds = new ArrayList<>();
+        Queue<Category> categoriesToVisit = new LinkedList<>();
+
+        categoriesToVisit.add(parentCategory);
+
+        while (!categoriesToVisit.isEmpty()) {
+
+            Category currentCategory = categoriesToVisit.poll();
+            allCategoryIds.add(currentCategory.getId());
+            if (currentCategory.getChildrenCategory() != null) {
+                categoriesToVisit.addAll(currentCategory.getChildrenCategory());
+            }
+        }
+
+        return bookRepository.findBooksByCategories(allCategoryIds);
     }
 
 
