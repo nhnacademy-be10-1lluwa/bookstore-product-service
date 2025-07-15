@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/books/{bookId}/reviews")
+@RequestMapping("/api/book-reviews/{bookId}/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
 
@@ -26,7 +26,7 @@ public class ReviewController {
     public ResponseEntity<ReviewResponse> createReview(@PathVariable long bookId,
                                                        @RequestHeader("X-USER-ID") long memberId,
                                                        @ModelAttribute @Valid ReviewRequest request) throws Exception {
-        log.info("{} // {} // {} // {}", bookId, request.getReviewTitle(), request.getReviewContent(), request.getReviewRating());
+
         ReviewResponse response = reviewService.createReview(bookId, memberId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -48,13 +48,13 @@ public class ReviewController {
         return ResponseEntity.ok(response);
     }
 
-    // 프론트에서 feign 으로 수정요청 받으려면 어쩔수 없이 써야함 (feign 은 patch 미지원)
+    // 프론트에서 feign 으로 수정요청 받으려면 어쩔수 없이 Post 써야함 (feign 은 patch 미지원)
     @PostMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ReviewResponse> updateReview(@PathVariable long bookId,
                                                        @PathVariable long reviewId,
                                                        @RequestHeader("X-USER-ID") Long memberId,
                                                        @ModelAttribute @Valid ReviewRequest request) throws Exception {
-        log.info("{} // {} // {} // {}", bookId, request.getReviewTitle(), request.getReviewContent(), request.getReviewRating());
+
         ReviewResponse response = reviewService.updateReview(bookId, reviewId, memberId, request);
         return ResponseEntity.ok(response);
     }

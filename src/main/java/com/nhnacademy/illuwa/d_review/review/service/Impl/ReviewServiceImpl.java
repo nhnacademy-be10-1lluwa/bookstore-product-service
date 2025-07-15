@@ -66,12 +66,8 @@ public class ReviewServiceImpl implements ReviewService {
         String rewardType = "REVIEW";
         List<String> imageUrls = new ArrayList<>();
         List<MultipartFile> images = request.getImages();
-        if(images != null) {
+        if(!images.isEmpty() && !Objects.requireNonNull(images.getFirst().getOriginalFilename()).isBlank()) {
             for(MultipartFile image : images){
-                if (image.getName().isBlank()) {
-                    continue;
-                }
-
                 String uploadedUrl = minioStorageService.uploadReviewImage(memberId, image).getUrl();
                 imageUrls.add(uploadedUrl);
                 ReviewImage reviewImage = ReviewImage.of(uploadedUrl, saved);
@@ -150,12 +146,8 @@ public class ReviewServiceImpl implements ReviewService {
 
         List<MultipartFile> newImages = request.getImages();
         // 새 이미지 업로드
-        if (newImages != null) {
+        if(!newImages.isEmpty() && !Objects.requireNonNull(newImages.getFirst().getOriginalFilename()).isBlank()) {
             for (MultipartFile newImage : newImages) {
-                if (Objects.requireNonNull(newImage.getOriginalFilename()).isBlank()) {
-                    continue;
-                }
-
                 String uploadedUrl = minioStorageService.uploadReviewImage(memberId, newImage).getUrl();
                 ReviewImage reviewImage = ReviewImage.of(uploadedUrl, review);
                 reviewImageRepository.save(reviewImage);
