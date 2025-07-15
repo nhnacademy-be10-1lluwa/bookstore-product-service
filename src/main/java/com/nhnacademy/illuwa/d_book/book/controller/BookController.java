@@ -21,15 +21,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "📖 도서 API", description = "도서 조회 및 검색 관련 API")
+@Tag(name = "도서 API", description = "도서 조회 및 검색 관련 API")
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
 
     private final BookSearchService bookSearchService;
-    BookService bookService;
-    AladinBookApiService aladinBookApiService;
-    BookMapper bookMapper;
+    private final BookService bookService;
+    private final AladinBookApiService aladinBookApiService;
+    private final BookMapper bookMapper;
 
     BookController(BookService bookService, AladinBookApiService aladinBookApiService, BookMapper bookMapper, BookSearchService bookSearchService){
         this.bookService = bookService;

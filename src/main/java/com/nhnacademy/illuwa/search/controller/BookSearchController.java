@@ -10,16 +10,12 @@ import org.springframework.web.bind.annotation.*;
 
 //@CrossOrigin
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping("/api/books/search")
 @RequiredArgsConstructor
 public class BookSearchController {
 
     private final BookSearchService bookSearchService;
 
-    /**
-     * 키워드로 도서 검색
-     * ex) GET /api/search?keyword=소설
-     */
     @GetMapping
     public ResponseEntity<Page<BookDocument>> searchBooksByKeyword(
             @RequestParam String keyword,
@@ -29,20 +25,12 @@ public class BookSearchController {
         return ResponseEntity.ok(results);
     }
 
-    /**
-     * 색인 추가 또는 갱신
-     * ex) POST /api/search/index
-     */
     @PostMapping("/index")
     public ResponseEntity<Void> indexBook(@RequestBody BookDocument bookDocument) {
         bookSearchService.save(bookDocument);
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * 색인 삭제
-     * ex) DELETE /api/search/index/{id}
-     */
     @DeleteMapping("/index/{id}")
     public ResponseEntity<Void> deleteIndex(@PathVariable Long id) {
         bookSearchService.deleteById(id);
