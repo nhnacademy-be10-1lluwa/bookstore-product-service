@@ -12,7 +12,7 @@ import org.springframework.data.elasticsearch.annotations.Setting;
 
 import java.math.BigDecimal;
 
-@Document(indexName = "books-v1")
+@Document(indexName = "books-v2")
 @Setting(settingPath = "elasticsearch/nori-settings.json")
 @Getter
 @Builder
