@@ -1,11 +1,8 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
-import com.nhnacademy.illuwa.search.document.BookDocument;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BestSellerResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.response.BookOrderResponse;
-import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
@@ -22,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Tag(name = "도서 API", description = "도서 조회 및 검색 관련 API")
 @RestController
@@ -110,27 +106,6 @@ public class BookController {
         }
 
         return ResponseEntity.ok(bookDetail);
-    }
-
-
-    @GetMapping("/search/es")
-    public ResponseEntity<Page<BookDocument>> searchBooksByKeyword(
-            @RequestParam String keyword,
-            Pageable pageable) {
-
-        Page<BookDocument> results = bookService.searchByKeyword(keyword, pageable);
-        return ResponseEntity.ok(results);
-    }
-
-    @GetMapping("/by-category")
-    public ResponseEntity<List<BookOrderResponse>> getBooksByCategoryName(@RequestParam("categoryName") String categoryName) {
-        List<Book> books = bookService.findBooksByCategoryAndSubCategories(categoryName);
-
-        List<BookOrderResponse> response = books.stream()
-                .map(BookOrderResponse::fromEntity)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(response);
     }
 
 
