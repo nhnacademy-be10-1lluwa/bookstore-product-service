@@ -2,6 +2,7 @@ package com.nhnacademy.illuwa.search.service;
 
 
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
+import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.search.document.BookDocument;
 import com.nhnacademy.illuwa.search.repository.BookSearchRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.StringQuery;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,10 +26,12 @@ public class BookSearchService {
 
     private final BookSearchRepository bookSearchRepository;
     private final ElasticsearchOperations elasticsearchOperations;
+    private final BookRepository bookRepository;
 
-    public BookSearchService(BookSearchRepository bookSearchRepository, ElasticsearchOperations elasticsearchOperations) {
+    public BookSearchService(BookSearchRepository bookSearchRepository, ElasticsearchOperations elasticsearchOperations, BookRepository bookRepository) {
         this.bookSearchRepository = bookSearchRepository;
         this.elasticsearchOperations = elasticsearchOperations;
+        this.bookRepository = bookRepository;
     }
 
 
@@ -85,6 +89,27 @@ public class BookSearchService {
 
     public void deleteById(Long id) {
         bookSearchRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public void syncAllBooksToElasticsearch() {
+        List<Book> books = bookRepository.findAll();
+        List<BookDocument> documents = books.stream()
+                .map(book -> BookDocument.builder()
+                        .id(book.getId())
+                        .title(book.getTitle())
+                        .description(book.getDescription())
+                        .author(book.getAuthor())
+                        .publisher(book.getPublisher())
+                        .isbn(book.getIsbn())
+                        .salePrice(book.getSalePrice())
+                        .thumbnailUrl(book.getBookImages() != null && !book.getBookImages().isEmpty()
+                                ? book.getBookImages().get(0).getImageUrl()
+                                : null)
+                        .build())
+                .toList();
+
+        bookSearchRepository.saveAll(documents);
     }
 
 }

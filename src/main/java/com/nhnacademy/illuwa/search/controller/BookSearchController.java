@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 //@CrossOrigin
 @RestController
-@RequestMapping("/api/books/search")
+@RequestMapping("/api/search")
 @RequiredArgsConstructor
 public class BookSearchController {
 
@@ -35,5 +35,11 @@ public class BookSearchController {
     public ResponseEntity<Void> deleteIndex(@PathVariable Long id) {
         bookSearchService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/index/sync")
+    public ResponseEntity<Void> syncAllBooks() {
+        bookSearchService.syncAllBooksToElasticsearch();
+        return ResponseEntity.ok().build();
     }
 }
