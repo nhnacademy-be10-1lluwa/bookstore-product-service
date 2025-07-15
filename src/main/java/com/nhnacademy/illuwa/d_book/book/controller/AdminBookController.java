@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
+import com.nhnacademy.illuwa.cart.dto.BookCountUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookApiRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailWithExtraInfoResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
@@ -94,6 +95,16 @@ public class AdminBookController {
         Page<BookDetailWithExtraInfoResponse> response = bookService.getAllBooksWithExtraInfo(pageable);
 
         return ResponseEntity.ok(response);
+    }
+
+
+
+    @PatchMapping("/update/bookCount")
+    public ResponseEntity<Void> deductBooksCount(
+            @RequestBody List<BookCountUpdateRequest> requests
+    ) {
+        bookService.updateBooksCount(requests);
+        return ResponseEntity.noContent().build();
     }
 
 
