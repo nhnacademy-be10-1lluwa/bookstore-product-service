@@ -14,12 +14,13 @@ import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
-import com.nhnacademy.illuwa.d_book.book.repository.BookSearchRepository;
+import com.nhnacademy.illuwa.search.repository.BookSearchRepository;
 import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
 import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
+import com.nhnacademy.illuwa.search.service.BookSearchService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,6 +65,9 @@ public class BookServiceTest {
 
     @Mock
     BookSearchRepository bookSearchRepository;
+
+    @Mock
+    BookSearchService bookSearchService;
 
 
     @InjectMocks
@@ -145,7 +148,7 @@ public class BookServiceTest {
     @Test
     @DisplayName("등록된 도서 삭제 - 성공")
     void deleteBook_Success() {
-        //given
+        // given
         Long id = 10L;
         Book book = Book.builder()
                 .id(id)
@@ -162,13 +165,16 @@ public class BookServiceTest {
 
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
 
-        //when
+        // when
         bookService.deleteBook(book.getId());
 
-        //then
-        verify(bookRepository,times(1)).findById(id);
-
+        // then
+        verify(bookRepository, times(1)).findById(id);
+        verify(bookSearchService, times(1)).deleteById(id);
+        verify(bookRepository, times(1)).delete(book);
     }
+
+
 
     @Test
     @DisplayName("등록된 도서 삭제 : 실패 (등록된 도서 중 id에 해당하는 도서 존재 X)")
@@ -257,10 +263,12 @@ public class BookServiceTest {
     @Test
     @DisplayName("도서 수정 - 성공")
     void updateBook_Success() {
+        // given
         Long id = 9L;
 
+        // 기존 Book
         Book updatedBook = Book.builder()
-                .id(9L)
+                .id(id)
                 .title("인어 공주")
                 .description("인어 공주는...")
                 .author("안데르센")
@@ -269,7 +277,7 @@ public class BookServiceTest {
                 .isbn("123456789EE")
                 .regularPrice(new BigDecimal(15000))
                 .salePrice(new BigDecimal(13000))
-                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
+                .bookExtraInfo(new BookExtraInfo(Status.NORMAL, true, 1))
                 .build();
 
         BookUpdateRequest bookUpdateRequest = new BookUpdateRequest(
@@ -292,23 +300,24 @@ public class BookServiceTest {
                 3L
         );
 
+        Category mockCategory = mock(Category.class);
+        BookCategory mockBookCategory = mock(BookCategory.class);
+        BookImage mockBookImage = mock(BookImage.class);
+
         when(bookRepository.findById(id)).thenReturn(Optional.of(updatedBook));
+        when(categoryRepository.findById(bookUpdateRequest.getCategoryId())).thenReturn(Optional.of(mockCategory));
+        when(bookCategoryRepository.findByBookId(id)).thenReturn(Optional.of(mockBookCategory));
+        when(bookImageRepository.findByBookIdAndImageType(id, ImageType.THUMBNAIL)).thenReturn(Optional.of(mockBookImage));
 
-        when(categoryRepository.findById(bookUpdateRequest.getCategoryId()))
-                .thenReturn(Optional.of(mock(Category.class)));
-
-        when(bookCategoryRepository.findByBookId(id))
-                .thenReturn(Optional.of(mock(BookCategory.class)));
-        when(bookImageRepository.findByBookIdAndImageType(9L, ImageType.THUMBNAIL))
-                .thenReturn(Optional.of(mock(BookImage.class)));
-
-        // 실행
         bookService.updateBook(id, bookUpdateRequest);
 
-        // 검증
-        verify(bookRepository, times(1)).findById(id);
-        verify(categoryRepository, times(1)).findById(bookUpdateRequest.getCategoryId());
-        verify(bookCategoryRepository, times(1)).findByBookId(id);
+        verify(bookRepository).findById(id);
+        verify(categoryRepository).findById(bookUpdateRequest.getCategoryId());
+        verify(bookCategoryRepository).findByBookId(id);
+        verify(bookImageRepository).findByBookIdAndImageType(id, ImageType.THUMBNAIL);
+        verify(mockBookCategory).setCategory(mockCategory);
+        verify(mockBookImage).setImageUrl(bookUpdateRequest.getCover());
+        verify(bookSearchService).syncBookToElasticsearch(updatedBook);
     }
 
     @Test
@@ -319,9 +328,9 @@ public class BookServiceTest {
 
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> bookService.updateBook(id,mockBookUpdateRequest))
+        assertThatThrownBy(() -> bookService.updateBook(id, mockBookUpdateRequest))
                 .isInstanceOf(NotFoundBookException.class)
-                .hasMessage("해당 도서를 찾을 수 없습니다. id: "+id);
+                .hasMessage("해당 ID(" + id + ")의 도서가 존재하지 않습니다.");
 
         verify(bookRepository, times(1)).findById(id);
         verify(bookRepository, never()).save(any(Book.class));

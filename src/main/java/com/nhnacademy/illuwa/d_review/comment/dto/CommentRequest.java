@@ -12,5 +12,5 @@ import org.hibernate.validator.constraints.Length;
 public class CommentRequest {
     @NotEmpty
     @Length(min = 1, max = 500)
-    String commentContents;
+    private String commentContents;
 }

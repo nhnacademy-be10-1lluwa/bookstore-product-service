@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ReviewLikeResponse {
-    boolean likedByMe;
-    Long likeCount;
+    private boolean likedByMe;
+    private Long likeCount;
 }

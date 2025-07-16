@@ -1,12 +1,12 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
-import com.nhnacademy.illuwa.d_book.book.document.BookDocument;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BestSellerResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
+import com.nhnacademy.illuwa.search.service.BookSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,19 +20,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "📖 도서 API", description = "도서 조회 및 검색 관련 API")
+@Tag(name = "도서 API", description = "도서 조회 및 검색 관련 API")
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
 
-    BookService bookService;
-    AladinBookApiService aladinBookApiService;
-    BookMapper bookMapper;
+    private final BookSearchService bookSearchService;
+    private final BookService bookService;
+    private final AladinBookApiService aladinBookApiService;
+    private final BookMapper bookMapper;
 
-    BookController(BookService bookService, AladinBookApiService aladinBookApiService, BookMapper bookMapper){
+    BookController(BookService bookService, AladinBookApiService aladinBookApiService, BookMapper bookMapper, BookSearchService bookSearchService){
         this.bookService = bookService;
         this.aladinBookApiService = aladinBookApiService;
         this.bookMapper = bookMapper;
+        this.bookSearchService = bookSearchService;
     }
 
     @Operation(summary = "도서 제목으로 검색", description = "DB에 저장된 도서를 제목(일부 포함)으로 검색")
@@ -104,16 +106,6 @@ public class BookController {
         }
 
         return ResponseEntity.ok(bookDetail);
-    }
-
-
-    @GetMapping("/search/es")
-    public ResponseEntity<Page<BookDocument>> searchBooksByKeyword(
-            @RequestParam String keyword,
-            Pageable pageable) {
-
-        Page<BookDocument> results = bookService.searchByKeyword(keyword, pageable);
-        return ResponseEntity.ok(results);
     }
 
 

@@ -8,6 +8,7 @@ import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
+import com.nhnacademy.illuwa.search.service.BookSearchService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -54,6 +56,9 @@ public class BookControllerTest {
 
     @MockBean
     private BookResponseMapper bookResponseMapper;
+
+    @MockBean
+    private BookSearchService bookSearchService;
 
     @Test
     @DisplayName("책 검색 성공 - Title")
@@ -101,14 +106,19 @@ public class BookControllerTest {
     }
 
     @Test
-    @Disabled
     void getRegisteredBooks() throws Exception {
+        // given
+        List<BookDetailResponse> mockBooks = List.of(
+                new BookDetailResponse()
+        );
+        given(bookService.getAllBooks()).willReturn(mockBooks);
 
         // when & then
-        mockMvc.perform(get("/books"))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/books"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(mockBooks.size())); // JSON 배열 길이 검증
 
-        verify(bookService).getAllBooksByPaging(any());
+        verify(bookService).getAllBooks(); // 여기 맞게 verify
     }
 
 
