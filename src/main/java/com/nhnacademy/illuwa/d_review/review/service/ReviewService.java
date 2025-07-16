@@ -19,4 +19,6 @@ public interface ReviewService {
     ReviewResponse updateReview(Long bookId, Long reviewId, Long memberId, ReviewRequest request) throws Exception;
 
     Map<Long, Boolean> areReviewsWritten(List<Long> bookIds, Long memberId);
+
+    Map<Long, Long> getExistingReviewIdMap(List<Long> bookIds, Long memberId);
 }

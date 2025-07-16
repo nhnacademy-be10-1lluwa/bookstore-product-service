@@ -72,4 +72,10 @@ public class ReviewController {
                                                 @RequestHeader("X-USER-ID") Long memberId) {
         return reviewService.areReviewsWritten(bookIds, memberId);
     }
+
+    @PostMapping("/api/book-reviews/reviews/check")
+    public Map<Long, Long> getExistingReviewIdMap(@RequestBody List<Long> bookIds,
+                                                  @RequestHeader("X-USER-ID") Long memberId){
+        return reviewService.getExistingReviewIdMap(bookIds, memberId);
+    }
 }
