@@ -12,6 +12,8 @@ public interface ReviewService {
 
     Page<ReviewResponse> getReviewPages(Long bookId, Pageable pageable, Long memberId);
 
+    Page<ReviewResponse> getReviewPagesWithoutLogin(Long bookId, Pageable pageable);
+
     ReviewResponse getReviewDetails(Long bookId, Long reviewId, Long memberId);
 
     ReviewResponse updateReview(Long bookId, Long reviewId, Long memberId, ReviewRequest request) throws Exception;
