@@ -3,7 +3,6 @@ package com.nhnacademy.illuwa.d_review.review.controller;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,18 +34,17 @@ public class ReviewController {
 
     @GetMapping(value = "/api/book-reviews/{bookId}/reviews")
     public ResponseEntity<Page<ReviewResponse>> getReviewPages(@PathVariable long bookId,
-                                                               @PageableDefault(size = 5, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                               HttpServletRequest httpServletRequest) {
+                                                               @PageableDefault(size = 5, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        String memberIdString = httpServletRequest.getHeader("X-USER-ID");
-        if(memberIdString == null) {
-            Page<ReviewResponse> responsePage = reviewService.getReviewPagesWithoutLogin(bookId, pageable);
-            return ResponseEntity.ok(responsePage);
-        } else {
-            long memberId = Long.parseLong(memberIdString);
-            Page<ReviewResponse> responsePage = reviewService.getReviewPages(bookId, pageable, memberId);
-            return ResponseEntity.ok(responsePage);
-        }
+//        if(memberId == null) {
+//            Page<ReviewResponse> responsePage = reviewService.getReviewPagesWithoutLogin(bookId, pageable);
+//            return ResponseEntity.ok(responsePage);
+//        } else {
+//            Page<ReviewResponse> responsePage = reviewService.getReviewPages(bookId, pageable, memberId);
+//            return ResponseEntity.ok(responsePage);
+//        }
+        Page<ReviewResponse> responsePage = reviewService.getReviewPagesWithoutLogin(bookId, pageable);
+        return ResponseEntity.ok(responsePage);
     }
 
     @GetMapping(value = "/api/book-reviews/{bookId}/reviews/{reviewId}")
