@@ -5,7 +5,6 @@ import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -65,5 +64,11 @@ public class ReviewController {
     public Map<Long, Boolean> areReviewsWritten(@RequestBody List<Long> bookIds,
                                                 @RequestHeader("X-USER-ID") Long memberId) {
         return reviewService.areReviewsWritten(bookIds, memberId);
+    }
+
+    @PostMapping("/api/book-reviews/reviews/check")
+    public Map<Long, Long> getExistingReviewIdMap(@RequestBody List<Long> bookIds,
+                                                  @RequestHeader("X-USER-ID") Long memberId){
+        return reviewService.getExistingReviewIdMap(bookIds, memberId);
     }
 }
