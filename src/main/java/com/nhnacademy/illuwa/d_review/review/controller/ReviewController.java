@@ -3,9 +3,9 @@ package com.nhnacademy.illuwa.d_review.review.controller;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,11 +35,18 @@ public class ReviewController {
 
     @GetMapping(value = "/api/book-reviews/{bookId}/reviews")
     public ResponseEntity<Page<ReviewResponse>> getReviewPages(@PathVariable long bookId,
-                                                               @RequestHeader("X-USER-ID") long memberId,
-                                                               @PageableDefault(size = 5, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                               @PageableDefault(size = 5, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable,
+                                                               HttpServletRequest httpServletRequest) {
 
-        Page<ReviewResponse> responsePage = reviewService.getReviewPages(bookId, pageable, memberId);
-        return ResponseEntity.ok(responsePage);
+        String memberIdString = httpServletRequest.getHeader("X-USER-ID");
+        if(memberIdString == null) {
+            Page<ReviewResponse> responsePage = reviewService.getReviewPagesWithoutLogin(bookId, pageable);
+            return ResponseEntity.ok(responsePage);
+        } else {
+            long memberId = Long.parseLong(memberIdString);
+            Page<ReviewResponse> responsePage = reviewService.getReviewPages(bookId, pageable, memberId);
+            return ResponseEntity.ok(responsePage);
+        }
     }
 
     @GetMapping(value = "/api/book-reviews/{bookId}/reviews/{reviewId}")
