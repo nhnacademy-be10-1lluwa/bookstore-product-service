@@ -1,4 +1,4 @@
-package com.nhnacademy.illuwa.cart.dto;
+package com.nhnacademy.illuwa.d_book.book.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
