@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
+import java.util.List;
 
 
 @Document(indexName = "books-v2")
@@ -46,4 +46,7 @@ public class BookDocument {
 
     @Field(type = FieldType.Text, index = false)
     private String thumbnailUrl;
+
+    @Field(type = FieldType.Keyword)
+    private List<String> categories;
 }
