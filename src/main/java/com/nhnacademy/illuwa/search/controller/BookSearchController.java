@@ -42,4 +42,13 @@ public class BookSearchController {
         bookSearchService.syncAllBooksToElasticsearch();
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/category")
+    public ResponseEntity<Page<BookDocument>> searchBooksByCategory(@RequestParam String category, Pageable pageable) {
+        Page<BookDocument> results = bookSearchService.searchByCategory(category, pageable);
+        return ResponseEntity.ok(results);
+    }
+
+
+
 }
