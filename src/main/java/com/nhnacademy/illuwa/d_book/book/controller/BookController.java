@@ -14,7 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,6 +72,29 @@ public class BookController {
         Page<BookDetailResponse> registeredBooks = bookService.getAllBooksByPaging(pageable);
         return ResponseEntity.ok(registeredBooks);
     }
+
+
+    // GET /api/books/paged 엔드포인트
+    @GetMapping("/paged")
+    @Operation(summary = "등록된 도서 목록 페이징 조회", description = "DB에 등록된 도서 목록을 페이징하여 조회")
+    public ResponseEntity<Page<BookDetailResponse>> getRegisteredBooksPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size, // 한 페이지당 12개
+            @RequestParam(defaultValue = "id") String sort) {
+
+        String[] sortParams = sort.split(",");
+        String property = sortParams[0];
+        Sort.Direction direction = Sort.Direction.ASC;
+        if (sortParams.length > 1) {
+            direction = Sort.Direction.fromString(sortParams[1]);
+        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
+
+        // product-service의 BookService.getAllBooksByPaging(Pageable pageable) 호출
+        Page<BookDetailResponse> registeredBooks = bookService.getAllBooksByPaging(pageable);
+        return ResponseEntity.ok(registeredBooks);
+    }
+
 
     @Operation(summary = "베스트셀러 목록 조회", description = "알라딘 API를 사용하여 베스트셀러 목록을 조회")
     @GetMapping("/bestseller")
