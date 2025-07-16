@@ -3,9 +3,9 @@ package com.nhnacademy.illuwa.d_review.review.controller;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,10 +35,16 @@ public class ReviewController {
 
     @GetMapping(value = "/api/book-reviews/{bookId}/reviews")
     public ResponseEntity<Page<ReviewResponse>> getReviewPages(@PathVariable long bookId,
-                                                               @RequestHeader("X-USER-ID") long memberId,
                                                                @PageableDefault(size = 5, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<ReviewResponse> responsePage = reviewService.getReviewPages(bookId, pageable, memberId);
+        //        if(memberId == null) {
+//            Page<ReviewResponse> responsePage = reviewService.getReviewPagesWithoutLogin(bookId, pageable);
+//            return ResponseEntity.ok(responsePage);
+//        } else {
+//            Page<ReviewResponse> responsePage = reviewService.getReviewPages(bookId, pageable, memberId);
+//            return ResponseEntity.ok(responsePage);
+//        }
+        Page<ReviewResponse> responsePage = reviewService.getReviewPagesWithoutLogin(bookId, pageable);
         return ResponseEntity.ok(responsePage);
     }
 
@@ -65,5 +71,11 @@ public class ReviewController {
     public Map<Long, Boolean> areReviewsWritten(@RequestBody List<Long> bookIds,
                                                 @RequestHeader("X-USER-ID") Long memberId) {
         return reviewService.areReviewsWritten(bookIds, memberId);
+    }
+
+    @PostMapping("/api/book-reviews/reviews/check")
+    public Map<Long, Long> getExistingReviewIdMap(@RequestBody List<Long> bookIds,
+                                                  @RequestHeader("X-USER-ID") Long memberId){
+        return reviewService.getExistingReviewIdMap(bookIds, memberId);
     }
 }

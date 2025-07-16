@@ -22,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
@@ -118,6 +117,35 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<ReviewResponse> getReviewPagesWithoutLogin(Long bookId, Pageable pageable) {
+        Page<Review> reviews = reviewRepository.findReviewsByBook_Id(bookId, pageable);
+        List<Long> reviewIds = reviews.getContent().stream()
+                .map(Review::getReviewId)
+                .toList();
+
+        // 2. 좋아요 수
+        Map<Long, Long> likeCountMap = reviewLikeRepository.countLikesByReviewIds(reviewIds);
+
+        // 3. 이미지
+        List<ReviewImage> allImages = reviewImageRepository.findAllByReview_ReviewIdIn(reviewIds);
+        Map<Long, List<String>> imageMap = allImages.stream()
+                .collect(Collectors.groupingBy(
+                        image -> image.getReview().getReviewId(),
+                        Collectors.mapping(ReviewImage::getImageUrl, Collectors.toList())
+                ));
+
+        // 4. 최종 변환
+        return reviews.map(review -> {
+
+            long likeCount = likeCountMap.getOrDefault(review.getReviewId(), 0L);
+            List<String> imageUrls = imageMap.getOrDefault(review.getReviewId(), List.of());
+
+            return ReviewResponse.from(review, imageUrls, false, likeCount);
+        });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ReviewResponse getReviewDetails(Long bookId, Long reviewId, Long memberId) {
         Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다. Review ID: " + reviewId));
 
@@ -180,7 +208,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Map<Long, Boolean> areReviewsWritten(List<Long> bookIds, Long memberId) {
         Map<Long, Boolean> result = new HashMap<>();
 
@@ -189,6 +217,18 @@ public class ReviewServiceImpl implements ReviewService {
             result.put(bookId, exists);
         }
 
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Map<Long, Long> getExistingReviewIdMap(List<Long> bookIds, Long memberId) {
+        Map<Long, Long> result = new HashMap<>();
+
+        for (Long bookId : bookIds) {
+            reviewRepository.findByBook_IdAndMemberId(bookId, memberId)
+                    .ifPresent(review -> result.put(bookId, review.getReviewId()));
+        }
         return result;
     }
 }

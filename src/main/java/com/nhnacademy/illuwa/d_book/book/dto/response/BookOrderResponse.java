@@ -16,9 +16,9 @@ public class BookOrderResponse {
     private String author;
     private BigDecimal salePrice;
 
-    private Integer stockCount; // 재고 수량
-    private String status;      // 판매 상태 (e.g., "FOR_SALE", "SOLD_OUT")
-    private boolean isGiftWrapAvailable; // 포장 가능 여부
+    private Integer stockCount;
+    private String status;
+    private boolean isGiftWrapAvailable;
 
     public static BookOrderResponse fromEntity(Book book) {
         Integer stockCount = 0;
