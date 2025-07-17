@@ -19,10 +19,8 @@ public class ReviewResponse {
     private Long bookId;
     private Long memberId;
     private List<String> reviewImageUrls;
-    private boolean likedByMe;
-    private Long likeCount;
 
-    public static ReviewResponse from(Review review, List<String> imageUrls, boolean likedByMe, Long likeCount) {
+    public static ReviewResponse from(Review review, List<String> imageUrls) {
         return new ReviewResponse(
                 review.getReviewId(),
                 review.getReviewTitle(),
@@ -31,9 +29,7 @@ public class ReviewResponse {
                 review.getReviewDate(),
                 review.getBook().getId(),
                 review.getMemberId(),
-                imageUrls,
-                likedByMe,
-                likeCount
+                imageUrls
         );
     }
 }

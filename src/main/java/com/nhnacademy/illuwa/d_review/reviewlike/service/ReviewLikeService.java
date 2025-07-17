@@ -3,7 +3,7 @@ package com.nhnacademy.illuwa.d_review.reviewlike.service;
 import com.nhnacademy.illuwa.d_review.reviewlike.dto.ReviewLikeResponse;
 
 public interface ReviewLikeService {
-    ReviewLikeResponse toggleLike(Long bookId, Long reviewId, Long memberId);
+    ReviewLikeResponse toggleLike(Long reviewId, Long memberId);
 
     ReviewLikeResponse getLikeInfo(Long reviewId, Long memberId);
 

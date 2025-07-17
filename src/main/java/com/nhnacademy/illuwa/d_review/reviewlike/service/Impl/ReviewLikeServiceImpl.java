@@ -19,8 +19,8 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
 
     @Override
     @Transactional
-    public ReviewLikeResponse toggleLike(Long bookId, Long reviewId, Long memberId) {
-        Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId)
+    public ReviewLikeResponse toggleLike(Long reviewId, Long memberId) {
+        Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다. Review ID: " + reviewId));
 
         boolean isLikedByMe = isLikedByMe(reviewId, memberId); // 중복호출 막으려고 로컬변수 만듬
@@ -41,11 +41,13 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isLikedByMe(Long reviewId, Long memberId) {
         return reviewLikeRepository.existsByReview_ReviewIdAndMemberId(reviewId, memberId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public long getLikeCount(Long reviewId) {
         return reviewLikeRepository.countByReview_ReviewId(reviewId);
     }

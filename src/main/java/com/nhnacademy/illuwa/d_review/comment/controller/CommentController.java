@@ -13,13 +13,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/book-reviews/{bookId}/reviews/{reviewId}/comments")
+@RequestMapping("/api/reviews/{review-id}/comments")
 public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<CommentResponse> createComment(@PathVariable Long bookId,
-                                                         @PathVariable Long reviewId,
+    public ResponseEntity<CommentResponse> createComment(@PathVariable(name = "review-id") Long reviewId,
                                                          @RequestBody @Valid CommentRequest request,
                                                          @RequestHeader("X-USER-ID") Long memberId) {
 
@@ -28,18 +27,16 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CommentResponse>> getCommentList(@PathVariable Long bookId,
-                                                                @PathVariable Long reviewId) {
+    public ResponseEntity<List<CommentResponse>> getCommentList(@PathVariable(name = "review-id") Long reviewId) {
 
         List<CommentResponse> responseList = commentService.getCommentList(reviewId);
         return ResponseEntity.ok(responseList);
     }
 
     // 프론트에서 feign 으로 수정요청 받으려면 어쩔수 없이 Post 써야함 (feign 은 patch 미지원)
-    @PostMapping("/{commentId}")
-    public ResponseEntity<CommentResponse> updateComment(@PathVariable Long bookId,
-                                                         @PathVariable Long reviewId,
-                                                         @PathVariable Long commentId,
+    @PostMapping("/{comment-id}")
+    public ResponseEntity<CommentResponse> updateComment(@PathVariable(name = "review-id") Long reviewId,
+                                                         @PathVariable(name = "comment-id") Long commentId,
                                                          @RequestBody @Valid CommentRequest request,
                                                          @RequestHeader("X-USER-ID") Long memberId) {
 

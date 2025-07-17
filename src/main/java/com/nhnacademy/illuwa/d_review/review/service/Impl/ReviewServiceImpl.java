@@ -15,7 +15,6 @@ import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewImageRepository;
 import com.nhnacademy.illuwa.d_review.review.repository.ReviewRepository;
 import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
-import com.nhnacademy.illuwa.d_review.reviewlike.repository.ReviewLikeRepository;
 import com.nhnacademy.illuwa.infra.storage.MinioStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,7 +35,6 @@ public class ReviewServiceImpl implements ReviewService {
     private final BookRepository bookRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
-    private final ReviewLikeRepository reviewLikeRepository;
     private final MinioStorageService minioStorageService;
     private final MemberServiceClient memberServiceClient;
     private final OrderServiceClient orderServiceClient;
@@ -44,9 +42,10 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public ReviewResponse createReview(Long bookId, Long memberId, ReviewRequest request){
-//        if(Boolean.FALSE.equals(orderServiceClient.isConfirmedOrder(memberId, bookId).getBody())){
-//            throw new CannotWriteReviewException("구매가 확정되지 않아서 리뷰를 작성하실 수 없습니다!");
-//        }
+        if(Boolean.FALSE.equals(orderServiceClient.isConfirmedOrder(memberId, bookId).getBody())){
+            throw new CannotWriteReviewException("구매가 확정되지 않아서 리뷰를 작성하실 수 없습니다!");
+        }
+
         if(reviewRepository.findByBook_IdAndMemberId(bookId, memberId).isPresent()){
             throw new CannotWriteReviewException("리뷰 중복 작성은 불가능합니다!");
         }
@@ -78,26 +77,17 @@ public class ReviewServiceImpl implements ReviewService {
 
         memberServiceClient.earnEventPoint(memberId, rewardType);
 
-        return ReviewResponse.from(saved, imageUrls, false, 0L);
+        return ReviewResponse.from(saved, imageUrls);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ReviewResponse> getReviewPages(Long bookId, Pageable pageable, Long memberId) {
+    public Page<ReviewResponse> getReviewPages(Long bookId, Pageable pageable) {
         Page<Review> reviews = reviewRepository.findReviewsByBook_Id(bookId, pageable);
         List<Long> reviewIds = reviews.getContent().stream()
                 .map(Review::getReviewId)
                 .toList();
 
-        // 1. 좋아요 상태 (내가 누른 리뷰 ID)
-        Set<Long> likedReviewIds = new HashSet<>(
-                reviewLikeRepository.findMyLikedReviewIds(reviewIds, memberId)
-        );
-
-        // 2. 좋아요 수
-        Map<Long, Long> likeCountMap = reviewLikeRepository.countLikesByReviewIds(reviewIds);
-
-        // 3. 이미지
         List<ReviewImage> allImages = reviewImageRepository.findAllByReview_ReviewIdIn(reviewIds);
         Map<Long, List<String>> imageMap = allImages.stream()
                 .collect(Collectors.groupingBy(
@@ -105,42 +95,10 @@ public class ReviewServiceImpl implements ReviewService {
                         Collectors.mapping(ReviewImage::getImageUrl, Collectors.toList())
                 ));
 
-        // 4. 최종 변환
         return reviews.map(review -> {
-            boolean likedByMe = likedReviewIds.contains(review.getReviewId());
-            long likeCount = likeCountMap.getOrDefault(review.getReviewId(), 0L);
             List<String> imageUrls = imageMap.getOrDefault(review.getReviewId(), List.of());
 
-            return ReviewResponse.from(review, imageUrls, likedByMe, likeCount);
-        });
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<ReviewResponse> getReviewPagesWithoutLogin(Long bookId, Pageable pageable) {
-        Page<Review> reviews = reviewRepository.findReviewsByBook_Id(bookId, pageable);
-        List<Long> reviewIds = reviews.getContent().stream()
-                .map(Review::getReviewId)
-                .toList();
-
-        // 2. 좋아요 수
-        Map<Long, Long> likeCountMap = reviewLikeRepository.countLikesByReviewIds(reviewIds);
-
-        // 3. 이미지
-        List<ReviewImage> allImages = reviewImageRepository.findAllByReview_ReviewIdIn(reviewIds);
-        Map<Long, List<String>> imageMap = allImages.stream()
-                .collect(Collectors.groupingBy(
-                        image -> image.getReview().getReviewId(),
-                        Collectors.mapping(ReviewImage::getImageUrl, Collectors.toList())
-                ));
-
-        // 4. 최종 변환
-        return reviews.map(review -> {
-
-            long likeCount = likeCountMap.getOrDefault(review.getReviewId(), 0L);
-            List<String> imageUrls = imageMap.getOrDefault(review.getReviewId(), List.of());
-
-            return ReviewResponse.from(review, imageUrls, false, likeCount);
+            return ReviewResponse.from(review, imageUrls);
         });
     }
 
@@ -153,10 +111,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .map(ReviewImage::getImageUrl)
                 .toList();
 
-        boolean likedByMe = reviewLikeRepository.existsByReview_ReviewIdAndMemberId(reviewId, memberId);
-        long likeCount = reviewLikeRepository.countByReview_ReviewId(reviewId);
-
-        return ReviewResponse.from(review, imageUrls, likedByMe, likeCount);
+        return ReviewResponse.from(review, imageUrls);
     }
 
     @Override
@@ -201,23 +156,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .map(ReviewImage::getImageUrl)
                 .toList();
 
-        boolean likedByMe = reviewLikeRepository.existsByReview_ReviewIdAndMemberId(reviewId, memberId);
-        long likeCount = reviewLikeRepository.countByReview_ReviewId(reviewId);
-
-        return ReviewResponse.from(review, imageUrls, likedByMe, likeCount);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Map<Long, Boolean> areReviewsWritten(List<Long> bookIds, Long memberId) {
-        Map<Long, Boolean> result = new HashMap<>();
-
-        for (Long bookId : bookIds) {
-            boolean exists = reviewRepository.findByBook_IdAndMemberId(bookId, memberId).isPresent();
-            result.put(bookId, exists);
-        }
-
-        return result;
+        return ReviewResponse.from(review, imageUrls);
     }
 
     @Override

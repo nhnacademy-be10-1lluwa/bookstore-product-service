@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/files")
+@RequestMapping("/api/files")
 public class FileUploadController {
 
     private final MinioStorageService minioStorageService;
