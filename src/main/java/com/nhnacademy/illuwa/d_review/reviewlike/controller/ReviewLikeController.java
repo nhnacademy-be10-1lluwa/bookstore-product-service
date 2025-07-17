@@ -27,7 +27,7 @@ public class ReviewLikeController {
     }
 
     @GetMapping("/api/reviews/likes/status")
-    public ResponseEntity<List<Long>> getMyLikedReviews(List<Long> reviewIds, Long memberId) {
+    public ResponseEntity<List<Long>> getMyLikedReviews(List<Long> reviewIds, @RequestHeader("X-USER-ID") Long memberId) {
         return ResponseEntity.ok(reviewLikeService.getMyLikedReviews(reviewIds, memberId));
     }
 }
