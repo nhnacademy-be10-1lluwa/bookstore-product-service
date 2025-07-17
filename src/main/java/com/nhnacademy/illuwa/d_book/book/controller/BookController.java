@@ -39,13 +39,13 @@ public class BookController {
         this.bookSearchService = bookSearchService;
     }
 
-    @Operation(summary = "도서 제목으로 검색", description = "DB에 저장된 도서를 제목(일부 포함)으로 검색")
-    @ApiResponse(responseCode = "200", description = "검색 성공", content = @Content(schema = @Schema(implementation = BookDetailResponse.class)))
-    @GetMapping("/search")
-    public ResponseEntity<List<BookDetailResponse>> searchBooksByTitle(@RequestParam String title){
-        List<BookDetailResponse> bookDetailsResponses = bookService.searchBookByTitle(title);
-        return ResponseEntity.ok(bookDetailsResponses);
-    }
+//    @Operation(summary = "도서 제목으로 검색", description = "DB에 저장된 도서를 제목(일부 포함)으로 검색")
+//    @ApiResponse(responseCode = "200", description = "검색 성공", content = @Content(schema = @Schema(implementation = BookDetailResponse.class)))
+//    @GetMapping("/search")
+//    public ResponseEntity<List<BookDetailResponse>> searchBooksByTitle(@RequestParam String title){
+//        List<BookDetailResponse> bookDetailsResponses = bookService.searchBookByTitle(title);
+//        return ResponseEntity.ok(bookDetailsResponses);
+//    }
 
     @Operation(summary = "도서 상세 정보 조회", description = "도서 ID로 특정 도서의 상세 정보를 조회")
     @ApiResponses({
