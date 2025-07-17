@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 //@CrossOrigin
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping("/api/books/search")
 @RequiredArgsConstructor
 public class BookSearchController {
 
