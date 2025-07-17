@@ -10,15 +10,11 @@ import java.util.*;
 public interface ReviewService {
     ReviewResponse createReview(Long bookId, Long memberId, ReviewRequest request) throws Exception;
 
-    Page<ReviewResponse> getReviewPages(Long bookId, Pageable pageable, Long memberId);
-
-    Page<ReviewResponse> getReviewPagesWithoutLogin(Long bookId, Pageable pageable);
+    Page<ReviewResponse> getReviewPages(Long bookId, Pageable pageable);
 
     ReviewResponse getReviewDetails(Long bookId, Long reviewId, Long memberId);
 
     ReviewResponse updateReview(Long bookId, Long reviewId, Long memberId, ReviewRequest request) throws Exception;
-
-    Map<Long, Boolean> areReviewsWritten(List<Long> bookIds, Long memberId);
 
     Map<Long, Long> getExistingReviewIdMap(List<Long> bookIds, Long memberId);
 }
