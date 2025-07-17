@@ -24,8 +24,8 @@ import java.util.Map;
 public class ReviewController {
     private final ReviewService reviewService;
 
-    @PostMapping(value = "/api/book-reviews/{bookId}/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ReviewResponse> createReview(@PathVariable long bookId,
+    @PostMapping(value = "/api/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ReviewResponse> createReview(@RequestParam(name = "book-id") long bookId,
                                                        @RequestHeader("X-USER-ID") long memberId,
                                                        @ModelAttribute @Valid ReviewRequest request) throws Exception {
 
@@ -33,33 +33,27 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping(value = "/api/book-reviews/{bookId}/reviews")
-    public ResponseEntity<Page<ReviewResponse>> getReviewPages(@PathVariable long bookId,
+    @GetMapping(value = "/api/public/reviews")
+    public ResponseEntity<Page<ReviewResponse>> getReviewPages(@RequestParam(name = "book-id") long bookId,
                                                                @PageableDefault(size = 5, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        //        if(memberId == null) {
-//            Page<ReviewResponse> responsePage = reviewService.getReviewPagesWithoutLogin(bookId, pageable);
-//            return ResponseEntity.ok(responsePage);
-//        } else {
-//            Page<ReviewResponse> responsePage = reviewService.getReviewPages(bookId, pageable, memberId);
-//            return ResponseEntity.ok(responsePage);
-//        }
-        Page<ReviewResponse> responsePage = reviewService.getReviewPagesWithoutLogin(bookId, pageable);
+        Page<ReviewResponse> responsePage = reviewService.getReviewPages(bookId, pageable);
         return ResponseEntity.ok(responsePage);
     }
 
-    @GetMapping(value = "/api/book-reviews/{bookId}/reviews/{reviewId}")
-    public ResponseEntity<ReviewResponse> getReviewDetails(@PathVariable long bookId,
-                                                           @PathVariable long reviewId,
+    @GetMapping(value = "/api/reviews/{review-id}")
+    public ResponseEntity<ReviewResponse> getReviewDetails(@RequestParam(name = "book-id") long bookId,
+                                                           @PathVariable(name = "review-id") long reviewId,
                                                            @RequestHeader("X-USER-ID") long memberId) {
+
         ReviewResponse response = reviewService.getReviewDetails(bookId, reviewId, memberId);
         return ResponseEntity.ok(response);
     }
 
     // 프론트에서 feign 으로 수정요청 받으려면 어쩔수 없이 Post 써야함 (feign 은 patch 미지원)
-    @PostMapping(value = "/api/book-reviews/{bookId}/reviews/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ReviewResponse> updateReview(@PathVariable long bookId,
-                                                       @PathVariable long reviewId,
+    @PostMapping(value = "/api/reviews/{review-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ReviewResponse> updateReview(@RequestParam(name = "book-id") long bookId,
+                                                       @PathVariable(name = "review-id") long reviewId,
                                                        @RequestHeader("X-USER-ID") Long memberId,
                                                        @ModelAttribute @Valid ReviewRequest request) throws Exception {
 
@@ -67,15 +61,10 @@ public class ReviewController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/api/book-reviews/reviews/check-batch")
-    public Map<Long, Boolean> areReviewsWritten(@RequestBody List<Long> bookIds,
-                                                @RequestHeader("X-USER-ID") Long memberId) {
-        return reviewService.areReviewsWritten(bookIds, memberId);
-    }
-
-    @PostMapping("/api/book-reviews/reviews/check")
+    @PostMapping("/api/reviews/check")
     public Map<Long, Long> getExistingReviewIdMap(@RequestBody List<Long> bookIds,
                                                   @RequestHeader("X-USER-ID") Long memberId){
+
         return reviewService.getExistingReviewIdMap(bookIds, memberId);
     }
 }
