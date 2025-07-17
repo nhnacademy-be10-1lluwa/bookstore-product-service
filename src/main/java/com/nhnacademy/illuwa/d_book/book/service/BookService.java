@@ -253,10 +253,14 @@ public class BookService {
         BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookApiRegisterRequest.getCount());
         bookEntity.setBookExtraInfo(bookExtraInfo);
 
-        bookCategoryRepository.save(new BookCategory(bookEntity,categoryEntity));
 
         Book savedBook = bookRepository.save(bookEntity);
         bookImageRepository.save(bookImage);
+
+        BookCategory bookCategory = new BookCategory(savedBook, categoryEntity);
+        savedBook.getBookCategories().add(bookCategory);
+        bookCategoryRepository.save(bookCategory);
+
         bookSearchService.syncBookToElasticsearch(savedBook);
 
         return bookResponseMapper.toBookDetailResponse(bookEntity);
