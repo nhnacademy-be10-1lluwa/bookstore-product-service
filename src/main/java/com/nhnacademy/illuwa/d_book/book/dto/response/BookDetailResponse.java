@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,6 +21,8 @@ public class BookDetailResponse {
     private String isbn;
     private BigDecimal regularPrice;
     private BigDecimal salePrice;
-    private boolean isGiftWrap;
-    private String imgUrl;
+    private boolean giftWrap;
+    private  List<String> imageUrls;
+    private  Integer count;
+    private  String status;
 }
