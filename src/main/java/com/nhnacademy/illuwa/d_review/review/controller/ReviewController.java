@@ -3,7 +3,6 @@ package com.nhnacademy.illuwa.d_review.review.controller;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
 import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

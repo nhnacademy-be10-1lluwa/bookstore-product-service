@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewLikeServiceImpl implements ReviewLikeService {
@@ -36,10 +39,22 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
 
     @Override
     @Transactional(readOnly = true)
-    public ReviewLikeResponse getLikeInfo(Long reviewId, Long memberId) {
-        return new ReviewLikeResponse(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
+    public Map<Long, Long> getLikeCountsFromReviews(List<Long> reviewIds) {
+        return reviewLikeRepository.countLikesByReviewIds(reviewIds);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getMyLikedReviews(List<Long> reviewIds, Long memberId) {
+        return reviewLikeRepository.findMyLikedReviewIds(reviewIds, memberId);
+    }
+
+//    @Override
+//    @Transactional(readOnly = true)
+//    public ReviewLikeResponse getLikeInfo(Long reviewId, Long memberId) {
+//        return new ReviewLikeResponse(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
+//    }
+//
     @Override
     @Transactional(readOnly = true)
     public boolean isLikedByMe(Long reviewId, Long memberId) {
