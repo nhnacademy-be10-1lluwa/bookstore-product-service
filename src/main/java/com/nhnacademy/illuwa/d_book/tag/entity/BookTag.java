@@ -15,12 +15,18 @@ public class BookTag {
     @Column(name = "book_tag_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "book_id")
     private Book book;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tag_id")
     private Tag tag;
+
+    public BookTag(Book book, Tag tag){
+        this.book = book;
+        this.tag = tag;
+    }
+
 
 }
