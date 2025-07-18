@@ -6,21 +6,28 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/reviews/{review-id}/likes")
 public class ReviewLikeController {
     private final ReviewLikeService reviewLikeService;
 
-    @PostMapping
+    @PostMapping("/api/reviews/{review-id}/likes")
     public ResponseEntity<ReviewLikeResponse> toggleLike(@PathVariable(name = "review-id") Long reviewId,
                                                          @RequestHeader("X-USER-ID") Long memberId) {
 
         return ResponseEntity.ok(reviewLikeService.toggleLike(reviewId, memberId));
     }
 
-    @GetMapping
-    public ResponseEntity<ReviewLikeResponse> getLikeInfo(@PathVariable(name = "review-id") Long reviewId, Long memberId) {
-        return ResponseEntity.ok(reviewLikeService.getLikeInfo(reviewId, memberId));
+    @GetMapping("/api/reviews/likes")
+    public ResponseEntity<Map<Long, Long>> getLikeCountsFromReviews(List<Long> reviewIds) {
+        return ResponseEntity.ok(reviewLikeService.getLikeCountsFromReviews(reviewIds));
+    }
+
+    @GetMapping("/api/reviews/likes/status")
+    public ResponseEntity<List<Long>> getMyLikedReviews(List<Long> reviewIds, @RequestHeader("X-USER-ID") Long memberId) {
+        return ResponseEntity.ok(reviewLikeService.getMyLikedReviews(reviewIds, memberId));
     }
 }
