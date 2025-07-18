@@ -8,6 +8,8 @@ import com.nhnacademy.illuwa.d_book.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
+import com.nhnacademy.illuwa.d_book.tag.dto.TagResponse;
+import com.nhnacademy.illuwa.d_book.tag.service.TagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,8 @@ import java.util.List;
 public class AdminBookController {
 
     private final BookService bookService;
+    private final TagService tagService;
+
 
     @GetMapping("/external")
     public ResponseEntity<List<BookExternalResponse>> searchBooksByExternalApi(@RequestParam("title") String title){
@@ -113,9 +117,26 @@ public class AdminBookController {
     ) {
         bookService.restoreBooksCount(requests);
         return ResponseEntity.noContent().build();
-
-
     }
+
+    @PostMapping("/{bookId}/tags/{tagId}")
+    public ResponseEntity<Void> addTagToBook(@PathVariable Long bookId, @PathVariable Long tagId) {
+        tagService.addTagToBook(bookId, tagId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{bookId}/tags/{tagId}")
+    public ResponseEntity<Void> removeTagFromBook(@PathVariable Long bookId, @PathVariable Long tagId) {
+        tagService.removeTagFromBook(bookId, tagId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{bookId}/tags")
+    public ResponseEntity<List<TagResponse>> getTagsByBookId(@PathVariable Long bookId) {
+        List<TagResponse> tags = tagService.getTagsByBookId(bookId);
+        return ResponseEntity.ok(tags);
+    }
+
 
 
 }
