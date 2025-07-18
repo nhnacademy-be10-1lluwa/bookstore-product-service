@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class BookmarkResponse {
-    private boolean isBookmarked;
+public class BookLikeResponse {
+    private boolean isLiked;
 }
