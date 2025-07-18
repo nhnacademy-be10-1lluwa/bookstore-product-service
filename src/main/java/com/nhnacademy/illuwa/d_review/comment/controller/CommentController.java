@@ -13,11 +13,10 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/reviews/{review-id}/comments")
 public class CommentController {
     private final CommentService commentService;
 
-    @PostMapping
+    @PostMapping("/api/reviews/{review-id}/comments")
     public ResponseEntity<CommentResponse> createComment(@PathVariable(name = "review-id") Long reviewId,
                                                          @RequestBody @Valid CommentRequest request,
                                                          @RequestHeader("X-USER-ID") Long memberId) {
@@ -26,7 +25,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping
+    @GetMapping("/api/public/reviews/{review-id}/comments")
     public ResponseEntity<List<CommentResponse>> getCommentList(@PathVariable(name = "review-id") Long reviewId) {
 
         List<CommentResponse> responseList = commentService.getCommentList(reviewId);
@@ -34,7 +33,7 @@ public class CommentController {
     }
 
     // 프론트에서 feign 으로 수정요청 받으려면 어쩔수 없이 Post 써야함 (feign 은 patch 미지원)
-    @PostMapping("/{comment-id}")
+    @PostMapping("/api/reviews/{review-id}/comments/{comment-id}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable(name = "review-id") Long reviewId,
                                                          @PathVariable(name = "comment-id") Long commentId,
                                                          @RequestBody @Valid CommentRequest request,

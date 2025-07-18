@@ -21,7 +21,7 @@ public class ReviewLikeController {
         return ResponseEntity.ok(reviewLikeService.toggleLike(reviewId, memberId));
     }
 
-    @GetMapping("/api/reviews/likes")
+    @GetMapping("/api/public/reviews/likes")
     public ResponseEntity<Map<Long, Long>> getLikeCountsFromReviews(@RequestParam List<Long> reviewIds) {
         return ResponseEntity.ok(reviewLikeService.getLikeCountsFromReviews(reviewIds));
     }
