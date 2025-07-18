@@ -7,5 +7,10 @@ import java.util.List;
 
 public interface BookTagRepository extends JpaRepository<BookTag, Long> {
     List<BookTag> findByBookId(Long bookId);
+
+    boolean existsByBookIdAndTagId(Long bookId, Long tagId);
+
     List<BookTag> findByTagId(Long tagId);
+
+    void deleteByBookIdAndTagId(Long bookId, Long tagId);
 }
