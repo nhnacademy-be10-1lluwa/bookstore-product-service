@@ -1,9 +1,11 @@
 package com.nhnacademy.illuwa.d_book.book.service.Impl;
 
+import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookLikeResponse;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.entity.BookLike;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
+import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.d_book.book.repository.BookLikeRepository;
 import com.nhnacademy.illuwa.d_book.book.service.BookLikeService;
@@ -11,11 +13,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class BookLikeServiceImpl implements BookLikeService {
     private final BookRepository bookRepository;
     private final BookLikeRepository bookLikeRepository;
+    private final BookResponseMapper bookResponseMapper;
 
     @Override
     @Transactional
@@ -33,5 +38,12 @@ public class BookLikeServiceImpl implements BookLikeService {
         }
 
         return new BookLikeResponse(!isLiked);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookDetailResponse> getLikedBooksByMember(Long memberId){
+        List<Book> likedBookList = bookLikeRepository.getLikedBooksByMember(memberId);
+        return bookResponseMapper.toBookDetailListResponse(likedBookList);
     }
 }
