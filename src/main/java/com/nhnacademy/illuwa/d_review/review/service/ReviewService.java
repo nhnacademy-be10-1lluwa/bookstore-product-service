@@ -2,7 +2,6 @@ package com.nhnacademy.illuwa.d_review.review.service;
 
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewRequest;
 import com.nhnacademy.illuwa.d_review.review.dto.ReviewResponse;
-import com.nhnacademy.illuwa.d_review.review.entity.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
