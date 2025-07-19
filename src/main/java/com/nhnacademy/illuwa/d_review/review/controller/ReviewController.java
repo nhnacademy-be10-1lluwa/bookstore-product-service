@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-
 @RestController
 @RequiredArgsConstructor
 public class ReviewController {
@@ -61,9 +60,15 @@ public class ReviewController {
     }
 
     @PostMapping("/api/reviews/check")
-    public Map<Long, Long> getExistingReviewIdMap(@RequestBody List<Long> bookIds,
-                                                  @RequestHeader("X-USER-ID") Long memberId){
+    public ResponseEntity<Map<Long, Long>> getExistingReviewIdMap(@RequestBody List<Long> bookIds,
+                                                                  @RequestHeader("X-USER-ID") Long memberId){
 
-        return reviewService.getExistingReviewIdMap(bookIds, memberId);
+        return ResponseEntity.ok(reviewService.getExistingReviewIdMap(bookIds, memberId));
+    }
+
+    @GetMapping("/api/reviews/book-title")
+    public ResponseEntity<Map<Long, String>> getBookTitleMapFromReviewIds(@RequestParam List<Long> reviewIds) {
+
+        return ResponseEntity.ok(reviewService.getBookTitleMapFromReviewIds(reviewIds));
     }
 }

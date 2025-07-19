@@ -170,4 +170,10 @@ public class ReviewServiceImpl implements ReviewService {
         }
         return result;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, String> getBookTitleMapFromReviewIds(List<Long> reviewIds){
+        return reviewRepository.findBookTitleMapByReviewIds(reviewIds);
+    }
 }
