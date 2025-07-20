@@ -12,9 +12,13 @@ public interface ReviewService {
 
     Page<ReviewResponse> getReviewPages(Long bookId, Pageable pageable);
 
+    Page<ReviewResponse> getMemberReviewPages(Long memberId, Pageable pageable);
+
     ReviewResponse getReviewDetails(Long bookId, Long reviewId, Long memberId);
 
     ReviewResponse updateReview(Long bookId, Long reviewId, Long memberId, ReviewRequest request) throws Exception;
 
     Map<Long, Long> getExistingReviewIdMap(List<Long> bookIds, Long memberId);
+
+    Map<Long, String> getBookTitleMapFromReviewIds(Collection<Long> reviewIds);
 }
