@@ -93,7 +93,7 @@ public class BookDetailWithExtraInfoResponse {
                 .regularPrice(book.getRegularPrice())
                 .salePrice(book.getSalePrice())
                 .imgUrl(book.getBookImages().isEmpty() ? null : book.getBookImages().get(0).getImageUrl())
-                .giftwrap(book.getBookExtraInfo().isGiftWrap())
+                .giftwrap(book.getBookExtraInfo().getGiftWrap())
                 .count(book.getBookExtraInfo().getCount())
                 .tags(tagResponses)
                 .status(book.getBookExtraInfo().getStatus())
