@@ -29,7 +29,7 @@ public interface BookResponseMapper {
     BookDetailResponse toBookDetailResponse(Book book);
 
     @Named("toImageUrlList")
-    static List<String> toImageUrlList(List<BookImage> images) {
+    default List<String> toImageUrlList(List<BookImage> images) {
         return images == null ? List.of()
                 : images.stream()
                 .filter(i -> i.getImageType() == ImageType.THUMBNAIL)
