@@ -95,6 +95,13 @@ public class BookService {
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
+    @Transactional(readOnly = true)
+    public Page<BookDetailResponse> getAllBooksWithDetails(Pageable pageable) {
+        Page<Book> bookPage = bookRepository.findAll(pageable);
+        return bookPage.map(bookResponseMapper::toBookDetailResponse);
+    }
+
+
 
     // ISBN으로 도서 상세 조회
     @Transactional(readOnly = true)
@@ -165,7 +172,7 @@ public class BookService {
                 .regularPrice(book.getRegularPrice())
                 .salePrice(book.getSalePrice())
                 .imgUrl(book.getBookImages().isEmpty() ? null : book.getBookImages().get(0).getImageUrl())
-                .giftwrap(book.getBookExtraInfo().isGiftwrap())
+                .giftwrap(book.getBookExtraInfo().isGiftWrap())
                 .count(book.getBookExtraInfo().getCount())
                 .status(book.getBookExtraInfo().getStatus())
                 .categoryId(categoryId)
@@ -377,7 +384,7 @@ public class BookService {
             book.getBookExtraInfo().setCount(requestDto.getCount());
         }
         if (requestDto.getGiftwrap() != null) {
-            book.getBookExtraInfo().setGiftwrap(requestDto.getGiftwrap());
+            book.getBookExtraInfo().setGiftWrap(requestDto.getGiftwrap());
         }
         if (requestDto.getStatus() != null) {
             book.getBookExtraInfo().setStatus(Status.valueOf(requestDto.getStatus()));

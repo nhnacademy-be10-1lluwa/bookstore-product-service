@@ -8,52 +8,53 @@ import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
 import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
-
 import java.util.List;
 
 
 @Mapper(componentModel = "spring")
 public interface BookResponseMapper {
 
-    BookResponseMapper INSTANCE = Mappers.getMapper(BookResponseMapper.class);
-
     //Book Entity -> BookExternalResponseDto
     @Mapping(source = "publishedDate",target = "pubDate")
     @Mapping(source = "regularPrice",target = "priceStandard")
     @Mapping(source = "salePrice",target = "priceSales")
-    BookExternalResponse toBookExternalResponse(Book bookEntity);
+    BookExternalResponse toExternalResponse(Book bookEntity);
 
-    //Book Entity -> BestSellerResponseDto
-    BestSellerResponse toBestSellerResponse(Book book);
 
-    default BookDetailResponse toBookDetailResponse(Book book) {
-        if (book == null) return null;
 
-        String thumbnailUrl = book.getBookImages().stream()
-                .filter(img -> img.getImageType() == ImageType.THUMBNAIL)
+    @Mapping(target = "imageUrls", source  = "bookImages", qualifiedByName = "toImageUrlList")
+    @Mapping(target = "count", source  = "bookExtraInfo.count", defaultValue = "0")
+    @Mapping(target = "status", source  = "bookExtraInfo.status")
+    @Mapping(target = "giftWrap", source  = "bookExtraInfo.giftWrap", defaultValue = "false")
+    BookDetailResponse toBookDetailResponse(Book book);
+
+
+    @Named("toImageUrlList")
+    default List<String> toImageUrlList(List<BookImage> images) {
+        return images == null ? List.of()
+                : images.stream()
+                .filter(i -> i.getImageType() == ImageType.THUMBNAIL)
                 .map(BookImage::getImageUrl)
-                .findFirst()
-                .orElse(null);
-
-        return new BookDetailResponse(
-                book.getId(),
-                book.getTitle(),
-                book.getContents(),
-                book.getDescription(),
-                book.getAuthor(),
-                book.getPublisher(),
-                book.getPublishedDate(),
-                book.getIsbn(),
-                book.getRegularPrice(),
-                book.getSalePrice(),
-                book.getBookExtraInfo() != null && book.getBookExtraInfo().isGiftwrap(),
-                thumbnailUrl
-        );
+                .toList();
     }
 
     List<BookDetailResponse> toBookDetailListResponse(List<Book> bookList);
+
+    @Mapping(source = "bookImages",target = "cover", qualifiedByName = "firstImageUrl")
+    @Mapping(source = "regularPrice",target = "priceStandard")
+    @Mapping(source = "salePrice",target = "priceSales")
+    BestSellerResponse toBestSellerResponse(Book book);
+
+    @Named("firstImageUrl")
+    default String getFirstImageUrl(List<BookImage> bookImages) {
+        if (bookImages != null && !bookImages.isEmpty() && bookImages.getFirst() != null) {
+            return bookImages.getFirst().getImageUrl();
+        }
+        return null;
+    }
+
 
     default Page<BestSellerResponse> toBestSellerPageResponse(Page<Book> bookPage) {
         List<BestSellerResponse> content = bookPage.getContent().stream()
