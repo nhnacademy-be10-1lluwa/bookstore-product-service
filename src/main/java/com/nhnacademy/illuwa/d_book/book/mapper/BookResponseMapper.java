@@ -8,7 +8,6 @@ import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 import java.util.List;
 
 
@@ -19,21 +18,13 @@ public interface BookResponseMapper {
     @Mapping(source = "publishedDate",target = "pubDate")
     @Mapping(source = "regularPrice",target = "priceStandard")
     @Mapping(source = "salePrice",target = "priceSales")
-    BookExternalResponse toBookExternalResponse(Book bookEntity);
+    BookExternalResponse toExternalResponse(Book bookEntity);
 
 
 
-    @Mapping(target = "imageUrls",
-            source  = "bookImages",
-            qualifiedByName = "toImageUrlList")
-
-    @Mapping(target = "count",
-            source  = "bookExtraInfo.count",
-            defaultValue = "0")
-
-    @Mapping(target = "status",
-            source  = "bookExtraInfo.status")
-
+    @Mapping(target = "imageUrls", source  = "bookImages", qualifiedByName = "toImageUrlList")
+    @Mapping(target = "count", source  = "bookExtraInfo.count", defaultValue = "0")
+    @Mapping(target = "status", source  = "bookExtraInfo.status")
     @Mapping(target = "giftWrap", source  = "bookExtraInfo.giftWrap", defaultValue = "false")
     BookDetailResponse toBookDetailResponse(Book book);
 
@@ -49,18 +40,5 @@ public interface BookResponseMapper {
 
 
     List<BookDetailResponse> toBookDetailListResponse(List<Book> bookList);
-
-
-    @Named("getThumbnailUrlFromImages")
-    default String getThumbnailUrl(List<BookImage> images) {
-        if (images == null) {
-            return null;
-        }
-        return images.stream()
-                .filter(img -> img.getImageType() == ImageType.THUMBNAIL)
-                .map(BookImage::getImageUrl)
-                .findFirst()
-                .orElse(null);
-    }
 
 }
