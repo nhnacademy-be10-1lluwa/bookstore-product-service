@@ -16,7 +16,7 @@ public class BookLikeController {
     private final BookLikeService bookLikeService;
 
     @GetMapping("/check")
-    public ResponseEntity<Boolean> isLikedByMe(@RequestParam long bookId,
+    public ResponseEntity<Boolean> isLikedByMe(@RequestParam("book-id") long bookId,
                                                @RequestHeader("X-USER-ID") Long memberId){
         return ResponseEntity.ok(bookLikeService.isLikedByMe(bookId, memberId));
     }
