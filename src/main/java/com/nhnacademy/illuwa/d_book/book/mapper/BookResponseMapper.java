@@ -8,6 +8,7 @@ import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
 import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 
@@ -26,7 +27,18 @@ public interface BookResponseMapper {
     BookExternalResponse toBookExternalResponse(Book bookEntity);
 
     //Book Entity -> BestSellerResponseDto
+    @Mapping(source = "bookImages",target = "cover", qualifiedByName = "firstImageUrl")
+    @Mapping(source = "regularPrice",target = "priceStandard")
+    @Mapping(source = "salePrice",target = "priceSales")
     BestSellerResponse toBestSellerResponse(Book book);
+
+    @Named("firstImageUrl")
+    default String getFirstImageUrl(List<BookImage> bookImages) {
+        if (bookImages != null && !bookImages.isEmpty() && bookImages.getFirst() != null) {
+            return bookImages.getFirst().getImageUrl();
+        }
+        return null;
+    }
 
     default BookDetailResponse toBookDetailResponse(Book book) {
         if (book == null) return null;
@@ -66,6 +78,5 @@ public interface BookResponseMapper {
                 bookPage.getTotalElements()
         );
     }
-
 
 }
