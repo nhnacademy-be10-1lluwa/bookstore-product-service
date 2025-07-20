@@ -21,7 +21,7 @@ public class BookDetailResponse {
     private String isbn;
     private BigDecimal regularPrice;
     private BigDecimal salePrice;
-    private boolean giftWrap;
+    private Boolean giftWrap;
     private  List<String> imageUrls;
     private  Integer count;
     private  String status;
