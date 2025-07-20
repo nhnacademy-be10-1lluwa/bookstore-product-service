@@ -32,6 +32,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -212,7 +213,7 @@ public class BookServiceTest {
                 .build();
 
         BookDetailResponse bookDetailResponse = new BookDetailResponse(
-                0L,
+                1L,
                 "헨젤과 그레텔",
                 "목차1, 목차2, 목차3...",
                 "설명",
@@ -220,10 +221,12 @@ public class BookServiceTest {
                 "한국출판사",
                 LocalDate.of(1999, 9, 19),
                 "0070ABC",
-                new BigDecimal(10000),
-                new BigDecimal(6000),
+                new BigDecimal("10000"),
+                new BigDecimal("6000"),
                 false,
-                "imgUrl"
+                new ArrayList<>(),
+                10,
+                "NORMAL"
         );
 
         //when

@@ -19,7 +19,7 @@ public class BookExtraInfo {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    private boolean giftwrap;
+    private boolean giftWrap;
 
     private Integer count;
 

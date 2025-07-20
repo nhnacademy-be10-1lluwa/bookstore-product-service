@@ -73,13 +73,19 @@ public class AdminBookController {
         return ResponseEntity.noContent().build();
     }
 
+    //모든 부가정보(+ 카테고리, 태그)
     @GetMapping("/{id}/detail")
     public ResponseEntity<BookDetailWithExtraInfoResponse> getBookDetailWithExtra(@PathVariable Long id) {
         BookDetailWithExtraInfoResponse response = bookService.getBookDetailWithExtraInfo(id);
         return ResponseEntity.ok(response);
     }
 
-
+    //부가 정보 포함
+    @GetMapping("/{id}/details")
+    public ResponseEntity<BookDetailResponse> getBookDetail(@PathVariable Long id) {
+        BookDetailResponse response = bookService.searchBookById(id);
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/extra_info")
     public ResponseEntity<Page<BookDetailWithExtraInfoResponse>> getBooksWithExtraInfo(
