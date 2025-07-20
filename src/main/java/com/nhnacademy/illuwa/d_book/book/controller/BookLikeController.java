@@ -1,6 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
-import com.nhnacademy.illuwa.d_book.book.dto.response.BestSellerResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.SimpleBookResponse;
 import com.nhnacademy.illuwa.d_book.book.service.BookLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +22,7 @@ public class BookLikeController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Page<BestSellerResponse>> getLikedBooksByMember(
+    public ResponseEntity<Page<SimpleBookResponse>> getLikedBooksByMember(
             @RequestParam("page") int page, @RequestParam("size") int size,
             @RequestHeader("X-USER-ID") Long memberId) {
         Pageable pageable = PageRequest.of(page, size);

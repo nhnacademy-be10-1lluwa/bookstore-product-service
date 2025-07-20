@@ -1,6 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.service.Impl;
 
-import com.nhnacademy.illuwa.d_book.book.dto.response.BestSellerResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.SimpleBookResponse;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.entity.BookLike;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
@@ -46,8 +46,8 @@ public class BookLikeServiceImpl implements BookLikeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BestSellerResponse> getLikedBooksByMember(Long memberId, Pageable pageable){
+    public Page<SimpleBookResponse> getLikedBooksByMember(Long memberId, Pageable pageable){
         Page<Book> likedBookList = bookLikeRepository.getLikedBooksByMember(memberId, pageable);
-        return bookResponseMapper.toBestSellerPageResponse(likedBookList);
+        return bookResponseMapper.toSimpleBookPageResponse(likedBookList);
     }
 }

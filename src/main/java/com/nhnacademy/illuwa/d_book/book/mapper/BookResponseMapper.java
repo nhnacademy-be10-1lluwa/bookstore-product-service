@@ -1,8 +1,8 @@
 package com.nhnacademy.illuwa.d_book.book.mapper;
 
-import com.nhnacademy.illuwa.d_book.book.dto.response.BestSellerResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
+import com.nhnacademy.illuwa.d_book.book.dto.response.SimpleBookResponse;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
 import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
@@ -22,7 +22,17 @@ public interface BookResponseMapper {
     @Mapping(source = "salePrice",target = "priceSales")
     BookExternalResponse toExternalResponse(Book bookEntity);
 
+    //Book Entity -> SimpleBookResponseDto
+    @Mapping(source = "bookImages",target = "cover", qualifiedByName = "firstImageUrl")
+    SimpleBookResponse toSimpleBookResponse(Book book);
 
+    @Named("firstImageUrl")
+    default String getFirstImageUrl(List<BookImage> bookImages) {
+        if (bookImages != null && !bookImages.isEmpty() && bookImages.getFirst() != null) {
+            return bookImages.getFirst().getImageUrl();
+        }
+        return null;
+    }
 
     @Mapping(target = "imageUrls", source  = "bookImages", qualifiedByName = "toImageUrlList")
     @Mapping(target = "count", source  = "bookExtraInfo.count", defaultValue = "0")
@@ -42,23 +52,9 @@ public interface BookResponseMapper {
 
     List<BookDetailResponse> toBookDetailListResponse(List<Book> bookList);
 
-    @Mapping(source = "bookImages",target = "cover", qualifiedByName = "firstImageUrl")
-    @Mapping(source = "regularPrice",target = "priceStandard")
-    @Mapping(source = "salePrice",target = "priceSales")
-    BestSellerResponse toBestSellerResponse(Book book);
-
-    @Named("firstImageUrl")
-    default String getFirstImageUrl(List<BookImage> bookImages) {
-        if (bookImages != null && !bookImages.isEmpty() && bookImages.getFirst() != null) {
-            return bookImages.getFirst().getImageUrl();
-        }
-        return null;
-    }
-
-
-    default Page<BestSellerResponse> toBestSellerPageResponse(Page<Book> bookPage) {
-        List<BestSellerResponse> content = bookPage.getContent().stream()
-                .map(this::toBestSellerResponse)
+    default Page<SimpleBookResponse> toSimpleBookPageResponse(Page<Book> bookPage) {
+        List<SimpleBookResponse> content = bookPage.getContent().stream()
+                .map(this::toSimpleBookResponse)
                 .toList();
 
         return new org.springframework.data.domain.PageImpl<>(
@@ -67,6 +63,5 @@ public interface BookResponseMapper {
                 bookPage.getTotalElements()
         );
     }
-
 
 }
