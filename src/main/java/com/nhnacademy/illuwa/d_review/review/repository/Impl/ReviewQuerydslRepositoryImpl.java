@@ -7,10 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -22,7 +19,7 @@ public class ReviewQuerydslRepositoryImpl implements ReviewQuerydslRepository {
     QBook book = QBook.book;
 
     @Override
-    public Map<Long,String> findBookTitleMapByReviewIds(List<Long> reviewIds){
+    public Map<Long,String> findBookTitleMapByReviewIds(Collection<Long> reviewIds){
         if (reviewIds == null || reviewIds.isEmpty()) {
             return Collections.emptyMap();
         }

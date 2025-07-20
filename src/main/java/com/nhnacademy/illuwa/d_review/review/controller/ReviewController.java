@@ -6,6 +6,7 @@ import com.nhnacademy.illuwa.d_review.review.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +38,14 @@ public class ReviewController {
                                                                @PageableDefault(size = 5, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
         Page<ReviewResponse> responsePage = reviewService.getReviewPages(bookId, pageable);
+        return ResponseEntity.ok(responsePage);
+    }
+
+    @GetMapping(value = "/api/reviews")
+    public ResponseEntity<Page<ReviewResponse>> getMemberReviewPages(@RequestHeader("X-USER-ID") long memberId,
+                                                                     @RequestParam("page") int page, @RequestParam("size") int size){
+    Pageable pageable = PageRequest.of(page, size, Sort.by("reviewDate").descending());
+    Page<ReviewResponse> responsePage = reviewService.getMemberReviewPages(memberId, pageable);
         return ResponseEntity.ok(responsePage);
     }
 
@@ -67,8 +77,7 @@ public class ReviewController {
     }
 
     @GetMapping("/api/reviews/book-title")
-    public ResponseEntity<Map<Long, String>> getBookTitleMapFromReviewIds(@RequestParam List<Long> reviewIds) {
-
+    public ResponseEntity<Map<Long, String>> getBookTitleMapFromReviewIds(@RequestParam("reviewIds") Collection<Long> reviewIds) {
         return ResponseEntity.ok(reviewService.getBookTitleMapFromReviewIds(reviewIds));
     }
 }

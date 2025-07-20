@@ -103,6 +103,27 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public Page<ReviewResponse> getMemberReviewPages(Long memberId, Pageable pageable) {
+        Page<Review> reviews = reviewRepository.findReviewsByMemberId(memberId, pageable);
+        List<Long> reviewIds = reviews.getContent().stream()
+                .map(Review::getReviewId)
+                .toList();
+
+        List<ReviewImage> allImages = reviewImageRepository.findAllByReview_ReviewIdIn(reviewIds);
+        Map<Long, List<String>> imageMap = allImages.stream()
+                .collect(Collectors.groupingBy(
+                        image -> image.getReview().getReviewId(),
+                        Collectors.mapping(ReviewImage::getImageUrl, Collectors.toList())
+                ));
+
+        return reviews.map(review -> {
+            List<String> imageUrls = imageMap.getOrDefault(review.getReviewId(), List.of());
+
+            return ReviewResponse.from(review, imageUrls);
+        });
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ReviewResponse getReviewDetails(Long bookId, Long reviewId, Long memberId) {
         Review review = reviewRepository.findByBook_IdAndReviewId(bookId, reviewId).orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다. Review ID: " + reviewId));
@@ -173,7 +194,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public Map<Long, String> getBookTitleMapFromReviewIds(List<Long> reviewIds){
+    public Map<Long, String> getBookTitleMapFromReviewIds(Collection<Long> reviewIds){
         return reviewRepository.findBookTitleMapByReviewIds(reviewIds);
     }
 }
