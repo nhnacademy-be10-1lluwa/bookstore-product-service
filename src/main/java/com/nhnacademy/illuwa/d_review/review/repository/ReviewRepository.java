@@ -9,8 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewQuerydslRepository {
     Page<Review> findReviewsByBook_Id(Long bookId, Pageable pageable);
+    Page<Review> findReviewsByMemberId(Long memberId, Pageable pageable);
     Optional<Review> findByBook_IdAndReviewId(Long bookId, Long reviewId);
     Optional<Review> findByBook_IdAndMemberId(Long bookId, Long memberId);
 }
