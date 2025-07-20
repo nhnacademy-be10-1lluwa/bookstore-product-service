@@ -8,7 +8,7 @@ import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
 import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
 import java.util.List;
 
@@ -41,6 +41,20 @@ public interface BookResponseMapper {
     }
 
     List<BookDetailResponse> toBookDetailListResponse(List<Book> bookList);
+
+    @Mapping(source = "bookImages",target = "cover", qualifiedByName = "firstImageUrl")
+    @Mapping(source = "regularPrice",target = "priceStandard")
+    @Mapping(source = "salePrice",target = "priceSales")
+    BestSellerResponse toBestSellerResponse(Book book);
+
+    @Named("firstImageUrl")
+    default String getFirstImageUrl(List<BookImage> bookImages) {
+        if (bookImages != null && !bookImages.isEmpty() && bookImages.getFirst() != null) {
+            return bookImages.getFirst().getImageUrl();
+        }
+        return null;
+    }
+
 
     default Page<BestSellerResponse> toBestSellerPageResponse(Page<Book> bookPage) {
         List<BestSellerResponse> content = bookPage.getContent().stream()
