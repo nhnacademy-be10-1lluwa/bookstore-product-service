@@ -49,4 +49,7 @@ public class BookDocument {
 
     @Field(type = FieldType.Keyword)
     private List<String> categories;
+
+    @Field(type = FieldType.Keyword)
+    private List<String> tags;
 }
