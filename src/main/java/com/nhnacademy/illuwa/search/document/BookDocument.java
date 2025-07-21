@@ -1,10 +1,7 @@
 package com.nhnacademy.illuwa.search.document;
 
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -50,6 +47,7 @@ public class BookDocument {
     @Field(type = FieldType.Keyword)
     private List<String> categories;
 
+    @Setter
     @Field(type = FieldType.Keyword)
     private List<String> tags;
 }
