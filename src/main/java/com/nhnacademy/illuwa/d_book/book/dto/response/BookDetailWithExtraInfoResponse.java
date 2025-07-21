@@ -31,7 +31,7 @@ public class BookDetailWithExtraInfoResponse {
     private BigDecimal salePrice;
     private String imgUrl;
 
-    private boolean giftwrap;
+    private Boolean giftwrap;
     private Integer count;
     private Status status;
 
