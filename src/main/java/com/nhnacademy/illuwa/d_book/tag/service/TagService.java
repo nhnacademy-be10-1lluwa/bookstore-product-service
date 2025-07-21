@@ -9,6 +9,7 @@ import com.nhnacademy.illuwa.d_book.tag.entity.Tag;
 import com.nhnacademy.illuwa.d_book.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.tag.repository.BookTagRepository;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
+import com.nhnacademy.illuwa.search.service.BookSearchService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,31 +26,17 @@ public class TagService {
     private final TagRepository tagRepository;
     private final BookRepository bookRepository;
     private final BookTagRepository bookTagRepository;
+    private final BookSearchService bookSearchService;
 
-    public TagService(TagRepository tagRepository, BookRepository bookRepository, BookTagRepository bookTagRepository ){
+    public TagService(TagRepository tagRepository, BookRepository bookRepository, BookTagRepository bookTagRepository, BookSearchService bookSearchService){
         this.tagRepository = tagRepository;
         this.bookRepository = bookRepository;
         this.bookTagRepository = bookTagRepository;
-    }
-
-    @Transactional
-    public TagResponse registerTag(TagRegisterRequest tagRegisterRequest) {
-
-        String tagName = tagRegisterRequest.getName();
-
-        if(tagRepository.existsByName(tagName)){
-            throw new TagAlreadyExistsException("이미 존재하는 태그입니다.");
-        }
-
-        //request -> entity 변환 필요없음, 태그명만 있으면 entity 생성가능
-        Tag tag = new Tag(tagRegisterRequest.getName());
-
-        Tag registeredTag = tagRepository.save(tag);
-
-        return new TagResponse(registeredTag.getId(),registeredTag.getName());
+        this.bookSearchService = bookSearchService;
     }
 
 
+    // 태그 GET( 페이징 )
     @Transactional(readOnly = true)
     public Page<TagResponse> getAllTags(Pageable pageable) {
         return tagRepository.findAll(pageable)
@@ -59,6 +46,7 @@ public class TagService {
                         .build());
     }
 
+    // 태그 등록
     @Transactional
     public TagResponse registerTag(String name) {
         if (tagRepository.existsByName(name)) {
@@ -72,6 +60,7 @@ public class TagService {
                 .build();
     }
 
+    // 태그 삭제
     @Transactional
     public void deleteTag(Long tagId) {
         Tag tag = tagRepository.findById(tagId)
@@ -84,6 +73,7 @@ public class TagService {
         tagRepository.delete(tag);
     }
 
+    // 태그 GET
     @Transactional(readOnly = true)
     public List<TagResponse> getAllTags() {
         return tagRepository.findAll().stream()
@@ -91,6 +81,7 @@ public class TagService {
                 .toList();
     }
 
+    // 도서에 태그 추가
     @Transactional
     public void addTagToBook(Long bookId, Long tagId) {
         if (bookTagRepository.existsByBookIdAndTagId(bookId, tagId)) {
@@ -104,15 +95,28 @@ public class TagService {
 
         BookTag bookTag = new BookTag(book, tag);
         bookTagRepository.save(bookTag);
+
+        bookSearchService.addTagToBookDocument(bookId, tag.getName());
     }
 
 
+    // 도서에서 태그 삭제
     @Transactional
     public void removeTagFromBook(Long bookId, Long tagId) {
+
+        Tag tagToRemove = tagRepository.findById(tagId)
+                .orElse(null);
+
         bookTagRepository.deleteByBookIdAndTagId(bookId, tagId);
+
+        if (tagToRemove != null) {
+            bookSearchService.removeTagFromBookDocument(bookId, tagToRemove.getName());
+        }
+
     }
 
 
+    // 도서 id로 등록된 태그 검색
     @Transactional(readOnly = true)
     public List<TagResponse> getTagsByBookId(Long bookId) {
 
@@ -124,8 +128,5 @@ public class TagService {
                 .map(tag -> new TagResponse(tag.getId(), tag.getName()))
                 .collect(Collectors.toList());
     }
-
-
-
 
 }

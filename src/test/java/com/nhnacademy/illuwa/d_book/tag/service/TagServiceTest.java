@@ -44,19 +44,18 @@ class TagServiceTest {
         tag = new Tag("태그 이름");
     }
 
-    @Test
-    void registerTag() {
-        TagRegisterRequest trr = new TagRegisterRequest("태그 이름");
-        String tagName = "태그 이름";
-        TagResponse tagResponse = new TagResponse(1L,"tagName");
-        given(tagRepository.existsByName(anyString())).willReturn(false);
-        given(tagRepository.save(any())).willReturn(tag);
-
-        TagResponse tagResponse1 = tagService.registerTag(trr);
-
-        Assertions.assertEquals("태그 이름", tagResponse1.getName());
-
-    }
+//    @Test
+//    void registerTag() {
+//        TagRegisterRequest trr = new TagRegisterRequest("태그 이름");
+//        String tagName = "태그 이름";
+//        TagResponse tagResponse = new TagResponse(1L,"tagName");
+//        given(tagRepository.existsByName(anyString())).willReturn(false);
+//        given(tagRepository.save(any())).willReturn(tag);
+//
+//        TagResponse tagResponse1 = tagService.registerTag(trr);
+//
+//        Assertions.assertEquals("태그 이름", tagResponse1.getName());
+//    }
 
     @Test
     @DisplayName("태그 삭제 - 성공")
