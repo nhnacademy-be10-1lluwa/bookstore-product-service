@@ -15,10 +15,17 @@ import org.springframework.web.bind.annotation.*;
 public class BookLikeController {
     private final BookLikeService bookLikeService;
 
-    @GetMapping("/check")
+    @GetMapping
     public ResponseEntity<Boolean> isLikedByMe(@RequestParam("book-id") long bookId,
                                                @RequestHeader("X-USER-ID") Long memberId){
         return ResponseEntity.ok(bookLikeService.isLikedByMe(bookId, memberId));
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> toggleBookLikes(@RequestParam("book-id") long bookId,
+                                                @RequestHeader("X-USER-ID") Long memberId) {
+        bookLikeService.toggleBookLikes(bookId, memberId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/list")
@@ -29,10 +36,5 @@ public class BookLikeController {
         return ResponseEntity.ok(bookLikeService.getLikedBooksByMember(memberId, pageable));
     }
 
-    @PostMapping
-    public ResponseEntity<Void> toggleBookLikes(@RequestParam("book-id") long bookId,
-                                                            @RequestHeader("X-USER-ID") Long memberId) {
-        bookLikeService.toggleBookLikes(bookId, memberId);
-        return ResponseEntity.ok().build();
-    }
+
 }
