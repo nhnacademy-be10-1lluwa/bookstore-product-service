@@ -93,17 +93,26 @@ public class TagService {
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 아이디의 태그를 찾을 수 없습니다. " + tagId));
 
-        tagRepository
-
         BookTag bookTag = new BookTag(book, tag);
         bookTagRepository.save(bookTag);
+
+        bookSearchService.addTagToBookDocument(bookId, tag.getName());
     }
 
 
     // 도서에서 태그 삭제
     @Transactional
     public void removeTagFromBook(Long bookId, Long tagId) {
+
+        Tag tagToRemove = tagRepository.findById(tagId)
+                .orElse(null);
+
         bookTagRepository.deleteByBookIdAndTagId(bookId, tagId);
+
+        if (tagToRemove != null) {
+            bookSearchService.removeTagFromBookDocument(bookId, tagToRemove.getName());
+        }
+
     }
 
 
@@ -119,8 +128,5 @@ public class TagService {
                 .map(tag -> new TagResponse(tag.getId(), tag.getName()))
                 .collect(Collectors.toList());
     }
-
-
-
 
 }
