@@ -41,7 +41,7 @@ public class BookSearchService {
                 .withQuery(q -> q
                         .multiMatch(m -> m
                                 .query(keyword)
-                                .fields("title", "title.jaso", "title.icu", "description", "author")
+                                .fields("title", "title.jaso", "title.icu", "description", "author", "tags")
                         )
                 )
                 .withPageable(pageable)
@@ -79,33 +79,8 @@ public class BookSearchService {
 
 
     public void syncBookToElasticsearch(Book book) {
-        if (book.getBookCategories() == null || book.getBookCategories().isEmpty()) {
-            throw new IllegalStateException("도서에 카테고리가 없습니다.");
-        }
 
-        List<String> categoryHierarchy = book.getBookCategories().stream()
-                .flatMap(bc -> buildCategoryHierarchy(bc.getCategory()).stream())
-                .distinct()
-                .toList();
-
-
-        BookDocument bookDocument = BookDocument.builder()
-                .id(book.getId())
-                .title(book.getTitle())
-                .description(book.getDescription())
-                .author(book.getAuthor())
-                .publisher(book.getPublisher())
-                .isbn(book.getIsbn())
-                .salePrice(book.getSalePrice())
-                .publishedDate(book.getPublishedDate())
-                .thumbnailUrl(
-                        book.getBookImages() != null && !book.getBookImages().isEmpty()
-                                ? book.getBookImages().get(0).getImageUrl()
-                                : null
-                )
-                .categories(categoryHierarchy)
-                .build();
-
+        BookDocument bookDocument = convertToDocument(book);
         bookSearchRepository.save(bookDocument);
         log.info("Elasticsearch에 동기화 완료: id={}", book.getId());
     }
@@ -126,33 +101,10 @@ public class BookSearchService {
 
 
         List<BookDocument> documents = books.stream()
-                .map(book -> {
-                    List<String> categoryHierarchy = new ArrayList<>();
-                    if (book.getBookCategories() != null && !book.getBookCategories().isEmpty()) {
-                        categoryHierarchy = book.getBookCategories().stream()
-                                .flatMap(bc -> buildCategoryHierarchy(bc.getCategory()).stream())
-                                .distinct()
-                                .toList();
-                    }
-
-                    return BookDocument.builder()
-                            .id(book.getId())
-                            .title(book.getTitle())
-                            .description(book.getDescription())
-                            .author(book.getAuthor())
-                            .publisher(book.getPublisher())
-                            .isbn(book.getIsbn())
-                            .salePrice(book.getSalePrice())
-                            .publishedDate(book.getPublishedDate())
-                            .thumbnailUrl(book.getBookImages() != null && !book.getBookImages().isEmpty()
-                                    ? book.getBookImages().get(0).getImageUrl()
-                                    : null)
-                            .categories(categoryHierarchy)
-                            .build();
-                })
+                .map(this::convertToDocument)
                 .toList();
-
         bookSearchRepository.saveAll(documents);
+
     }
 
     public static  List<String> buildCategoryHierarchy(Category category) {
@@ -162,6 +114,72 @@ public class BookSearchService {
             category = category.getParentCategory();
         }
         return hierarchy;
+    }
+
+    public void addTagToBookDocument(Long bookId, String tagName){
+        bookSearchRepository.findById(bookId).ifPresent(bookDocument -> {
+            List<String> tags = bookDocument.getTags();
+            if(tags == null) {
+                tags = new ArrayList<>();
+            }
+            if(!tags.contains(tagName)){
+                tags.add(tagName);
+                bookDocument.setTags(tags);
+                bookSearchRepository.save(bookDocument);
+            }
+        });
+    }
+
+    public void removeTagFromBookDocument(Long bookId, String tagName) {
+        bookSearchRepository.findById(bookId).ifPresent(bookDocument -> {
+            List<String> tags = bookDocument.getTags();
+            if (tags != null && tags.contains(tagName)) {
+                tags.remove(tagName);
+                bookDocument.setTags(tags);
+                bookSearchRepository.save(bookDocument);
+            }
+        });
+    }
+
+    private BookDocument convertToDocument(Book book) {
+        if (book.getBookCategories() == null || book.getBookCategories().isEmpty()) {
+            // 전체 동기화 시에는 예외를 던지는 대신 로그를 남기고 건너뛰는 것이 더 안정적일 수 있습니다.
+            log.warn("도서에 카테고리가 없습니다. id={}", book.getId());
+        }
+
+        List<String> categoryHierarchy = new ArrayList<>();
+        if (book.getBookCategories() != null) {
+            categoryHierarchy = book.getBookCategories().stream()
+                    .flatMap(bc -> buildCategoryHierarchy(bc.getCategory()).stream())
+                    .distinct()
+                    .toList();
+        }
+
+        List<String> tags = new ArrayList<>();
+        if (book.getBookTags() != null) {
+            tags = book.getBookTags().stream()
+                    .map(bt -> bt.getTag().getName())
+                    .distinct()
+                    .toList();
+        }
+
+        return BookDocument.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .description(book.getDescription())
+                .author(book.getAuthor())
+                .publisher(book.getPublisher())
+                .isbn(book.getIsbn())
+                .salePrice(book.getSalePrice())
+                .publishedDate(book.getPublishedDate())
+                .thumbnailUrl(
+                        book.getBookImages() != null && !book.getBookImages().isEmpty()
+                                ? book.getBookImages().get(0).getImageUrl()
+                                : null
+                )
+                .categories(categoryHierarchy)
+                .tags(tags)
+                .build();
     }
 
 }

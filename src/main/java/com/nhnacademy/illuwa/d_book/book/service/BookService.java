@@ -95,6 +95,13 @@ public class BookService {
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
+    @Transactional(readOnly = true)
+    public Page<BookDetailResponse> getAllBooksWithDetails(Pageable pageable) {
+        Page<Book> bookPage = bookRepository.findAll(pageable);
+        return bookPage.map(bookResponseMapper::toBookDetailResponse);
+    }
+
+
 
     // ISBN으로 도서 상세 조회
     @Transactional(readOnly = true)
@@ -165,7 +172,7 @@ public class BookService {
                 .regularPrice(book.getRegularPrice())
                 .salePrice(book.getSalePrice())
                 .imgUrl(book.getBookImages().isEmpty() ? null : book.getBookImages().get(0).getImageUrl())
-                .giftwrap(book.getBookExtraInfo().isGiftwrap())
+                .giftwrap(book.getBookExtraInfo().getGiftWrap()) 
                 .count(book.getBookExtraInfo().getCount())
                 .status(book.getBookExtraInfo().getStatus())
                 .categoryId(categoryId)
@@ -277,9 +284,11 @@ public class BookService {
 
         bookEntity.setBookImages(new ArrayList<>());
 
-        //카테고리
+        // 카테고리
         Category categoryEntity = categoryRepository.findById(bookRegisterRequest.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
+
+        // 태그는 도서 등록 후에 관리자 페이지에서 등록
 
         if (bookEntity == null) {
             throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
@@ -377,7 +386,7 @@ public class BookService {
             book.getBookExtraInfo().setCount(requestDto.getCount());
         }
         if (requestDto.getGiftwrap() != null) {
-            book.getBookExtraInfo().setGiftwrap(requestDto.getGiftwrap());
+            book.getBookExtraInfo().setGiftWrap(requestDto.getGiftwrap());
         }
         if (requestDto.getStatus() != null) {
             book.getBookExtraInfo().setStatus(Status.valueOf(requestDto.getStatus()));

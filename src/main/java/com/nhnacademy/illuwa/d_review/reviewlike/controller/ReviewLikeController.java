@@ -21,13 +21,13 @@ public class ReviewLikeController {
         return ResponseEntity.ok(reviewLikeService.toggleLike(reviewId, memberId));
     }
 
-    @GetMapping("/api/reviews/likes")
-    public ResponseEntity<Map<Long, Long>> getLikeCountsFromReviews(List<Long> reviewIds) {
+    @GetMapping("/api/public/reviews/likes")
+    public ResponseEntity<Map<Long, Long>> getLikeCountsFromReviews(@RequestParam List<Long> reviewIds) {
         return ResponseEntity.ok(reviewLikeService.getLikeCountsFromReviews(reviewIds));
     }
 
     @GetMapping("/api/reviews/likes/status")
-    public ResponseEntity<List<Long>> getMyLikedReviews(List<Long> reviewIds, @RequestHeader("X-USER-ID") Long memberId) {
+    public ResponseEntity<List<Long>> getMyLikedReviews(@RequestParam List<Long> reviewIds, @RequestHeader("X-USER-ID") Long memberId) {
         return ResponseEntity.ok(reviewLikeService.getMyLikedReviews(reviewIds, memberId));
     }
 }

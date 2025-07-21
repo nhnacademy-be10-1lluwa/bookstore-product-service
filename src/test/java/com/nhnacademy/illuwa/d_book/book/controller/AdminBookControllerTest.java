@@ -14,6 +14,7 @@ import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.d_book.book.service.BookImageService;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import com.nhnacademy.illuwa.d_book.category.service.BookCategoryService;
+import com.nhnacademy.illuwa.d_book.tag.service.TagService;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
@@ -58,6 +59,8 @@ class AdminBookControllerTest {
     BookCategoryService bookCategoryService;
     @MockBean
     BookImageService bookImageService;
+    @MockBean
+    TagService tagService;
 
 
     @Autowired

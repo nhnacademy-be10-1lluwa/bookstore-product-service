@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,31 +19,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin")
 public class AdminTagController {
 
-    TagService tagService;
+    private final TagService tagService;
 
-    TagRepository tagRepository;
 
-    AdminTagController(TagService tagService, TagRepository tagRepository){
+    AdminTagController(TagService tagService){
         this.tagService = tagService;
-        this.tagRepository = tagRepository;
     }
 
 
     @GetMapping("/tags")
     public ResponseEntity<PageResponse<TagResponse>> getTags(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id,asc") String sort
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
     ) {
-        String[] sortParams = sort.split(",");
-        String property = sortParams[0];
-        Sort.Direction direction = Sort.Direction.ASC;
-
-        if (sortParams.length > 1 && sortParams[1].equalsIgnoreCase("desc")) {
-            direction = Sort.Direction.DESC;
-        }
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
 
         Page<TagResponse> result = tagService.getAllTags(pageable);
 

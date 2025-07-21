@@ -8,8 +8,6 @@ import com.nhnacademy.illuwa.d_book.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiException;
 import com.nhnacademy.illuwa.d_book.book.exception.BookApiParsingException;
 import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
-import com.nhnacademy.illuwa.d_review.comment.exception.CommentNotFoundException;
-import com.nhnacademy.illuwa.d_review.comment.exception.InvalidCommentStatusException;
 import com.nhnacademy.illuwa.d_review.review.exception.CannotWriteReviewException;
 import com.nhnacademy.illuwa.d_review.review.exception.MemberIdDoesNotMatchWithReviewException;
 import com.nhnacademy.illuwa.d_review.review.exception.ReviewNotFoundException;
@@ -172,40 +170,6 @@ public class GlobalExceptionHandler {
                 status.value(),
                 status.getReasonPhrase()
                 ,"MEMBERID_DOES_NOT_MATCH",
-                e.getMessage(),
-                request.getRequestURI()
-        );
-
-        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
-
-        return new ResponseEntity<>(response, status);
-    }
-
-    @ExceptionHandler(CommentNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleCommentNotFoundException(CommentNotFoundException e, HttpServletRequest request) {
-        HttpStatus status = HttpStatus.NOT_FOUND;
-
-        ErrorResponse response = ErrorResponse.of(
-                status.value(),
-                status.getReasonPhrase()
-                ,"COMMENT_NOT_FOUND",
-                e.getMessage(),
-                request.getRequestURI()
-        );
-
-        log.error("에러코드: {}, 메시지: {}", status.value(), e.getMessage(), e);
-
-        return new ResponseEntity<>(response, status);
-    }
-
-    @ExceptionHandler(InvalidCommentStatusException.class)
-    public ResponseEntity<ErrorResponse> handleCommentStatusInvalidException(InvalidCommentStatusException e, HttpServletRequest request) {
-        HttpStatus status = HttpStatus.CONFLICT;
-
-        ErrorResponse response = ErrorResponse.of(
-                status.value(),
-                status.getReasonPhrase(),
-                "INVALID_COMMENT_STATUS",
                 e.getMessage(),
                 request.getRequestURI()
         );

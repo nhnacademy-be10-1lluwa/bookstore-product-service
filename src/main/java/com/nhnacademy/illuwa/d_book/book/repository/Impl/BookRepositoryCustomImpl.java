@@ -1,9 +1,10 @@
-package com.nhnacademy.illuwa.d_book.book.repository;
+package com.nhnacademy.illuwa.d_book.book.repository.Impl;
 
 import com.nhnacademy.illuwa.cart.entity.QBookCart;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.entity.QBook;
 import com.nhnacademy.illuwa.d_book.book.entity.QBookImage;
+import com.nhnacademy.illuwa.d_book.book.repository.BookRepositoryCustom;
 import com.nhnacademy.illuwa.d_book.category.entity.QBookCategory;
 import com.nhnacademy.illuwa.d_book.tag.entity.QBookTag;
 import com.nhnacademy.illuwa.d_book.tag.entity.QTag;

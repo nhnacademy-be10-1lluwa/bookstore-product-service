@@ -13,9 +13,4 @@ import java.util.Optional;
 public interface BookCartRepository extends JpaRepository<BookCart, Long> {
     Optional<BookCart> findByCartAndBook(Cart cart, Book book);
     List<BookCart> findAllByCart_MemberId(Long memberId);
-
-
-    @Modifying
-    @Transactional
-    void deleteAllByBook_Id(Long bookId);
 }
