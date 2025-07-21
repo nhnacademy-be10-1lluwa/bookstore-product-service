@@ -11,6 +11,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -93,7 +94,9 @@ public class BookDetailWithExtraInfoResponse {
                 .regularPrice(book.getRegularPrice())
                 .salePrice(book.getSalePrice())
                 .imgUrl(book.getBookImages().isEmpty() ? null : book.getBookImages().get(0).getImageUrl())
-                .giftwrap(book.getBookExtraInfo().getGiftWrap())
+                .giftwrap(Optional.ofNullable(book.getBookExtraInfo())
+                        .map(info -> info.getGiftWrap() != null ? info.getGiftWrap() : false)
+                        .orElse(false))
                 .count(book.getBookExtraInfo().getCount())
                 .tags(tagResponses)
                 .status(book.getBookExtraInfo().getStatus())
