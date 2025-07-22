@@ -64,7 +64,7 @@ public class AdminBookController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/update")
+    @PatchMapping("/{id}")
     public ResponseEntity<Void> updateBook(
             @PathVariable Long id,
             @RequestBody BookUpdateRequest requestDto
