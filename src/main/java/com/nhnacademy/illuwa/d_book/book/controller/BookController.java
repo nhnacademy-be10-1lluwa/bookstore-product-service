@@ -2,7 +2,6 @@ package com.nhnacademy.illuwa.d_book.book.controller;
 
 import com.nhnacademy.illuwa.d_book.book.dto.response.BestSellerResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
-import com.nhnacademy.illuwa.d_book.book.dto.response.BookExternalResponse;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,15 +68,15 @@ public class BookController {
 
 
 
-
-    @GetMapping("/external/isbn/{isbn}")
-    public ResponseEntity<BookExternalResponse> getBookByIsbnFromExternalApi(@PathVariable String isbn){
-        BookExternalResponse bookDetail = aladinBookApiService.findBookByIsbn(isbn);
-
-        if (bookDetail == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(bookDetail);
-    }
+//      <ExternalBookController로 이동>
+//    @GetMapping("/external/isbn/{isbn}")
+//    public ResponseEntity<BookExternalResponse> getBookByIsbnFromExternalApi(@PathVariable String isbn){
+//        BookExternalResponse bookDetail = aladinBookApiService.findBookByIsbn(isbn);
+//
+//        if (bookDetail == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        return ResponseEntity.ok(bookDetail);
+//    }
 
 }
