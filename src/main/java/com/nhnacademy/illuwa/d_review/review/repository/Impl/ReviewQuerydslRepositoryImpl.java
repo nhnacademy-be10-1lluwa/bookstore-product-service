@@ -33,7 +33,10 @@ public class ReviewQuerydslRepositoryImpl implements ReviewQuerydslRepository {
                 .stream()
                 .collect(Collectors.toMap(
                         tuple -> tuple.get(review.reviewId),
-                        tuple -> Optional.ofNullable(tuple.get(book.title)).orElse("제목 삭제됨")
+                        tuple -> {
+                            String title = tuple.get(book.title);
+                            return Objects.requireNonNull(title).isBlank() ? "제목 없음" : title;
+                        }
                 ));
     }
 }
