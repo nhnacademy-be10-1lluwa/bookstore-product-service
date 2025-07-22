@@ -342,13 +342,6 @@ public class BookService {
         log.info("삭제된 도서 제목 : {}" , targetBook.getTitle());
     }
 
-    // 도서 + 연관 엔티티 삭제
-    @Transactional
-    public void deleteBookAndRelatedEntities(Long bookId) {
-        bookRepository.deleteBookAndRelatedEntities(bookId);
-    }
-
-
 
     // 도서 수정
     @Transactional

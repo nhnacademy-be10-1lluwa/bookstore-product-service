@@ -10,7 +10,5 @@ public interface BookRepositoryCustom {
 
     Page<Book> findBooksByCriteria(Long categoryId, String tagName, Pageable pageable);
 
-    void deleteBookAndRelatedEntities(Long bookId);
-
     List<Book> findBooksByCategories(List<Long> categoryIds);
 }
