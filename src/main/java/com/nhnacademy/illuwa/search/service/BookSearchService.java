@@ -1,57 +1,90 @@
 package com.nhnacademy.illuwa.search.service;
 
 
+import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScore;
+import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScoreMode;
 import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.search.document.BookDocument;
 import com.nhnacademy.illuwa.search.repository.BookSearchRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import co.elastic.clients.elasticsearch._types.query_dsl.FunctionBoostMode;
+
 
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class BookSearchService {
 
     private final BookSearchRepository bookSearchRepository;
     private final ElasticsearchOperations elasticsearchOperations;
     private final BookRepository bookRepository;
 
-    public BookSearchService(BookSearchRepository bookSearchRepository, ElasticsearchOperations elasticsearchOperations, BookRepository bookRepository) {
-        this.bookSearchRepository = bookSearchRepository;
-        this.elasticsearchOperations = elasticsearchOperations;
-        this.bookRepository = bookRepository;
-    }
-
 
     public Page<BookDocument> searchByKeyword(String keyword, Pageable pageable) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "_score");
+
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
-                        .multiMatch(m -> m
-                                .query(keyword)
-                                .fields("title", "title.jaso", "title.icu", "description", "author", "tags")
+                        // function_score 쿼리로 전체를 감쌉니다.
+                        .functionScore(fs -> fs
+                                // 1. 기본 쿼리: 먼저 키워드와 일치하는 모든 문서를 찾습니다.
+                                .query(baseQuery -> baseQuery
+                                        .multiMatch(m -> m
+                                                .query(keyword)
+                                                .fields("title", "title.jaso", "title.icu", "description", "author", "tags")
+                                        )
+                                )
+                                .functions(
+                                        new FunctionScore.Builder()
+                                                .filter(f -> f.match(m -> m.field("title").query(keyword)))
+                                                .weight(3.0)
+                                                .build(),
+
+                                        new FunctionScore.Builder()
+                                                .filter(f -> f.match(m -> m.field("author").query(keyword)))
+                                                .weight(2.0)
+                                                .build(),
+
+                                        new FunctionScore.Builder()
+                                                .filter(f -> f.match(m -> m.field("tags").query(keyword)))
+                                                .weight(1.5)
+                                                .build()
+                                )
+                                .scoreMode(FunctionScoreMode.Multiply)
+                                .boostMode(FunctionBoostMode.Sum)
                         )
                 )
                 .withPageable(pageable)
+                .withSort(sort)
                 .build();
 
         SearchHits<BookDocument> searchHits = elasticsearchOperations.search(query, BookDocument.class);
 
+        searchHits.forEach(hit -> {
+            log.info("도서 제목: {}, score: {}", hit.getContent().getTitle(), hit.getScore());
+        });
+
         List<BookDocument> content = searchHits.getSearchHits().stream()
                 .map(SearchHit::getContent)
-                .toList();
+                .collect(Collectors.toList());
 
         return new PageImpl<>(content, pageable, searchHits.getTotalHits());
     }

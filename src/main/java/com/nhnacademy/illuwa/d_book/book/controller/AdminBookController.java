@@ -59,7 +59,7 @@ public class AdminBookController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id){
-        bookService.deleteBookAndRelatedEntities(id);
+        bookService.deleteBook(id);
 
         return ResponseEntity.noContent().build();
     }
