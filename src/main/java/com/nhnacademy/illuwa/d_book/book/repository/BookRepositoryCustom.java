@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface BookRepositoryCustom {
 
-    Page<Book> findBooksByCriteria(Long categoryId, String tagName, Pageable pageable);
+//    Page<Book> findBooksByCriteria(Long categoryId, String tagName, Pageable pageable);
 
     List<Book> findBooksByCategories(List<Long> categoryIds);
 }
