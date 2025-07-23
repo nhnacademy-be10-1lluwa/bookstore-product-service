@@ -53,8 +53,8 @@ public class FileUploadController {
     }
 
     // 파일 직접 다운로드 또는 표시
-    @GetMapping("/show")
-    public ResponseEntity<byte[]> getImage(@RequestParam String img){
+    @GetMapping("/{img}")
+    public ResponseEntity<byte[]> getImage(@PathVariable(name = "img") String img){
         try (InputStream stream = minioClient.getObject(
                 GetObjectArgs.builder()
                         .bucket(bucket)
