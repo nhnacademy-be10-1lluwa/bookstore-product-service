@@ -40,7 +40,8 @@ public class AdminBookController {
         return ResponseEntity.ok(bookExternalResponses);
     }
 
-    @PostMapping(value = "/register/manual", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // "/manual 제거 O"
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> registerBookDirectly(
             @ModelAttribute BookRegisterRequest request) {
 
@@ -49,8 +50,8 @@ public class AdminBookController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // 외부 API 사용 (front)
-    @PostMapping("/register/aladin")
+    // "/aladin -> /external 수정 O"
+    @PostMapping("/external")
     public ResponseEntity<BookDetailResponse> registerBook(@RequestBody @Valid BookApiRegisterRequest bookApiRegisterRequest){
         // apiDTO -> bookRegisterDTO
         BookDetailResponse detailResponse = bookService.registerBookByApi(bookApiRegisterRequest);
@@ -64,7 +65,7 @@ public class AdminBookController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/update")
+    @PatchMapping("/{id}")
     public ResponseEntity<Void> updateBook(
             @PathVariable Long id,
             @RequestBody BookUpdateRequest requestDto
@@ -73,21 +74,17 @@ public class AdminBookController {
         return ResponseEntity.noContent().build();
     }
 
-    //모든 부가정보(+ 카테고리, 태그)
+    //모든 부가정보(+카테고리, 태그)
     @GetMapping("/{id}/detail")
     public ResponseEntity<BookDetailWithExtraInfoResponse> getBookDetailWithExtra(@PathVariable Long id) {
         BookDetailWithExtraInfoResponse response = bookService.getBookDetailWithExtraInfo(id);
         return ResponseEntity.ok(response);
     }
 
-    //부가 정보 포함
-    @GetMapping("/{id}/details")
-    public ResponseEntity<BookDetailResponse> getBookDetail(@PathVariable Long id) {
-        BookDetailResponse response = bookService.searchBookById(id);
-        return ResponseEntity.ok(response);
-    }
 
-    @GetMapping("/extra_info")
+
+    // extra_info -> details 수정
+    @GetMapping("/details")
     public ResponseEntity<Page<BookDetailWithExtraInfoResponse>> getBooksWithExtraInfo(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -109,6 +106,7 @@ public class AdminBookController {
 
 
 
+    // "bookCount -> count 1개로 통합예정"
     @PutMapping("/update/bookCount")
     public ResponseEntity<Void> deductBooksCount(
             @RequestBody List<BookCountUpdateRequest> requests
@@ -116,6 +114,7 @@ public class AdminBookController {
         bookService.updateBooksCount(requests);
         return ResponseEntity.noContent().build();
     }
+
 
     @PutMapping("/restore/bookCount")
     public ResponseEntity<Void> restoreBooksCount(
@@ -143,6 +142,15 @@ public class AdminBookController {
         return ResponseEntity.ok(tags);
     }
 
+
+
+
+//    부가 정보 포함 (임시 주석 처리
+//    @GetMapping("/{id}/details")
+//    public ResponseEntity<BookDetailResponse> getBookDetail(@PathVariable Long id) {
+//        BookDetailResponse response = bookService.searchBookById(id);
+//        return ResponseEntity.ok(response);
+//    }
 
 
 }

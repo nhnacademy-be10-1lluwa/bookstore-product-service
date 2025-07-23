@@ -140,7 +140,7 @@ class AdminBookControllerTest {
                         .file(imageFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .characterEncoding("UTF-8"))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isConflict())
                 .andDo(print());
     }
 
@@ -159,6 +159,15 @@ class AdminBookControllerTest {
 
         verify(bookService).deleteBook(id);
     }
+
+//    @PatchMapping("/{id}")
+//    public ResponseEntity<Void> updateBook(
+//            @PathVariable Long id,
+//            @RequestBody BookUpdateRequest requestDto
+//    ) {
+//        bookService.updateBook(id, requestDto);
+//        return ResponseEntity.noContent().build();
+//    }
 
     @Test
     void updateBook() throws Exception {
@@ -186,7 +195,7 @@ class AdminBookControllerTest {
         );
 
         // when & then
-        mockMvc.perform(post("/api/admin/books/{id}/update", id)
+        mockMvc.perform(patch("/api/admin/books/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(bookUpdateRequest)))
                 .andExpect(status().isNoContent());

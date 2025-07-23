@@ -104,11 +104,13 @@ public class MinioStorageService {
         }
     }
 
-    public void deleteFile(String objectName) throws Exception {
+    public void deleteFile(String objectName, long memberId) throws Exception {
+        String pathPrefix = String.format("Review/%s/", memberId);
+
         minioClient.removeObject(
                 RemoveObjectArgs.builder()
                         .bucket(bucket)
-                        .object(objectName)
+                        .object(pathPrefix+objectName)
                         .build()
         );
     }

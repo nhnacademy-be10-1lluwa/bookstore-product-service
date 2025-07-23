@@ -29,9 +29,10 @@ public class BookLikeController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Page<SimpleBookResponse>> getLikedBooksByMember(
-            @RequestParam("page") int page, @RequestParam("size") int size,
-            @RequestHeader("X-USER-ID") Long memberId) {
+    public ResponseEntity<Page<SimpleBookResponse>> getLikedBooksByMember(@RequestParam("page") int page,
+                                                                          @RequestParam("size") int size,
+                                                                          @RequestHeader("X-USER-ID") Long memberId) {
+
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(bookLikeService.getLikedBooksByMember(memberId, pageable));
     }

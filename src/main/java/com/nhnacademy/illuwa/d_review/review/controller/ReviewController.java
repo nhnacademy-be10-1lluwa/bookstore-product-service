@@ -44,8 +44,9 @@ public class ReviewController {
     @GetMapping(value = "/api/reviews")
     public ResponseEntity<Page<ReviewResponse>> getMemberReviewPages(@RequestHeader("X-USER-ID") long memberId,
                                                                      @RequestParam("page") int page, @RequestParam("size") int size){
-    Pageable pageable = PageRequest.of(page, size, Sort.by("reviewDate").descending());
-    Page<ReviewResponse> responsePage = reviewService.getMemberReviewPages(memberId, pageable);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("reviewDate").descending());
+        Page<ReviewResponse> responsePage = reviewService.getMemberReviewPages(memberId, pageable);
         return ResponseEntity.ok(responsePage);
     }
 
@@ -77,7 +78,8 @@ public class ReviewController {
     }
 
     @GetMapping("/api/reviews/book-title")
-    public ResponseEntity<Map<Long, String>> getBookTitleMapFromReviewIds(@RequestParam("reviewIds") Collection<Long> reviewIds) {
+    public ResponseEntity<Map<Long, String>> getBookTitleMapFromReviewIds(@RequestParam("review-ids") Collection<Long> reviewIds) {
+
         return ResponseEntity.ok(reviewService.getBookTitleMapFromReviewIds(reviewIds));
     }
 }
