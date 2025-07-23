@@ -57,23 +57,6 @@ public class CategoryService {
         return new CategoryResponse(category);
     }
 
-
-    public CategoryResponse registerCategory(CategoryCreateRequest categoryCreateRequest){
-        Optional<Category> categoryById = categoryRepository.findById(categoryCreateRequest.getParentId());
-
-        if(categoryById.isEmpty()){
-            throw new CategoryNotAllowedException("허용되지 않는 카테고리 입니다.");
-        }
-
-        Category parentCategory = categoryById.get();
-
-        Category newCategory = new Category(categoryCreateRequest.getCategoryName());
-
-        parentCategory.addChildCategory(newCategory);
-
-        return new CategoryResponse(newCategory);
-    }
-
     @Transactional
     public void createCategory(CategoryCreateRequest request) {
         Category newCategory = new Category(request.getCategoryName());
