@@ -31,6 +31,12 @@ public class CategoryController {
     }
 
 
+    @GetMapping("/tree")
+    public List<CategoryResponse> getCategoryTree() {
+        List<CategoryResponse> categoryTree = categoryService.getCategoryTree();
+        return categoryTree;
+    }
+
     @GetMapping
     public ResponseEntity<List<CategoryResponse>> getAllCategories(
             Pageable pageable
