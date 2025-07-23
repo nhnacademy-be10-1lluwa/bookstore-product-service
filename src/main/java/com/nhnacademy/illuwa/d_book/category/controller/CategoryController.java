@@ -31,10 +31,22 @@ public class CategoryController {
     }
 
 
+//    @GetMapping("/tree")
+//    public List<CategoryResponse> getCategoryTree() {
+//        List<CategoryResponse> categoryTree = categoryService.getCategoryTree();
+//        return categoryTree;
+//    }
+
     @GetMapping
     public ResponseEntity<List<CategoryResponse>> getAllCategories(
+            @RequestParam(required = false) String view,
             Pageable pageable
     ) {
+
+        if ("tree".equalsIgnoreCase(view)) {
+            return ResponseEntity.ok(categoryService.getCategoryTree());
+        }
+
         // 페이징 요청 처리
         if (pageable != null && pageable.isPaged()) {
             Page<CategoryResponse> paged = categoryService.getAllCategoriesByPaging(pageable);
