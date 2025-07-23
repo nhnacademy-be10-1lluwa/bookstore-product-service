@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
+@Slf4j
 public class BookController {
 
     private final BookService bookService;
@@ -39,12 +41,14 @@ public class BookController {
 
 
     @Operation(summary = "도서 목록 조회 및 검색 (통합)")
-    @GetMapping("/bestseller")
+    @GetMapping()
     public ResponseEntity<?> getBooks(
             @RequestParam(required = false) String type,
             Pageable pageable) {
 
-        if ("bestseller".equalsIgnoreCase(type)) {
+        log.info("요청 type = {}", type);
+
+        if ("bestseller".equalsIgnoreCase(type == null ? "" : type.trim())) {
             List<BestSellerResponse> bestSellerList = aladinBookApiService.getBestSeller();
             return ResponseEntity.ok(bestSellerList);
         }
