@@ -39,7 +39,7 @@ public class BookController {
 
 
     @Operation(summary = "도서 목록 조회 및 검색 (통합)")
-    @GetMapping
+    @GetMapping("/bestseller")
     public ResponseEntity<?> getBooks(
             @RequestParam(required = false) String type,
             Pageable pageable) {
