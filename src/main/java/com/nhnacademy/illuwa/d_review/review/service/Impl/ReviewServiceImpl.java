@@ -168,7 +168,7 @@ public class ReviewServiceImpl implements ReviewService {
                 reviewImageRepository.delete(image);
                 String path = URI.create(image.getImageUrl()).getPath();
                 String storageName = path.substring(path.lastIndexOf('/') + 1);
-                minioStorageService.deleteFile(storageName);
+                minioStorageService.deleteFile(storageName, memberId);
             }
         }
 
