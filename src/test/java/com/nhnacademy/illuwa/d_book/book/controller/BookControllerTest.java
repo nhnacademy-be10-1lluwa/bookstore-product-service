@@ -1,6 +1,7 @@
 package com.nhnacademy.illuwa.d_book.book.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.illuwa.d_book.book.dto.response.BestSellerResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
@@ -9,14 +10,22 @@ import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
 import com.nhnacademy.illuwa.infra.apiclient.AladinBookApiService;
 import com.nhnacademy.illuwa.d_book.book.service.BookService;
 import com.nhnacademy.illuwa.search.service.BookSearchService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -106,19 +115,37 @@ public class BookControllerTest {
 
     @Test
     void getRegisteredBooks() throws Exception {
+
         // given
-        List<BookDetailResponse> mockBooks = List.of(
-                new BookDetailResponse()
-        );
-        given(bookService.getAllBooks()).willReturn(mockBooks);
+        Pageable pageable = PageRequest.of(0, 10); // 테스트용 페이징
+        Page<BookDetailResponse> mockPage = new PageImpl<>(List.of(new BookDetailResponse()));
+
+
+        given(bookService.getAllBooksByPaging(any(Pageable.class))).willReturn(mockPage);
 
         // when & then
         mockMvc.perform(get("/api/books"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(mockBooks.size())); // JSON 배열 길이 검증
+                .andExpect(status().isOk());
 
-        verify(bookService).getAllBooks(); // 여기 맞게 verify
+        verify(bookService).getAllBooksByPaging(any(Pageable.class)); // 여기 맞게 verify
     }
+
+
+
+
+//    @Operation(summary = "도서 목록 조회 및 검색 (통합)")
+//    @GetMapping
+//    public ResponseEntity<?> getBooks(@RequestParam(required = false) String type,Pageable pageable) {
+//
+//        if ("bestseller".equalsIgnoreCase(type)) {
+//            List<BestSellerResponse> bestSellerList = aladinBookApiService.getBestSeller();
+//            return ResponseEntity.ok(bestSellerList);
+//        }
+//
+//        Page<BookDetailResponse> allBooksPaged = bookService.getAllBooksByPaging(pageable);
+//        return ResponseEntity.ok(allBooksPaged);
+
+//    }
 
 
 

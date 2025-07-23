@@ -216,15 +216,15 @@ public class BookService {
         return pageMap;
     }
 
-
-    // 카테고리+태그로 도서 검색 (페이징)
-    @Transactional(readOnly = true)
-    public Page<BookDetailResponse> searchBooksByCriteria(Long categoryId, String tagName, Pageable pageable) {
-        Page<Book> bookPage = bookRepository.findBooksByCriteria(categoryId, tagName, pageable);
-
-        return bookPage.map(bookResponseMapper::toBookDetailResponse);
-    }
-
+//
+//    // 카테고리+태그로 도서 검색 (페이징)
+//    @Transactional(readOnly = true)
+//    public Page<BookDetailResponse> searchBooksByCriteria(Long categoryId, String tagName, Pageable pageable) {
+//        Page<Book> bookPage = bookRepository.findBooksByCriteria(categoryId, tagName, pageable);
+//
+//        return bookPage.map(bookResponseMapper::toBookDetailResponse);
+//    }
+//
 
     // 모든 도서 조회 (간단 정보)
     @Transactional(readOnly = true)
@@ -310,13 +310,9 @@ public class BookService {
         bookEntity.setBookExtraInfo(bookExtraInfo);
 
 
-
         Book savedBook = bookRepository.save(bookEntity);
-
         bookImageRepository.save(bookImage);
-
         bookCategoryRepository.save(new BookCategory(savedBook,categoryEntity));
-
         bookSearchService.syncBookToElasticsearch(savedBook);
 
 
