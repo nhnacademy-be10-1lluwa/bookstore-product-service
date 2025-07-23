@@ -140,7 +140,7 @@ class AdminBookControllerTest {
                         .file(imageFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .characterEncoding("UTF-8"))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isConflict())
                 .andDo(print());
     }
 
