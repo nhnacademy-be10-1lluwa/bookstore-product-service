@@ -20,9 +20,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/book-likes")
+@Tag(name = "도서 좋아요", description = "도서의 좋아요 체크에 관한 API 입니다.")
 public class BookLikeController {
     private final BookLikeService bookLikeService;
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "도서의 좋아요 상태를 성공적으로 불러왔습니다.")
+    })
     @Operation(summary = "도서 좋아요 상태표시", description = "유저가 도서에 좋아요 했는지 표시합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "좋아요 상태 조회 성공",
@@ -34,6 +38,9 @@ public class BookLikeController {
         return ResponseEntity.ok(bookLikeService.isLikedByMe(bookId, memberId));
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "도서의 좋아요 상태를 성공적으로 변경했습니다.")
+    })
     @Operation(summary = "도서 좋아요 설정하기 (토글)", description = "도서에 좋아요를 설정하거나 취소할 수 있습니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "좋아요 토글 성공"),
@@ -47,6 +54,9 @@ public class BookLikeController {
         return ResponseEntity.ok().build();
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "좋아요한 도서 목록을 성공적으로 불러왔습니다.")
+    })
     @Operation(summary = "좋아요 한 도서 가져오기 (페이징)", description = "현재 유저가 좋아요한 도서들을 가져옵니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "좋아요 도서 목록 조회 성공",
