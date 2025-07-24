@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
+import com.nhnacademy.illuwa.common.aop.BookRegisterSync;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookCountUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookApiRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
@@ -235,6 +236,7 @@ public class BookService {
 
     // 외부 API 데이터로 도서 등록
     @Transactional
+    @BookRegisterSync
     public BookDetailResponse registerBookByApi(BookApiRegisterRequest bookApiRegisterRequest) {
 
         Book bookEntity = bookMapper.fromApiRequest(bookApiRegisterRequest);
@@ -268,12 +270,13 @@ public class BookService {
         savedBook.getBookCategories().add(bookCategory);
         bookCategoryRepository.save(bookCategory);
 
-        bookSearchService.syncBookToElasticsearch(savedBook);
+//        bookSearchService.syncBookToElasticsearch(savedBook);
 
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
     // 도서 직접 등록 (폼+파일 업로드)
+    @BookRegisterSync
     public BookDetailResponse registgerBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
 
         String savedImageName = minioStorageService.uploadBookImage(bookImageFile);
@@ -313,7 +316,7 @@ public class BookService {
         Book savedBook = bookRepository.save(bookEntity);
         bookImageRepository.save(bookImage);
         bookCategoryRepository.save(new BookCategory(savedBook,categoryEntity));
-        bookSearchService.syncBookToElasticsearch(savedBook);
+//        bookSearchService.syncBookToElasticsearch(savedBook);
 
 
         return bookResponseMapper.toBookDetailResponse(bookEntity); // Entity -> DTO
