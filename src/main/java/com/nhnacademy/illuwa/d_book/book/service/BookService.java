@@ -270,8 +270,6 @@ public class BookService {
         savedBook.getBookCategories().add(bookCategory);
         bookCategoryRepository.save(bookCategory);
 
-//        bookSearchService.syncBookToElasticsearch(savedBook);
-
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
@@ -316,7 +314,6 @@ public class BookService {
         Book savedBook = bookRepository.save(bookEntity);
         bookImageRepository.save(bookImage);
         bookCategoryRepository.save(new BookCategory(savedBook,categoryEntity));
-//        bookSearchService.syncBookToElasticsearch(savedBook);
 
 
         return bookResponseMapper.toBookDetailResponse(bookEntity); // Entity -> DTO
