@@ -4,11 +4,13 @@ import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @Table(name = "book_tags")
+@BatchSize(size = 10)
 public class BookTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
