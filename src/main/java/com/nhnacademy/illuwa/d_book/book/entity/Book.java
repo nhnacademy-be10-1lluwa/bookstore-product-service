@@ -74,7 +74,4 @@ public class Book {
     @BatchSize(size = 100)
     private Set<BookCategory> bookCategories = new HashSet<>();
 
-
-
-
 }
