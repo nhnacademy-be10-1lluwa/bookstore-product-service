@@ -53,6 +53,7 @@ public class Book {
 
     @Builder.Default
     @OneToMany(mappedBy = "book", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @BatchSize(size = 5)
     private List<BookImage> bookImages = new ArrayList<>();
 
     @Embedded
@@ -65,10 +66,12 @@ public class Book {
 
     @Builder.Default
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @BatchSize(size = 10)
     private Set<BookTag> bookTags = new HashSet<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 100)
     private Set<BookCategory> bookCategories = new HashSet<>();
 
 
