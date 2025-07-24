@@ -2,6 +2,7 @@ package com.nhnacademy.illuwa.d_book.book.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "book_likes", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"book_id", "member_id"})
 })
