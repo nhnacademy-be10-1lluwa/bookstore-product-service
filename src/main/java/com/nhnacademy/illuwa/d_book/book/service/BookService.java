@@ -143,20 +143,22 @@ public class BookService {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("도서를 찾을 수 없습니다."));
 
-        BookCategory bookCategory = bookCategoryRepository.findByBookId(bookId)
-                .orElseThrow(() -> new RuntimeException("도서에 연결된 카테고리를 찾을 수 없습니다."));
-
-        Category category = bookCategory.getCategory();
-
-        Long categoryId = category.getId();
+        Long categoryId = null;
         Long level1 = null;
         Long level2 = null;
 
-        if (category.getParentCategory() != null) {
-            level2 = category.getParentCategory().getId();
+        if (book.getBookCategories() != null && !book.getBookCategories().isEmpty()) {
+            BookCategory bookCategory = book.getBookCategories().iterator().next();
+            Category category = bookCategory.getCategory(); // 추가 쿼리 발생 안 함
 
-            if (category.getParentCategory().getParentCategory() != null) {
-                level1 = category.getParentCategory().getParentCategory().getId();
+            if (category != null) {
+                categoryId = category.getId();
+                if (category.getParentCategory() != null) {
+                    level2 = category.getParentCategory().getId();
+                    if (category.getParentCategory().getParentCategory() != null) {
+                        level1 = category.getParentCategory().getParentCategory().getId();
+                    }
+                }
             }
         }
 
@@ -180,7 +182,6 @@ public class BookService {
                 .level2(level2)
                 .build();
 
-        log.info("BookDetailWithExtraInfoResponse 생성: categoryId={}, level1={}, level2={}", categoryId, level1, level2);
 
         return response;
     }
@@ -194,8 +195,7 @@ public class BookService {
         return all
                 .map(book -> {
                     // 카테고리 조회
-                    BookCategory bookCategory = bookCategoryRepository.findByBookId(book.getId())
-                            .orElse(null);
+                    BookCategory bookCategory = book.getBookCategories().stream().findFirst().orElse(null);
 
                     // 태그 조회
                     List<TagResponse> tags = book.getBookTags().stream()
