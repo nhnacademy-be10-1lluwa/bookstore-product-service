@@ -69,7 +69,7 @@ class BookSearchServiceTest {
     @DisplayName("책 Elasticsearch에 동기화")
     void syncBookToElasticsearch() {
         Book book = new Book();
-        book.setBookCategories(Collections.emptyList());
+        book.setBookCategories(Collections.emptySet());
         book.setBookTags(Collections.emptySet());
 
         bookSearchService.syncBookToElasticsearch(book);

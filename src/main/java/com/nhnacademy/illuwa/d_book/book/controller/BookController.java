@@ -31,6 +31,13 @@ public class BookController {
 
     // 도서 상세 정보 조회 (ISBN - 고유 식별자이므로 경로 변수로 처리)
     @Operation(summary = "ISBN으로 DB 도서 검색", description = "DB에서 ISBN으로 등록된 도서 검색")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공적으로 도서 정보를 반환합니다.",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = BookDetailResponse.class))),
+        @ApiResponse(responseCode = "404", description = "도서를 찾을 수 없습니다."),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @GetMapping("/isbn/{isbn}")
     public ResponseEntity<BookDetailResponse> getBookByIsbn(@PathVariable String isbn){ // 메소드명 명확화
         BookDetailResponse bookByIsbn = bookService.searchBookByIsbn(isbn);
@@ -38,7 +45,15 @@ public class BookController {
     }
 
 
-    @Operation(summary = "도서 목록 조회 및 검색 (통합)")
+    @Operation(summary = "도서 목록 조회 및 검색 (통합)", description = "도서 목록을 조회하거나, 베스트셀러 목록을 조회합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공적으로 도서 목록을 반환합니다.",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(oneOf = {BookDetailResponse.class, BestSellerResponse.class}))
+            }),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @GetMapping
     public ResponseEntity<?> getBooks(
             @RequestParam(name = "type", required = false) String type,
