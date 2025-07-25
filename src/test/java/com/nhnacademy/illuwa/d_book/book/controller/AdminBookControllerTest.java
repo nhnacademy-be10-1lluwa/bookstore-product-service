@@ -255,10 +255,11 @@ class AdminBookControllerTest {
         // When & Then
         mockMvc.perform(put("/api/admin/books/update/bookCount")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("sign", "negative")
                         .content(objectMapper.writeValueAsString(requests)))
                 .andExpect(status().isNoContent());
 
-        verify(bookService, times(1)).updateBooksCount(anyList(),"postive");
+        verify(bookService, times(1)).updateBooksCount(anyList(),"negative");
     }
 
 
