@@ -74,7 +74,6 @@ public class CategoryController {
                     .body(categoryService.getCategoryTree());
         }
 
-
         // 페이징 요청 처리
         if (pageable != null && pageable.isPaged()) {
 
