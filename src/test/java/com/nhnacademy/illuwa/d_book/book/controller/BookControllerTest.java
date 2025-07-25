@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BestSellerResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.response.BookDetailResponse;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
+import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookMapper;
 import com.nhnacademy.illuwa.d_book.book.mapper.BookResponseMapper;
 import com.nhnacademy.illuwa.d_book.book.repository.BookRepository;
@@ -69,37 +70,34 @@ public class BookControllerTest {
     @MockBean
     private BookSearchService bookSearchService;
 
-//    @Test
-//    @DisplayName("책 검색 성공 - Title")
-//    void searchBook_Success() throws Exception {
-//        //given
-//        BookDetailResponse bookDetailResponse = new BookDetailResponse(
-//                0L,
-//                "어린 왕자",
-//                "contents",
-//                "description",
-//                "author",
-//                "출판사",
-//                LocalDate.of(2024, 6, 13),
-//                "010000",
-//                new BigDecimal(10000),
-//                new BigDecimal(9000),
-//                true,
-//                "img/path.jpg"
-//        );
-//
-//        when(bookService.searchBookByTitle("어린 왕자")).thenReturn(List.of(bookDetailResponse));
-//
-//
-//        //when & then
-//        mockMvc.perform(get("/api/books/search")
-//                        .param("title","어린 왕자")
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andDo(print())
-//                .andExpect(status().isOk());
-//
-//    }
+    @Test
+    @DisplayName("ISBN으로 DB 도서 검색 - 성공")
+    void getBookByIsbn_Success() throws Exception {
+        // Given
+        String isbn = "1234567890123";
+        BookDetailResponse mockResponse = new BookDetailResponse();
+        given(bookService.searchBookByIsbn(isbn)).willReturn(mockResponse);
 
+        // When & Then
+        mockMvc.perform(get("/api/books/isbn/{isbn}", isbn))
+                .andExpect(status().isOk());
+
+        verify(bookService, times(1)).searchBookByIsbn(isbn);
+    }
+
+    @Test
+    @DisplayName("ISBN으로 DB 도서 검색 - 실패 (도서 없음)")
+    void getBookByIsbn_NotFound() throws Exception {
+        // Given
+        String isbn = "1234567890123";
+        given(bookService.searchBookByIsbn(isbn)).willThrow(new NotFoundBookException("도서를 찾을 수 없습니다."));
+
+        // When & Then
+        mockMvc.perform(get("/api/books/isbn/{isbn}", isbn))
+                .andExpect(status().isNotFound());
+
+        verify(bookService, times(1)).searchBookByIsbn(isbn);
+    }
 
     @Test
     void searchBookById() throws Exception {
@@ -114,39 +112,36 @@ public class BookControllerTest {
     }
 
     @Test
-    void getRegisteredBooks() throws Exception {
-
-        // given
-        Pageable pageable = PageRequest.of(0, 10); // 테스트용 페이징
+    @DisplayName("도서 목록 조회 - 일반 도서")
+    void getBooks_Normal() throws Exception {
+        // Given
+        Pageable pageable = PageRequest.of(0, 10);
         Page<BookDetailResponse> mockPage = new PageImpl<>(List.of(new BookDetailResponse()));
-
-
         given(bookService.getAllBooksByPaging(any(Pageable.class))).willReturn(mockPage);
 
-        // when & then
-        mockMvc.perform(get("/api/books"))
+        // When & Then
+        mockMvc.perform(get("/api/books")
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk());
 
-        verify(bookService).getAllBooksByPaging(any(Pageable.class)); // 여기 맞게 verify
+        verify(bookService, times(1)).getAllBooksByPaging(any(Pageable.class));
+        verify(aladinBookApiService, never()).getBestSeller();
     }
 
+    @Test
+    @DisplayName("도서 목록 조회 - 베스트셀러")
+    void getBooks_BestSeller() throws Exception {
+        // Given
+        List<BestSellerResponse> mockBestSellers = List.of(new BestSellerResponse());
+        given(aladinBookApiService.getBestSeller()).willReturn(mockBestSellers);
 
+        // When & Then
+        mockMvc.perform(get("/api/books")
+                        .param("type", "bestseller"))
+                .andExpect(status().isOk());
 
-
-//    @Operation(summary = "도서 목록 조회 및 검색 (통합)")
-//    @GetMapping
-//    public ResponseEntity<?> getBooks(@RequestParam(required = false) String type,Pageable pageable) {
-//
-//        if ("bestseller".equalsIgnoreCase(type)) {
-//            List<BestSellerResponse> bestSellerList = aladinBookApiService.getBestSeller();
-//            return ResponseEntity.ok(bestSellerList);
-//        }
-//
-//        Page<BookDetailResponse> allBooksPaged = bookService.getAllBooksByPaging(pageable);
-//        return ResponseEntity.ok(allBooksPaged);
-
-//    }
-
-
-
+        verify(aladinBookApiService, times(1)).getBestSeller();
+        verify(bookService, never()).getAllBooksByPaging(any(Pageable.class));
+    }
 }

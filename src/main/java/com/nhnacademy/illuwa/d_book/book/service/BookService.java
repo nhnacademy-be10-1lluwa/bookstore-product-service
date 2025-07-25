@@ -242,6 +242,11 @@ public class BookService {
         Book bookEntity = bookMapper.fromApiRequest(bookApiRegisterRequest);
         bookEntity.setBookImages(new ArrayList<>());
 
+        if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
+            log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
+            throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
+        }
+
         Category categoryEntity = categoryRepository.findById(bookApiRegisterRequest.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
 
@@ -251,10 +256,6 @@ public class BookService {
         }
 
         log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
-        if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
-            log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
-            throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
-        }
 
         BookImage bookImage = new BookImage(bookEntity,bookApiRegisterRequest.getCover(), ImageType.THUMBNAIL);
         bookEntity.addImage(bookImage);
@@ -285,22 +286,16 @@ public class BookService {
 
         bookEntity.setBookImages(new ArrayList<>());
 
-        // 카테고리
-        Category categoryEntity = categoryRepository.findById(bookRegisterRequest.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
-
-        // 태그는 도서 등록 후에 관리자 페이지에서 등록
-
-        if (bookEntity == null) {
-            throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
-        }
-
         log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
 
         if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
             log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
+
+        // 카테고리
+        Category categoryEntity = categoryRepository.findById(bookRegisterRequest.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
 
         //이미지 MiniO 등록 예정
         BookImage bookImage = new BookImage(bookEntity,savedImageName, ImageType.THUMBNAIL);
@@ -446,6 +441,7 @@ public class BookService {
             }
 
             book.getBookExtraInfo().setCount(updatedCount);
+            bookRepository.save(book);
         }
     }
 
@@ -464,6 +460,7 @@ public class BookService {
             int updatedCount = currentCount + request.getBookCount();
 
             book.getBookExtraInfo().setCount(updatedCount);
+            bookRepository.save(book);
         }
     }
 

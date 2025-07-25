@@ -5,6 +5,7 @@ import com.nhnacademy.illuwa.d_book.category.dto.CategoryFlatResponse;
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryResponse;
 import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
+import com.nhnacademy.illuwa.d_book.category.exception.CategoryAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.category.exception.CategoryNotAllowedException;
 import com.nhnacademy.illuwa.d_book.category.repository.bookcategory.BookCategoryRepository;
 import com.nhnacademy.illuwa.d_book.category.repository.category.CategoryRepository;
@@ -49,7 +50,7 @@ public class CategoryService {
         Optional<Category> categoryById = categoryRepository.findById(categoryId);
 
         if(categoryById.isEmpty()){
-            throw new CategoryNotAllowedException("존재하지 않는 카테고리입니다..");
+            throw new CategoryNotAllowedException("존재하지 않는 카테고리입니다.");
         }
 
         Category category = categoryById.get();
@@ -59,11 +60,14 @@ public class CategoryService {
 
     @Transactional
     public void createCategory(CategoryCreateRequest request) {
+        if (categoryRepository.findByCategoryName(request.getCategoryName()).isPresent()) {
+            throw new CategoryAlreadyExistsException("이미 존재하는 카테고리입니다.");
+        }
         Category newCategory = new Category(request.getCategoryName());
 
         if (request.getParentId() != null) {
             Category parent = categoryRepository.findById(request.getParentId())
-                    .orElseThrow(() -> new IllegalArgumentException("상위 카테고리가 존재하지 않습니다."));
+                    .orElseThrow(() -> new CategoryNotAllowedException("상위 카테고리가 존재하지 않습니다."));
             parent.addChildCategory(newCategory);
         }
 
@@ -74,7 +78,7 @@ public class CategoryService {
     public void deleteCategory(Long categoryId) {
 
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리"));
+                .orElseThrow(() -> new CategoryNotAllowedException("존재하지 않는 카테고리"));
 
         if (!category.getChildrenCategory().isEmpty()) {
             throw new IllegalStateException("하위 카테고리를 포함한 경우 삭제 불가");
@@ -110,7 +114,7 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public Page<CategoryFlatResponse> getAllCategoriesFlatPaged(Pageable pageable) {
         // 1) 모든 카테고리 가져오기
-        List<Category> allCategories = categoryRepository.findAll();
+        List<Category> allCategories = categoryRepository.findAll(pageable).getContent();
 
         // 2) 계층 평면화
         List<CategoryFlatResponse> flatList = new ArrayList<>();

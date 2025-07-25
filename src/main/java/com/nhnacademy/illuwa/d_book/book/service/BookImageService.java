@@ -1,18 +1,12 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
-import com.nhnacademy.illuwa.d_book.book.repository.BookImageRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.nhnacademy.illuwa.d_book.book.entity.Book;
+import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
+import org.springframework.web.multipart.MultipartFile;
 
-@Service
-@RequiredArgsConstructor
-public class BookImageService {
-    private final BookImageRepository bookImageRepository;
+import java.io.IOException;
+public interface BookImageService {
+    void deleteByBookId(Long bookId);
 
-    @Transactional
-    public void deleteByBookId(Long bookId) {
-        bookImageRepository.deleteAllByBook_Id(bookId);
-    }
-
+    void saveBookImage(Book book, MultipartFile file, ImageType type) throws IOException;
 }
