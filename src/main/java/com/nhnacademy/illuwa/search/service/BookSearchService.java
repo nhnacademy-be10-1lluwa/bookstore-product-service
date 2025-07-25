@@ -18,6 +18,7 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import co.elastic.clients.elasticsearch._types.query_dsl.FunctionBoostMode;
@@ -111,8 +112,8 @@ public class BookSearchService {
     }
 
 
+    @Async
     public void syncBookToElasticsearch(Book book) {
-
         BookDocument bookDocument = convertToDocument(book);
         bookSearchRepository.save(bookDocument);
         log.info("Elasticsearch에 동기화 완료: id={}", book.getId());
@@ -123,10 +124,14 @@ public class BookSearchService {
         bookSearchRepository.save(document);
     }
 
+
+    @Async
     public void deleteById(Long id) {
         bookSearchRepository.deleteById(id);
     }
 
+
+    @Async
     @Transactional(readOnly = true)
     public void syncAllBooksToElasticsearch() {
 
