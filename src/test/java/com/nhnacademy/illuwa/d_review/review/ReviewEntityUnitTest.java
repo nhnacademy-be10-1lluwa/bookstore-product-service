@@ -90,5 +90,16 @@ public class ReviewEntityUnitTest {
         assertThat(review.getReviewTitle()).isEqualTo("Not Bad");
         assertThat(review.getReviewContent()).isEqualTo("But, That's all, No more.");
         assertThat(review.getReviewRating()).isEqualTo(3);
+
+        // when 2
+        newTitle = null;
+        newContent = null;
+        newRating = null;
+        review.update(newTitle, newContent, newRating);
+
+        // then 2
+        assertThat(review.getReviewTitle()).isEqualTo("Not Bad");
+        assertThat(review.getReviewContent()).isEqualTo("But, That's all, No more.");
+        assertThat(review.getReviewRating()).isEqualTo(3);
     }
 }

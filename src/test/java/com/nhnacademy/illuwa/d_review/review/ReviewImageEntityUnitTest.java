@@ -63,6 +63,7 @@ public class ReviewImageEntityUnitTest {
         ReviewImage image = ReviewImage.of(imageUrl, review);
 
         // then
+        assertThat(image.getImageId()).isNull();
         assertThat(image.getImageUrl()).isEqualTo("https://media.tenor.com/qLET435-HUwAAAAi/dumb-pepe.gif");
         assertThat(image.getReview()).isEqualTo(review);
     }
