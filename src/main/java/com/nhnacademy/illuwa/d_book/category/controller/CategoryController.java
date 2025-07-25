@@ -5,6 +5,7 @@ import com.nhnacademy.illuwa.d_book.category.dto.CategoryFlatResponse;
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryResponse;
 import com.nhnacademy.illuwa.d_book.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -51,13 +53,6 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getCategoryInfo(categoryId));
     }
 
-
-//    @GetMapping("/tree")
-//    public List<CategoryResponse> getCategoryTree() {
-//        List<CategoryResponse> categoryTree = categoryService.getCategoryTree();
-//        return categoryTree;
-//    }
-
     @Operation(summary = "모든 카테고리 조회", description = "모든 카테고리 목록을 조회합니다. 'tree' 뷰 또는 페이징된 목록으로 조회할 수 있습니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공적으로 카테고리 목록을 반환합니다.",
@@ -71,17 +66,29 @@ public class CategoryController {
             Pageable pageable
     ) {
 
+        CacheControl cacheControl = CacheControl.maxAge(10, TimeUnit.MINUTES);
+
         if ("tree".equalsIgnoreCase(view)) {
-            return ResponseEntity.ok(categoryService.getCategoryTree());
+            return ResponseEntity.ok()
+                    .cacheControl(cacheControl)
+                    .body(categoryService.getCategoryTree());
         }
+
 
         // 페이징 요청 처리
         if (pageable != null && pageable.isPaged()) {
+
+
             Page<CategoryResponse> paged = categoryService.getAllCategoriesByPaging(pageable);
-            return ResponseEntity.ok(paged.getContent());
+
+            return ResponseEntity.ok()
+                    .cacheControl(cacheControl)
+                    .body(paged.getContent());
         }
         // 기본 전체 조회
-        return ResponseEntity.ok(categoryService.getAllCategories());
+        return ResponseEntity.ok()
+                .cacheControl(cacheControl)
+                .body(categoryService.getAllCategories());
     }
 
     @Operation(summary = "평탄화된 카테고리 목록 조회 (페이징)", description = "모든 카테고리를 평탄화된 형태로 페이징하여 조회합니다.")
