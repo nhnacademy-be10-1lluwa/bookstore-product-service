@@ -195,6 +195,7 @@
                         <exclude>**/entity/**</exclude>
                         <exclude>**/*MapperImpl.class</exclude>
                         <exclude>**/*Config.class</exclude>
+                        <exclude>**/service/Impl/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
