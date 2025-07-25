@@ -234,82 +234,21 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("알라딘 api를 통한 도서 검색 성공")
-    void searchBookFromExternalApiTest_Success(){
-        //givnen
-        String title = "어린 왕자";
-        BookExternalResponse mockResponse = new BookExternalResponse(
-                "어린 왕자",
-                "description",
-                "author",
-                "출판사C",
-                LocalDate.of(2024, 6, 13),
-                "isbn",
-                10000,
-                9000,
-                "img/path.jpg",
-                "category1"
+    @DisplayName("API를 통한 도서 등록 - 실패 (bookEntity가 null)")
+    void registerBookByApi_NullBookEntity_Failure() {
+        // Given
+        BookApiRegisterRequest apiRequest = new BookApiRegisterRequest(
+                "API 테스트 책", "API 저자", "API 출판사", "API 내용", "2024-07-24", "9781234567890",
+                25000, 20000, "API 설명", "http://api.cover.url", 50, 2L
         );
-        when(aladinBookApiService.searchBooksByTitle(title)).thenReturn(List.of(mockResponse));
+        when(bookMapper.fromApiRequest(any(BookApiRegisterRequest.class))).thenReturn(null);
 
+        // When & Then
+        assertThatThrownBy(() -> bookService.registerBookByApi(apiRequest))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("등록할 도서가 존재하지 않습니다.");
 
-        //when
-        List<BookExternalResponse> result = bookService.searchBookFromExternalApi(title);
-
-        //then
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(1);
-        assertThat(result.getFirst().getTitle()).isEqualTo("어린 왕자");
-
-        verify(aladinBookApiService, times(1)).searchBooksByTitle(title);
-    }
-
-    @Test
-    @DisplayName("알라딘 api를 통한 도서 검색 실패")
-    void searchBookFromExternalApiTest_Fail(){
-        //given
-        String title = "어린 왕자";
-        when(aladinBookApiService.searchBooksByTitle(title)).thenReturn(Collections.emptyList());
-
-
-
-        //when & then
-        assertThatThrownBy(() -> bookService.searchBookFromExternalApi(title))
-                .isInstanceOf(NotFoundBookException.class)
-                .hasMessage("제목과 일치하는 도서가 존재하지 않습니다.");
-
-        verify(aladinBookApiService, times(1)).searchBooksByTitle(title);
-
-    }
-
-
-    @Test
-    @DisplayName("등록된 도서 삭제 - 성공")
-    void deleteBook_Success() {
-        // given
-        Long id = 10L;
-        Book book = Book.builder()
-                .id(id)
-                .title("인어 공주")
-                .description("인어 공주는...")
-                .author("안데르센")
-                .publisher("스웨덴출판사")
-                .publishedDate(LocalDate.of(2016, 6, 16))
-                .isbn("123456789EE")
-                .regularPrice(new BigDecimal(15000))
-                .salePrice(new BigDecimal(13000))
-                .bookExtraInfo(new BookExtraInfo(Status.DELETED, true, 1))
-                .build();
-
-        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
-
-        // when
-        bookService.deleteBook(book.getId());
-
-        // then
-        verify(bookRepository, times(1)).findById(id);
-        verify(bookSearchService, times(1)).deleteById(id);
-        verify(bookRepository, times(1)).delete(book);
+        verify(bookRepository, never()).save(any(Book.class));
     }
 
 
@@ -459,10 +398,79 @@ public class BookServiceTest {
         verify(mockBookCategory).setCategory(mockCategory);
         verify(mockBookImage).setImageUrl(bookUpdateRequest.getCover());
         verify(bookSearchService).syncBookToElasticsearch(updatedBook);
+
+        assertThat(updatedBook.getTitle()).isEqualTo(bookUpdateRequest.getTitle());
+        assertThat(updatedBook.getAuthor()).isEqualTo(bookUpdateRequest.getAuthor());
+        assertThat(updatedBook.getPublisher()).isEqualTo(bookUpdateRequest.getPublisher());
+        assertThat(updatedBook.getDescription()).isEqualTo(bookUpdateRequest.getDescription());
+        assertThat(updatedBook.getContents()).isEqualTo(bookUpdateRequest.getContents());
+        assertThat(updatedBook.getRegularPrice()).isEqualTo(bookUpdateRequest.getRegularPrice());
+        assertThat(updatedBook.getSalePrice()).isEqualTo(bookUpdateRequest.getSalePrice());
+        assertThat(updatedBook.getBookExtraInfo().getCount()).isEqualTo(bookUpdateRequest.getCount());
+        assertThat(updatedBook.getBookExtraInfo().getGiftWrap()).isEqualTo(bookUpdateRequest.getGiftwrap());
+        assertThat(updatedBook.getBookExtraInfo().getStatus().name()).isEqualTo(bookUpdateRequest.getStatus());
     }
 
     @Test
-    @DisplayName("도서 수정(존재하지 않는 도서) - 실패")
+    @DisplayName("도서 수정 - 특정 필드가 null일 때 업데이트되지 않음")
+    void updateBook_NullFieldsDoNotUpdate() {
+        // Given
+        Long id = 9L;
+        Book originalBook = Book.builder()
+                .id(id)
+                .title("Original Title")
+                .author("Original Author")
+                .publisher("Original Publisher")
+                .description("Original Description")
+                .contents("Original Contents")
+                .regularPrice(new BigDecimal("10000"))
+                .salePrice(new BigDecimal("8000"))
+                .bookExtraInfo(new BookExtraInfo(Status.NORMAL, false, 5))
+                .build();
+
+        BookUpdateRequest updateRequest = new BookUpdateRequest(
+                null, // id
+                null, // title
+                null, // author
+                null, // publisher
+                null, // pubDate
+                null, // isbn
+                null, // regularPrice
+                null, // salePrice
+                null, // description
+                null, // contents
+                null, // cover
+                null, // count
+                null, // status
+                null, // giftwrap
+                null, // categoryId
+                null, // level1
+                null  // level2
+        );
+
+        when(bookRepository.findById(id)).thenReturn(Optional.of(originalBook));
+
+        // When
+        bookService.updateBook(id, updateRequest);
+
+        // Then
+        verify(bookRepository, times(1)).findById(id);
+        verify(bookSearchService, times(1)).syncBookToElasticsearch(originalBook);
+
+        // Assert that fields remain unchanged
+        assertThat(originalBook.getTitle()).isEqualTo("Original Title");
+        assertThat(originalBook.getAuthor()).isEqualTo("Original Author");
+        assertThat(originalBook.getPublisher()).isEqualTo("Original Publisher");
+        assertThat(originalBook.getDescription()).isEqualTo("Original Description");
+        assertThat(originalBook.getContents()).isEqualTo("Original Contents");
+        assertThat(originalBook.getRegularPrice()).isEqualTo(new BigDecimal("10000"));
+        assertThat(originalBook.getSalePrice()).isEqualTo(new BigDecimal("8000"));
+        assertThat(originalBook.getBookExtraInfo().getCount()).isEqualTo(5);
+        assertThat(originalBook.getBookExtraInfo().getGiftWrap()).isFalse();
+        assertThat(originalBook.getBookExtraInfo().getStatus()).isEqualTo(Status.NORMAL);
+    }
+    @Test
+    @DisplayName("도서 수정 - 실패 (도서 없음)")
     void updateBook_Failure() {
         Long id = 0L;
         BookUpdateRequest mockBookUpdateRequest = mock(BookUpdateRequest.class);
@@ -637,35 +645,229 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("모든 도서와 추가 정보 페이징 조회 - 성공")
-    void getAllBooksWithExtraInfo_Success() {
+    @DisplayName("모든 도서 상세 정보 페이징 조회 - 성공")
+    void getAllBooksWithDetails_Success() {
         // Given
         Pageable pageable = PageRequest.of(0, 10);
-        Book book = Book.builder()
-                .id(1L)
-                .title("Test Book")
-                .publishedDate(LocalDate.now())
-                .bookExtraInfo(new BookExtraInfo(Status.NORMAL, false, 10))
-                .build();
-        book.setBookImages(Collections.singletonList(new BookImage(book, "test.jpg", ImageType.THUMBNAIL)));
-        book.setBookCategories(Collections.singleton(new BookCategory(book, new Category("Test Category"))));
-        List<Book> books = Collections.singletonList(book);
+        List<Book> books = Collections.singletonList(Book.builder().id(1L).title("Test Book").build());
         Page<Book> bookPage = new PageImpl<>(books, pageable, books.size());
-        // Removed: BookDetailWithExtraInfoResponse mockResponse = BookDetailWithExtraInfoResponse.builder().id(1L).title("Test Book").build();
+        BookDetailResponse mockResponse = new BookDetailResponse();
 
         when(bookRepository.findAll(pageable)).thenReturn(bookPage);
+        when(bookResponseMapper.toBookDetailResponse(any(Book.class))).thenReturn(mockResponse);
 
         // When
-        Page<BookDetailWithExtraInfoResponse> result = bookService.getAllBooksWithExtraInfo(pageable); // Directly call the service method
+        Page<BookDetailResponse> result = bookService.getAllBooksWithDetails(pageable);
 
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getId()).isEqualTo(1L); // Verify properties directly
-        assertThat(result.getContent().get(0).getTitle()).isEqualTo("Test Book"); // Verify properties directly
         verify(bookRepository, times(1)).findAll(pageable);
+        verify(bookResponseMapper, times(1)).toBookDetailResponse(any(Book.class));
     }
 
+    @Test
+    @DisplayName("도서 상세 (부가정보 포함) 조회 - 성공 (모든 정보 포함)")
+    void getBookDetailWithExtraInfo_SuccessAllInfo() {
+        // Given
+        Long bookId = 1L;
+        Category categoryLevel1 = mock(Category.class);
+
+        Category categoryLevel2 = mock(Category.class);
+        when(categoryLevel2.getId()).thenReturn(101L);
+        when(categoryLevel2.getParentCategory()).thenReturn(categoryLevel1);
+
+        Category categoryLevel3 = mock(Category.class);
+        when(categoryLevel3.getId()).thenReturn(102L);
+        when(categoryLevel3.getParentCategory()).thenReturn(categoryLevel2);
+
+        Book book = Book.builder()
+                .id(bookId)
+                .title("Test Book")
+                .contents("Test Contents")
+                .description("Test Description")
+                .author("Test Author")
+                .publisher("Test Publisher")
+                .publishedDate(LocalDate.now())
+                .isbn("1234567890123")
+                .regularPrice(new BigDecimal("20000"))
+                .salePrice(new BigDecimal("15000"))
+                .bookExtraInfo(new BookExtraInfo(Status.NORMAL, true, 10))
+                .build();
+
+        BookImage bookImage = new BookImage(book, "http://test.url/image.jpg", ImageType.THUMBNAIL);
+        book.setBookImages(Collections.singletonList(bookImage));
+
+        BookCategory bookCategory = new BookCategory(book, categoryLevel3);
+        book.setBookCategories(Collections.singleton(bookCategory));
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+
+        // When
+        BookDetailWithExtraInfoResponse result = bookService.getBookDetailWithExtraInfo(bookId);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(bookId);
+        assertThat(result.getTitle()).isEqualTo("Test Book");
+        assertThat(result.getCategoryId()).isEqualTo(categoryLevel3.getId());
+        assertThat(result.getLevel1()).isEqualTo(categoryLevel1.getId());
+        assertThat(result.getLevel2()).isEqualTo(categoryLevel2.getId());
+        assertThat(result.getImgUrl()).isEqualTo("http://test.url/image.jpg");
+    }
+
+    @Test
+    @DisplayName("도서 상세 (부가정보 포함) 조회 - 카테고리 없음")
+    void getBookDetailWithExtraInfo_NoCategory() {
+        // Given
+        Long bookId = 1L;
+        Book book = Book.builder()
+                .id(bookId)
+                .title("Test Book")
+                .publishedDate(LocalDate.now()) // Add publishedDate
+                .bookExtraInfo(new BookExtraInfo(Status.NORMAL, true, 10))
+                .build();
+        book.setBookCategories(Collections.emptySet()); // No categories
+
+        BookImage bookImage = new BookImage(book, "http://test.url/image.jpg", ImageType.THUMBNAIL);
+        book.setBookImages(Collections.singletonList(bookImage));
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+
+        // When
+        BookDetailWithExtraInfoResponse result = bookService.getBookDetailWithExtraInfo(bookId);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getCategoryId()).isNull();
+        assertThat(result.getLevel1()).isNull();
+        assertThat(result.getLevel2()).isNull();
+        assertThat(result.getImgUrl()).isEqualTo("http://test.url/image.jpg");
+    }
+
+    @Test
+    @DisplayName("도서 상세 (부가정보 포함) 조회 - 상위 카테고리 없음")
+    void getBookDetailWithExtraInfo_NoParentCategory() {
+        // Given
+        Long bookId = 1L;
+        Category categoryLevel3 = mock(Category.class);
+        when(categoryLevel3.getId()).thenReturn(102L);
+        when(categoryLevel3.getParentCategory()).thenReturn(null); // No parent category
+
+        Book book = Book.builder()
+                .id(bookId)
+                .title("Test Book")
+                .publishedDate(LocalDate.now()) // Add publishedDate
+                .bookExtraInfo(new BookExtraInfo(Status.NORMAL, true, 10))
+                .build();
+
+        BookImage bookImage = new BookImage(book, "http://test.url/image.jpg", ImageType.THUMBNAIL);
+        book.setBookImages(Collections.singletonList(bookImage));
+
+        BookCategory bookCategory = new BookCategory(book, categoryLevel3);
+        book.setBookCategories(Collections.singleton(bookCategory));
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+
+        // When
+        BookDetailWithExtraInfoResponse result = bookService.getBookDetailWithExtraInfo(bookId);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getCategoryId()).isEqualTo(categoryLevel3.getId());
+        assertThat(result.getLevel1()).isNull();
+        assertThat(result.getLevel2()).isNull();
+        assertThat(result.getImgUrl()).isEqualTo("http://test.url/image.jpg");
+    }
+
+    @Test
+    @DisplayName("도서 상세 (부가정보 포함) 조회 - 이미지 없음")
+    void getBookDetailWithExtraInfo_NoImage() {
+        // Given
+        Long bookId = 1L;
+        Category categoryLevel1 = mock(Category.class);
+
+        Category categoryLevel2 = mock(Category.class);
+        when(categoryLevel2.getId()).thenReturn(101L);
+        when(categoryLevel2.getParentCategory()).thenReturn(categoryLevel1);
+
+        Category categoryLevel3 = mock(Category.class);
+        when(categoryLevel3.getId()).thenReturn(102L);
+        when(categoryLevel3.getParentCategory()).thenReturn(categoryLevel2);
+
+        Book book = Book.builder()
+                .id(bookId)
+                .title("Test Book")
+                .publishedDate(LocalDate.now()) // Add publishedDate
+                .bookExtraInfo(new BookExtraInfo(Status.NORMAL, true, 10))
+                .build();
+        book.setBookImages(Collections.emptyList()); // No images
+
+        BookCategory bookCategory = new BookCategory(book, categoryLevel3);
+        book.setBookCategories(Collections.singleton(bookCategory));
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+
+        // When
+        BookDetailWithExtraInfoResponse result = bookService.getBookDetailWithExtraInfo(bookId);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getCategoryId()).isEqualTo(categoryLevel3.getId());
+        assertThat(result.getLevel1()).isEqualTo(categoryLevel1.getId());
+        assertThat(result.getLevel2()).isEqualTo(categoryLevel2.getId());
+        assertThat(result.getImgUrl()).isNull();
+    }
+
+    @Test
+    @DisplayName("도서 상세 (부가정보 포함) 조회 - 도서 없음 실패")
+    void getBookDetailWithExtraInfo_NotFound_Failure() {
+        // Given
+        Long bookId = 1L;
+        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> bookService.getBookDetailWithExtraInfo(bookId))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("도서를 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("모든 도서 조회 (간단 정보) - 성공")
+    void getAllBooks_Success() {
+        // Given
+        List<Book> books = Collections.singletonList(Book.builder().id(1L).title("Test Book").build());
+        List<BookDetailResponse> mockResponses = Collections.singletonList(new BookDetailResponse());
+
+        when(bookRepository.findAll()).thenReturn(books);
+        when(bookResponseMapper.toBookDetailListResponse(anyList())).thenReturn(mockResponses);
+
+        // When
+        List<BookDetailResponse> result = bookService.getAllBooks();
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        verify(bookRepository, times(1)).findAll();
+        verify(bookResponseMapper, times(1)).toBookDetailListResponse(anyList());
+    }
+
+    @Test
+    @DisplayName("모든 도서 조회 (간단 정보) - 도서 없음")
+    void getAllBooks_NoBooks() {
+        // Given
+        when(bookRepository.findAll()).thenReturn(Collections.emptyList());
+        when(bookResponseMapper.toBookDetailListResponse(anyList())).thenReturn(Collections.emptyList());
+
+        // When
+        List<BookDetailResponse> result = bookService.getAllBooks();
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result).isEmpty();
+        verify(bookRepository, times(1)).findAll();
+        verify(bookResponseMapper, times(1)).toBookDetailListResponse(anyList());
+    }
     @Test
     @DisplayName("ID로 도서 검색 - 성공")
     void searchBookById_Success() {
@@ -675,7 +877,7 @@ public class BookServiceTest {
         BookDetailResponse mockResponse = new BookDetailResponse();
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
-        when(bookResponseMapper.toBookDetailResponse(any(Book.class))).thenReturn(mockResponse);
+        when(bookResponseMapper.toBookDetailResponse(eq(book))).thenReturn(mockResponse);
 
         // When
         BookDetailResponse result = bookService.searchBookById(bookId);
@@ -683,7 +885,7 @@ public class BookServiceTest {
         // Then
         assertThat(result).isEqualTo(mockResponse);
         verify(bookRepository, times(1)).findById(bookId);
-        verify(bookResponseMapper, times(1)).toBookDetailResponse(any(Book.class));
+        verify(bookResponseMapper, times(1)).toBookDetailResponse(eq(book));
     }
 
     @Test

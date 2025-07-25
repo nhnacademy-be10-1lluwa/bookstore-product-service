@@ -211,6 +211,7 @@ class CategoryServiceTest {
         // Given
         Pageable pageable = PageRequest.of(0, 10);
 
+
         // 계층 구조 생성
         Category parent = new Category("부모 카테고리");
         parent.setId(1L);
@@ -235,6 +236,7 @@ class CategoryServiceTest {
         Page<CategoryFlatResponse> result = categoryService.getAllCategoriesFlatPaged(pageable);
 
         // Then
+
         assertEquals(3, result.getTotalElements());
         assertEquals("부모 카테고리", result.getContent().get(0).getCategoryName());
         verify(categoryRepository, times(1)).findAll();

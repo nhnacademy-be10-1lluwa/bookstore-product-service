@@ -66,18 +66,28 @@ public class CategoryController {
             Pageable pageable
     ) {
 
+        CacheControl cacheControl = CacheControl.maxAge(10, TimeUnit.MINUTES);
+
         if ("tree".equalsIgnoreCase(view)) {
-            return ResponseEntity.ok(categoryService.getCategoryTree());
+            return ResponseEntity.ok()
+                    .cacheControl(cacheControl)
+                    .body(categoryService.getCategoryTree());
         }
 
-        CacheControl cacheControl = CacheControl.maxAge(10, TimeUnit.MINUTES);
         // 페이징 요청 처리
         if (pageable != null && pageable.isPaged()) {
+
+
             Page<CategoryResponse> paged = categoryService.getAllCategoriesByPaging(pageable);
-            return ResponseEntity.ok(paged.getContent());
+
+            return ResponseEntity.ok()
+                    .cacheControl(cacheControl)
+                    .body(paged.getContent());
         }
         // 기본 전체 조회
-        return ResponseEntity.ok(categoryService.getAllCategories());
+        return ResponseEntity.ok()
+                .cacheControl(cacheControl)
+                .body(categoryService.getAllCategories());
     }
 
     @Operation(summary = "평탄화된 카테고리 목록 조회 (페이징)", description = "모든 카테고리를 평탄화된 형태로 페이징하여 조회합니다.")
