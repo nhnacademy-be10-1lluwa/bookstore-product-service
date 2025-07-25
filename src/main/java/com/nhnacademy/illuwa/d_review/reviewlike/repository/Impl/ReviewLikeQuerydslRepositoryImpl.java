@@ -41,10 +41,7 @@ public class ReviewLikeQuerydslRepositoryImpl implements ReviewLikeQuerydslRepos
                 .stream()
                 .collect(Collectors.toMap(
                         tuple -> tuple.get(reviewLike.review.reviewId),
-                        tuple -> {
-                            Long count = tuple.get(reviewLike.count());
-                            return count != null ? count : 0L;
-                        }
+                        tuple -> tuple.get(reviewLike.count()) // 실제 DB에서 null 안나옴
                 ));
     }
 }
