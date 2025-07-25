@@ -163,35 +163,29 @@ public class AdminBookController {
 
 
 
-    // "bookCount -> count 1개로 통합예정"
-    @Operation(summary = "도서 수량 감소", description = "주문 시 도서의 재고 수량을 감소시킵니다.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "도서 수량이 성공적으로 감소되었습니다."),
-        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터 또는 재고 부족"),
-        @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
     @PutMapping("/update/bookCount")
-    public ResponseEntity<Void> deductBooksCount(
-            @RequestBody List<BookCountUpdateRequest> requests
+    public ResponseEntity<Void> updateBooksCount(
+            @RequestBody List<BookCountUpdateRequest> requests,
+            @RequestHeader("sign") String sign
     ) {
-        bookService.updateBooksCount(requests);
+        bookService.updateBooksCount(requests, sign);
         return ResponseEntity.noContent().build();
     }
 
 
-    @Operation(summary = "도서 수량 복원", description = "주문 취소 시 도서의 재고 수량을 복원합니다.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "도서 수량이 성공적으로 복원되었습니다."),
-        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-        @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
-    @PutMapping("/restore/bookCount")
-    public ResponseEntity<Void> restoreBooksCount(
-            @RequestBody List<BookCountUpdateRequest> requests
-    ) {
-        bookService.restoreBooksCount(requests);
-        return ResponseEntity.noContent().build();
-    }
+//    @Operation(summary = "도서 수량 복원", description = "주문 취소 시 도서의 재고 수량을 복원합니다.")
+//    @ApiResponses(value = {
+//        @ApiResponse(responseCode = "204", description = "도서 수량이 성공적으로 복원되었습니다."),
+//        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+//        @ApiResponse(responseCode = "500", description = "서버 오류")
+//    })
+//    @PutMapping("/restore/bookCount")
+//    public ResponseEntity<Void> restoreBooksCount(
+//            @RequestBody List<BookCountUpdateRequest> requests
+//    ) {
+//        bookService.restoreBooksCount(requests);
+//        return ResponseEntity.noContent().build();
+//    }
 
     @Operation(summary = "도서에 태그 추가", description = "특정 도서에 태그를 추가합니다.")
     @ApiResponses(value = {
