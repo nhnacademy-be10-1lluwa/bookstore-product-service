@@ -162,7 +162,15 @@ public class AdminBookController {
     }
 
 
-
+    @Operation(
+            summary = "도서 재고 수량 변경",
+            description = "도서의 수량을 변경합니다. 'sign' 헤더가 positive이면 증가, negative이면 감소입니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "성공적으로 처리됨"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PutMapping("/update/bookCount")
     public ResponseEntity<Void> updateBooksCount(
             @RequestBody List<BookCountUpdateRequest> requests,
