@@ -236,6 +236,11 @@ public class BookService {
     public BookDetailResponse registerBookByApi(BookApiRegisterRequest bookApiRegisterRequest) {
 
         Book bookEntity = bookMapper.fromApiRequest(bookApiRegisterRequest);
+
+        if (bookEntity == null) {
+            throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
+        }
+
         bookEntity.setBookImages(new ArrayList<>());
 
         if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
@@ -245,11 +250,6 @@ public class BookService {
 
         Category categoryEntity = categoryRepository.findById(bookApiRegisterRequest.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
-
-
-        if (bookEntity == null) {
-            throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
-        }
 
         log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
 
