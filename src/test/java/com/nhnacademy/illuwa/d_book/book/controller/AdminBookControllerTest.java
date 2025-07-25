@@ -31,8 +31,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.times;
@@ -248,33 +247,20 @@ class AdminBookControllerTest {
 
     @Test
     @DisplayName("도서 수량 감소 - 성공")
-    void deductBooksCount_Success() throws Exception {
+    void updateBooksCount_Success() throws Exception {
         // Given
         List<BookCountUpdateRequest> requests = Collections.singletonList(new BookCountUpdateRequest(1L, 5));
 
         // When & Then
         mockMvc.perform(put("/api/admin/books/update/bookCount")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("sign", "negative")
                         .content(objectMapper.writeValueAsString(requests)))
                 .andExpect(status().isNoContent());
 
-        verify(bookService, times(1)).updateBooksCount(anyList());
+        verify(bookService, times(1)).updateBooksCount(anyList(),eq("negative"));
     }
 
-    @Test
-    @DisplayName("도서 수량 복원 - 성공")
-    void restoreBooksCount_Success() throws Exception {
-        // Given
-        List<BookCountUpdateRequest> requests = Collections.singletonList(new BookCountUpdateRequest(1L, 5));
-
-        // When & Then
-        mockMvc.perform(put("/api/admin/books/restore/bookCount")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requests)))
-                .andExpect(status().isNoContent());
-
-        verify(bookService, times(1)).restoreBooksCount(anyList());
-    }
 
     @Test
     @DisplayName("도서에 태그 추가 - 성공")
