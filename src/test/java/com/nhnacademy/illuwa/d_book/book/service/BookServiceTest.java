@@ -583,7 +583,7 @@ public class BookServiceTest {
         when(bookRepository.save(any(Book.class))).thenReturn(mock(Book.class));
 
         // When
-        bookService.updateBooksCount(requests);
+        bookService.updateBooksCount(requests,"postive");
 
         // Then
         assertThat(book1.getBookExtraInfo().getCount()).isEqualTo(5);
@@ -607,60 +607,12 @@ public class BookServiceTest {
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book1));
 
         // When & Then
-        assertThatThrownBy(() -> bookService.updateBooksCount(requests))
+        assertThatThrownBy(() -> bookService.updateBooksCount(requests,"postive"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("재고 부족: 현재 재고=10, 요청 차감=15");
     }
 
-    @Test
-    @DisplayName("도서 수량 복원 - 성공")
-    void restoreBooksCount_Success() {
-        // Given
-        List<BookCountUpdateRequest> requests = new ArrayList<>();
-        BookCountUpdateRequest req1 = new BookCountUpdateRequest();
-        req1.setBookId(1L);
-        req1.setBookCount(5);
-        requests.add(req1);
 
-        BookCountUpdateRequest req2 = new BookCountUpdateRequest();
-        req2.setBookId(2L);
-        req2.setBookCount(3);
-        requests.add(req2);
-
-        Book book1 = Book.builder().id(1L).bookExtraInfo(new BookExtraInfo(Status.NORMAL, false, 10)).build();
-        Book book2 = Book.builder().id(2L).bookExtraInfo(new BookExtraInfo(Status.NORMAL, false, 5)).build();
-
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(book1));
-        when(bookRepository.findById(2L)).thenReturn(Optional.of(book2));
-        when(bookRepository.save(any(Book.class))).thenReturn(mock(Book.class));
-
-        // When
-        bookService.restoreBooksCount(requests);
-
-        // Then
-        assertThat(book1.getBookExtraInfo().getCount()).isEqualTo(15);
-        assertThat(book2.getBookExtraInfo().getCount()).isEqualTo(8);
-        verify(bookRepository, times(1)).save(book1);
-        verify(bookRepository, times(1)).save(book2);
-    }
-
-    @Test
-    @DisplayName("도서 수량 복원 - 도서 없음 실패")
-    void restoreBooksCount_BookNotFound_Failure() {
-        // Given
-        List<BookCountUpdateRequest> requests = new ArrayList<>();
-        BookCountUpdateRequest req1 = new BookCountUpdateRequest();
-        req1.setBookId(1L);
-        req1.setBookCount(5);
-        requests.add(req1);
-
-        when(bookRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // When & Then
-        assertThatThrownBy(() -> bookService.restoreBooksCount(requests))
-                .isInstanceOf(NotFoundBookException.class)
-                .hasMessageContaining("ID " + 1L + "에 해당하는 도서를 찾을 수 없습니다.");
-    }
 
     @Test
     @DisplayName("모든 도서 페이징 조회 - 성공")
