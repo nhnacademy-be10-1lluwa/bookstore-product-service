@@ -5,6 +5,7 @@ import com.nhnacademy.illuwa.d_book.category.dto.CategoryFlatResponse;
 import com.nhnacademy.illuwa.d_book.category.dto.CategoryResponse;
 import com.nhnacademy.illuwa.d_book.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -51,13 +53,6 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getCategoryInfo(categoryId));
     }
 
-
-//    @GetMapping("/tree")
-//    public List<CategoryResponse> getCategoryTree() {
-//        List<CategoryResponse> categoryTree = categoryService.getCategoryTree();
-//        return categoryTree;
-//    }
-
     @Operation(summary = "모든 카테고리 조회", description = "모든 카테고리 목록을 조회합니다. 'tree' 뷰 또는 페이징된 목록으로 조회할 수 있습니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공적으로 카테고리 목록을 반환합니다.",
@@ -75,6 +70,7 @@ public class CategoryController {
             return ResponseEntity.ok(categoryService.getCategoryTree());
         }
 
+        CacheControl cacheControl = CacheControl.maxAge(10, TimeUnit.MINUTES);
         // 페이징 요청 처리
         if (pageable != null && pageable.isPaged()) {
             Page<CategoryResponse> paged = categoryService.getAllCategoriesByPaging(pageable);

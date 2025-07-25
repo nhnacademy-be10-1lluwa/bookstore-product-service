@@ -210,19 +210,34 @@ class CategoryServiceTest {
     void getAllCategoriesFlatPaged_Success() {
         // Given
         Pageable pageable = PageRequest.of(0, 10);
-        Category category = new Category("테스트 카테고리");
-        category.setId(1L);
-        Page<Category> categoryPage = new PageImpl<>(Collections.singletonList(category), pageable, 1);
 
-        given(categoryRepository.findAll(pageable)).willReturn(categoryPage);
+        // 계층 구조 생성
+        Category parent = new Category("부모 카테고리");
+        parent.setId(1L);
+        parent.setParentCategory(null);
+
+        Category child1 = new Category("자식 카테고리 1");
+        child1.setId(2L);
+        child1.setParentCategory(parent);
+
+        Category child2 = new Category("자식 카테고리 2");
+        child2.setId(3L);
+        child2.setParentCategory(parent);
+
+        // 자식들 설정
+        parent.setChildrenCategory(List.of(child1, child2));
+
+        // findAll() 호출 시 반환될 리스트
+        List<Category> categoryList = List.of(parent, child1, child2);
+        given(categoryRepository.findAll()).willReturn(categoryList);
 
         // When
         Page<CategoryFlatResponse> result = categoryService.getAllCategoriesFlatPaged(pageable);
 
         // Then
-        assertEquals(1, result.getTotalElements());
-        assertEquals("테스트 카테고리", result.getContent().get(0).getCategoryName());
-        verify(categoryRepository, times(1)).findAll(pageable);
+        assertEquals(3, result.getTotalElements());
+        assertEquals("부모 카테고리", result.getContent().get(0).getCategoryName());
+        verify(categoryRepository, times(1)).findAll();
     }
 
     @Test

@@ -9,5 +9,8 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Long> , CustomizedCategoryRepository{
     List<Category> findByParentCategoryIsNull();
 
+    @Override
+    List<Category> findAll();
+
     Optional<Category> findByCategoryName(String categoryName);
 }

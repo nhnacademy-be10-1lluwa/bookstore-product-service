@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -114,7 +115,7 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public Page<CategoryFlatResponse> getAllCategoriesFlatPaged(Pageable pageable) {
         // 1) 모든 카테고리 가져오기
-        List<Category> allCategories = categoryRepository.findAll(pageable).getContent();
+        List<Category> allCategories = categoryRepository.findAll();
 
         // 2) 계층 평면화
         List<CategoryFlatResponse> flatList = new ArrayList<>();
@@ -126,8 +127,12 @@ public class CategoryService {
 
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), flatList.size());
-        List<CategoryFlatResponse> pageContent = flatList.subList(start, end);
 
+        if (start >= flatList.size()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, flatList.size());
+        }
+
+        List<CategoryFlatResponse> pageContent = flatList.subList(start, end);
         return new PageImpl<>(pageContent, pageable, flatList.size());
     }
 
