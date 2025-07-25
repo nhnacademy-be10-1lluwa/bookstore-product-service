@@ -31,8 +31,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.times;
@@ -259,7 +258,7 @@ class AdminBookControllerTest {
                         .content(objectMapper.writeValueAsString(requests)))
                 .andExpect(status().isNoContent());
 
-        verify(bookService, times(1)).updateBooksCount(anyList(),"negative");
+        verify(bookService, times(1)).updateBooksCount(anyList(),eq("negative"));
     }
 
 
