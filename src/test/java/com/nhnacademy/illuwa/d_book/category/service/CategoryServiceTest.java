@@ -210,11 +210,14 @@ class CategoryServiceTest {
     void getAllCategoriesFlatPaged_Success() {
         // Given
         Pageable pageable = PageRequest.of(0, 10);
+
         Category category = new Category("테스트 카테고리");
         category.setId(1L);
-        Page<Category> categoryPage = new PageImpl<>(Collections.singletonList(category), pageable, 1);
+        category.setParentCategory(null); // 루트 카테고리
 
-        given(categoryRepository.findAll(pageable)).willReturn(categoryPage);
+        List<Category> allCategories = List.of(category);
+
+        given(categoryRepository.findAll()).willReturn(allCategories);
 
         // When
         Page<CategoryFlatResponse> result = categoryService.getAllCategoriesFlatPaged(pageable);
@@ -222,7 +225,7 @@ class CategoryServiceTest {
         // Then
         assertEquals(1, result.getTotalElements());
         assertEquals("테스트 카테고리", result.getContent().get(0).getCategoryName());
-        verify(categoryRepository, times(1)).findAll(pageable);
+        verify(categoryRepository, times(1)).findAll();
     }
 
     @Test
