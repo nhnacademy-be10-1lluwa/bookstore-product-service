@@ -1,13 +1,12 @@
-package com.nhnacademy.illuwa.d_review.review;
+package com.nhnacademy.illuwa.d_review.reviewlike;
 
-import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.entity.BookImage;
 import com.nhnacademy.illuwa.d_book.book.enums.ImageType;
 import com.nhnacademy.illuwa.d_book.book.enums.Status;
+import com.nhnacademy.illuwa.d_book.book.entity.Book;
 import com.nhnacademy.illuwa.d_book.book.extrainfo.BookExtraInfo;
 import com.nhnacademy.illuwa.d_review.review.entity.Review;
-import com.nhnacademy.illuwa.d_review.review.entity.ReviewImage;
-import org.junit.jupiter.api.BeforeEach;
+import com.nhnacademy.illuwa.d_review.reviewlike.entity.ReviewLike;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,18 +15,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-public class ReviewImageEntityUnitTest {
+public class ReviewLikeEntityUnitTest {
     private Book book;
-    private Review review;
-    private final String imageUrl = "https://media.tenor.com/qLET435-HUwAAAAi/dumb-pepe.gif";
-
-
-    @BeforeEach
-    void setUp() {
+    private final LocalDateTime fixedTime = LocalDateTime.of(2099, 8, 22, 4, 17, 32);
+    @Test
+    @DisplayName("ReviewLike Entity of 메서드 테스트")
+    void entityOfMethodTest(){
+        //given
+        String imageUrl = "https://media.tenor.com/qLET435-HUwAAAAi/dumb-pepe.gif";
         book = new Book(
                 999999L,
                 "이상한 책",
@@ -45,26 +42,23 @@ public class ReviewImageEntityUnitTest {
                 null
         );
 
-        review = new Review(
-                999L,
-                "리뷰리뷰리뷰",
-                "포인트냠냠",
-                3,
-                LocalDateTime.of(2024, 2, 19, 21, 32, 11),
+        Review review = new Review(
+                1L,
+                "리뷰 제목",
+                "리뷰 내용",
+                5,
+                fixedTime,
                 book,
-                77L
+                9999L
         );
-    }
+        Long memberId = 999L;
 
-    @Test
-    @DisplayName("ReviewImage Entity of 메서드 테스트")
-    void entityOfMethodTest() {
-        // given & when
-        ReviewImage image = ReviewImage.of(imageUrl, review);
+        // when
+        ReviewLike reviewLike = ReviewLike.of(review, memberId);
 
         // then
-        assertThat(image.getImageId()).isNull();
-        assertThat(image.getImageUrl()).isEqualTo("https://media.tenor.com/qLET435-HUwAAAAi/dumb-pepe.gif");
-        assertThat(image.getReview()).isEqualTo(review);
+        assertThat(reviewLike.getLikeId()).isNull();
+        assertThat(reviewLike.getReview().getReviewId()).isEqualTo(1L);
+        assertThat(reviewLike.getMemberId()).isEqualTo(999L);
     }
 }

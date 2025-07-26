@@ -49,12 +49,6 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
         return reviewLikeRepository.findMyLikedReviewIds(reviewIds, memberId);
     }
 
-//    @Override
-//    @Transactional(readOnly = true)
-//    public ReviewLikeResponse getLikeInfo(Long reviewId, Long memberId) {
-//        return new ReviewLikeResponse(isLikedByMe(reviewId, memberId), getLikeCount(reviewId));
-//    }
-//
     @Override
     @Transactional(readOnly = true)
     public boolean isLikedByMe(Long reviewId, Long memberId) {
