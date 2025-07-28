@@ -66,7 +66,7 @@ public class CategoryController {
             Pageable pageable
     ) {
 
-        CacheControl cacheControl = CacheControl.maxAge(10, TimeUnit.MINUTES);
+        CacheControl cacheControl = CacheControl.maxAge(10, TimeUnit.MINUTES).cachePublic();
 
         if ("tree".equalsIgnoreCase(view)) {
             return ResponseEntity.ok()
