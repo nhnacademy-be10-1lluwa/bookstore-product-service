@@ -206,6 +206,9 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
+                    <generatedSourcesDirectory>
+                        ${project.build.directory}/generated-sources/querydsl
+                    </generatedSourcesDirectory>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
