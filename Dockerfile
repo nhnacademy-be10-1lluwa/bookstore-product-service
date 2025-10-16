@@ -16,5 +16,5 @@ EXPOSE 10307 10308
 ENV SERVER_PORT=10307
 
 # 실행
-ENTRYPOINT ["java", "-jar", "/app/1lluwa-auth-service.jar", "--spring.profiles.active=prod"]
+ENTRYPOINT ["java", "-jar", "/app/1lluwa-product-service.jar", "--spring.profiles.active=prod"]
 CMD ["--server.port=${SERVER_PORT}"]
