@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.tag.repository;
 
+import java.util.Optional;
 import com.nhnacademy.illuwa.d_book.tag.entity.BookTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,6 @@ public interface BookTagRepository extends JpaRepository<BookTag, Long> {
     List<BookTag> findByTagId(Long tagId);
 
     void deleteByBookIdAndTagId(Long bookId, Long tagId);
+
+    Optional<BookTag> findByBookIdAndTagId(Long bookId, Long tagId);
 }

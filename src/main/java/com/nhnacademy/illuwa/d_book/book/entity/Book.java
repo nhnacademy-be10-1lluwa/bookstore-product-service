@@ -5,6 +5,8 @@ import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.tag.entity.BookTag;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -51,6 +53,7 @@ public class Book {
 
     @Builder.Default
     @OneToMany(mappedBy = "book", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @BatchSize(size = 5)
     private List<BookImage> bookImages = new ArrayList<>();
 
     @Embedded
@@ -63,13 +66,12 @@ public class Book {
 
     @Builder.Default
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @BatchSize(size = 10)
     private Set<BookTag> bookTags = new HashSet<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookCategory> bookCategories = new ArrayList<>();
-
-
-
+    @BatchSize(size = 100)
+    private Set<BookCategory> bookCategories = new HashSet<>();
 
 }

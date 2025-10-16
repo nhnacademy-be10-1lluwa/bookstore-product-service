@@ -10,6 +10,8 @@ import com.nhnacademy.illuwa.d_book.tag.exception.TagAlreadyExistsException;
 import com.nhnacademy.illuwa.d_book.tag.repository.BookTagRepository;
 import com.nhnacademy.illuwa.d_book.tag.repository.TagRepository;
 import com.nhnacademy.illuwa.search.service.BookSearchService;
+import com.nhnacademy.illuwa.d_book.book.exception.NotFoundBookException;
+import com.nhnacademy.illuwa.d_book.tag.exception.TagNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,7 +52,7 @@ public class TagService {
     @Transactional
     public TagResponse registerTag(String name) {
         if (tagRepository.existsByName(name)) {
-            throw new IllegalArgumentException("이미 존재하는 태그입니다.");
+            throw new TagAlreadyExistsException("이미 존재하는 태그입니다.");
         }
 
         Tag saved = tagRepository.save(new Tag(name));
@@ -64,7 +66,7 @@ public class TagService {
     @Transactional
     public void deleteTag(Long tagId) {
         Tag tag = tagRepository.findById(tagId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 태그입니다."));
+                .orElseThrow(() -> new TagNotFoundException("존재하지 않는 태그입니다."));
 
         List<BookTag> bookTags = bookTagRepository.findByTagId(tagId);
         if (!bookTags.isEmpty()) {
@@ -85,13 +87,13 @@ public class TagService {
     @Transactional
     public void addTagToBook(Long bookId, Long tagId) {
         if (bookTagRepository.existsByBookIdAndTagId(bookId, tagId)) {
-            return;
+            throw new TagAlreadyExistsException("이미 존재하는 태그입니다.");
         }
 
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 아이디의 도서를 찾을 수 없습니다.: " + bookId));
+                .orElseThrow(() -> new NotFoundBookException("해당 아이디의 도서를 찾을 수 없습니다.: " + bookId));
         Tag tag = tagRepository.findById(tagId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 아이디의 태그를 찾을 수 없습니다. " + tagId));
+                .orElseThrow(() -> new TagNotFoundException("해당 아이디의 태그를 찾을 수 없습니다. " + tagId));
 
         BookTag bookTag = new BookTag(book, tag);
         bookTagRepository.save(bookTag);
@@ -105,13 +107,11 @@ public class TagService {
     public void removeTagFromBook(Long bookId, Long tagId) {
 
         Tag tagToRemove = tagRepository.findById(tagId)
-                .orElse(null);
+                .orElseThrow(() -> new TagNotFoundException("해당 아이디의 태그를 찾을 수 없습니다. " + tagId));
 
         bookTagRepository.deleteByBookIdAndTagId(bookId, tagId);
 
-        if (tagToRemove != null) {
-            bookSearchService.removeTagFromBookDocument(bookId, tagToRemove.getName());
-        }
+        bookSearchService.removeTagFromBookDocument(bookId, tagToRemove.getName());
 
     }
 

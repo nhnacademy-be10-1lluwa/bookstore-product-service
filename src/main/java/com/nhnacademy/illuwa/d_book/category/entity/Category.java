@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Table(name = "categories")
+@BatchSize(size = 100)
 public class Category {
 
     @Id
@@ -40,3 +42,4 @@ public class Category {
     }
 
 }
+

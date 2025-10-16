@@ -7,6 +7,7 @@ import com.nhnacademy.illuwa.d_book.category.entity.BookCategory;
 import com.nhnacademy.illuwa.d_book.category.entity.Category;
 import com.nhnacademy.illuwa.d_book.tag.dto.TagResponse;
 import lombok.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -18,30 +19,52 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "도서 상세 정보 및 추가 정보 응답 DTO")
 public class BookDetailWithExtraInfoResponse {
 
+    @Schema(description = "도서 ID")
     private Long id;
+    @Schema(description = "도서 제목")
     private String title;
+    @Schema(description = "도서 내용")
     private String contents;
+    @Schema(description = "도서 설명")
     private String description;
+    @Schema(description = "저자")
     private String author;
+    @Schema(description = "출판사")
     private String publisher;
+    @Schema(description = "출판일")
     private String publishedDate; // 문자열로 유지
+    @Schema(description = "ISBN")
     private String isbn;
+    @Schema(description = "정가")
     private BigDecimal regularPrice;
+    @Schema(description = "판매 가격")
     private BigDecimal salePrice;
+    @Schema(description = "표지 이미지 URL")
     private String imgUrl;
 
+    @Schema(description = "선물 포장 가능 여부")
     private Boolean giftwrap;
+    @Schema(description = "재고 수량")
     private Integer count;
+    @Schema(description = "도서 상태")
     private Status status;
 
+    @Schema(description = "카테고리 ID")
     private Long categoryId;
+    @Schema(description = "1단계 카테고리 ID")
     private Long level1;
+    @Schema(description = "2단계 카테고리 ID")
     private Long level2;
+    @Schema(description = "1단계 카테고리 이름")
     private String level1Name;
+    @Schema(description = "2단계 카테고리 이름")
     private String level2Name;
+    @Schema(description = "카테고리 이름")
     private String categoryName;
+    @Schema(description = "태그 목록")
     private List<TagResponse> tags;
 
 

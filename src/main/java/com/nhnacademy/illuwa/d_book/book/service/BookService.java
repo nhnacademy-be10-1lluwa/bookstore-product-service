@@ -1,5 +1,6 @@
 package com.nhnacademy.illuwa.d_book.book.service;
 
+import com.nhnacademy.illuwa.common.aop.BookRegisterSync;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookCountUpdateRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookApiRegisterRequest;
 import com.nhnacademy.illuwa.d_book.book.dto.request.BookRegisterRequest;
@@ -55,7 +56,6 @@ public class BookService {
     private final BookSearchService bookSearchService;
 
 
-
     public BookService(AladinBookApiService aladinBookApiService, BookRepository bookRepository, BookResponseMapper bookResponseMapper, TagRepository tagRepository, BookTagRepository bookTagRepository, BookImageRepository bookImageRepository, BookMapper bookMapper, CategoryRepository categoryRepository, BookCategoryRepository bookCategoryRepository, MinioStorageService minioStorageService, BookSearchService bookSearchService) {
         this.aladinBookApiService = aladinBookApiService;
         this.bookRepository = bookRepository;
@@ -76,7 +76,7 @@ public class BookService {
         if (bookExternalResponseDtos == null || bookExternalResponseDtos.isEmpty()) {
             throw new NotFoundBookException("제목과 일치하는 도서가 존재하지 않습니다.");
         }
-            return bookExternalResponseDtos;
+        return bookExternalResponseDtos;
     }
 
 
@@ -100,7 +100,6 @@ public class BookService {
         Page<Book> bookPage = bookRepository.findAll(pageable);
         return bookPage.map(bookResponseMapper::toBookDetailResponse);
     }
-
 
 
     // ISBN으로 도서 상세 조회
@@ -136,27 +135,28 @@ public class BookService {
     }
 
 
-
     // 도서 상세 (부가정보 포함) 조회
     @Transactional
     public BookDetailWithExtraInfoResponse getBookDetailWithExtraInfo(Long bookId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("도서를 찾을 수 없습니다."));
 
-        BookCategory bookCategory = bookCategoryRepository.findByBookId(bookId)
-                .orElseThrow(() -> new RuntimeException("도서에 연결된 카테고리를 찾을 수 없습니다."));
-
-        Category category = bookCategory.getCategory();
-
-        Long categoryId = category.getId();
+        Long categoryId = null;
         Long level1 = null;
         Long level2 = null;
 
-        if (category.getParentCategory() != null) {
-            level2 = category.getParentCategory().getId();
+        if (book.getBookCategories() != null && !book.getBookCategories().isEmpty()) {
+            BookCategory bookCategory = book.getBookCategories().iterator().next();
+            Category category = bookCategory.getCategory(); // 추가 쿼리 발생 안 함
 
-            if (category.getParentCategory().getParentCategory() != null) {
-                level1 = category.getParentCategory().getParentCategory().getId();
+            if (category != null) {
+                categoryId = category.getId();
+                if (category.getParentCategory() != null) {
+                    level2 = category.getParentCategory().getId();
+                    if (category.getParentCategory().getParentCategory() != null) {
+                        level1 = category.getParentCategory().getParentCategory().getId();
+                    }
+                }
             }
         }
 
@@ -172,7 +172,7 @@ public class BookService {
                 .regularPrice(book.getRegularPrice())
                 .salePrice(book.getSalePrice())
                 .imgUrl(book.getBookImages().isEmpty() ? null : book.getBookImages().get(0).getImageUrl())
-                .giftwrap(book.getBookExtraInfo().getGiftWrap()) 
+                .giftwrap(book.getBookExtraInfo().getGiftWrap())
                 .count(book.getBookExtraInfo().getCount())
                 .status(book.getBookExtraInfo().getStatus())
                 .categoryId(categoryId)
@@ -180,11 +180,9 @@ public class BookService {
                 .level2(level2)
                 .build();
 
-        log.info("BookDetailWithExtraInfoResponse 생성: categoryId={}, level1={}, level2={}", categoryId, level1, level2);
 
         return response;
     }
-
 
 
     // 모든 도서 조회 (부가정보 포함)
@@ -194,8 +192,7 @@ public class BookService {
         return all
                 .map(book -> {
                     // 카테고리 조회
-                    BookCategory bookCategory = bookCategoryRepository.findByBookId(book.getId())
-                            .orElse(null);
+                    BookCategory bookCategory = book.getBookCategories().stream().findFirst().orElse(null);
 
                     // 태그 조회
                     List<TagResponse> tags = book.getBookTags().stream()
@@ -208,7 +205,7 @@ public class BookService {
 
 
     // 도서 페이징 조회
-    public Page<BookDetailResponse> getAllBooksByPaging(Pageable pageable){
+    public Page<BookDetailResponse> getAllBooksByPaging(Pageable pageable) {
         Page<Book> bookPage = bookRepository.findAll(pageable);
 
         Page<BookDetailResponse> pageMap = bookPage.map(bookResponseMapper::toBookDetailResponse);
@@ -228,36 +225,38 @@ public class BookService {
 
     // 모든 도서 조회 (간단 정보)
     @Transactional(readOnly = true)
-    public List<BookDetailResponse> getAllBooks(){
+    public List<BookDetailResponse> getAllBooks() {
         List<Book> bookEntityList = bookRepository.findAll();
         return bookResponseMapper.toBookDetailListResponse(bookEntityList);
     }
 
     // 외부 API 데이터로 도서 등록
     @Transactional
+    @BookRegisterSync
     public BookDetailResponse registerBookByApi(BookApiRegisterRequest bookApiRegisterRequest) {
 
         Book bookEntity = bookMapper.fromApiRequest(bookApiRegisterRequest);
-        bookEntity.setBookImages(new ArrayList<>());
-
-        Category categoryEntity = categoryRepository.findById(bookApiRegisterRequest.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
-
 
         if (bookEntity == null) {
             throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
         }
 
-        log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
+        bookEntity.setBookImages(new ArrayList<>());
+
         if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
             log.warn("이미 등록된 도서: 제목={}", bookEntity.getTitle());
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
-        BookImage bookImage = new BookImage(bookEntity,bookApiRegisterRequest.getCover(), ImageType.THUMBNAIL);
+        Category categoryEntity = categoryRepository.findById(bookApiRegisterRequest.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
+
+        log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
+
+        BookImage bookImage = new BookImage(bookEntity, bookApiRegisterRequest.getCover(), ImageType.THUMBNAIL);
         bookEntity.addImage(bookImage);
 
-        BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookApiRegisterRequest.getCount());
+        BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL, true, bookApiRegisterRequest.getCount());
         bookEntity.setBookExtraInfo(bookExtraInfo);
 
 
@@ -268,12 +267,11 @@ public class BookService {
         savedBook.getBookCategories().add(bookCategory);
         bookCategoryRepository.save(bookCategory);
 
-        bookSearchService.syncBookToElasticsearch(savedBook);
-
         return bookResponseMapper.toBookDetailResponse(bookEntity);
     }
 
     // 도서 직접 등록 (폼+파일 업로드)
+    @BookRegisterSync
     public BookDetailResponse registgerBookDirectly(BookRegisterRequest bookRegisterRequest, MultipartFile bookImageFile) {
 
         String savedImageName = minioStorageService.uploadBookImage(bookImageFile);
@@ -284,16 +282,6 @@ public class BookService {
 
         bookEntity.setBookImages(new ArrayList<>());
 
-        // 카테고리
-        Category categoryEntity = categoryRepository.findById(bookRegisterRequest.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
-
-        // 태그는 도서 등록 후에 관리자 페이지에서 등록
-
-        if (bookEntity == null) {
-            throw new IllegalArgumentException("등록할 도서가 존재하지 않습니다.");
-        }
-
         log.info("도서 등록 시작: 제목={}", bookEntity.getTitle());
 
         if (bookRepository.existsByIsbn(bookEntity.getIsbn())) {
@@ -301,19 +289,22 @@ public class BookService {
             throw new BookAlreadyExistsException("이미 등록된 도서입니다.");
         }
 
+        // 카테고리
+        Category categoryEntity = categoryRepository.findById(bookRegisterRequest.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
+
         //이미지 MiniO 등록 예정
-        BookImage bookImage = new BookImage(bookEntity,savedImageName, ImageType.THUMBNAIL);
+        BookImage bookImage = new BookImage(bookEntity, savedImageName, ImageType.THUMBNAIL);
         bookEntity.addImage(bookImage);
 
         //도서 부가 정보
-        BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL,true, bookRegisterRequest.getCount());
+        BookExtraInfo bookExtraInfo = new BookExtraInfo(Status.NORMAL, true, bookRegisterRequest.getCount());
         bookEntity.setBookExtraInfo(bookExtraInfo);
 
 
         Book savedBook = bookRepository.save(bookEntity);
         bookImageRepository.save(bookImage);
-        bookCategoryRepository.save(new BookCategory(savedBook,categoryEntity));
-        bookSearchService.syncBookToElasticsearch(savedBook);
+        bookCategoryRepository.save(new BookCategory(savedBook, categoryEntity));
 
 
         return bookResponseMapper.toBookDetailResponse(bookEntity); // Entity -> DTO
@@ -325,8 +316,8 @@ public class BookService {
     public void deleteBook(Long id) {
         Optional<Book> book = bookRepository.findById(id);
 
-        if(book.isEmpty()){
-            log.warn("도서를 찾을 수 없습니다. id : {}",id);
+        if (book.isEmpty()) {
+            log.warn("도서를 찾을 수 없습니다. id : {}", id);
             throw new NotFoundBookException("id : " + id + "에 해당하는 도서를 찾을 수 없습니다.");
         }
 
@@ -335,7 +326,7 @@ public class BookService {
         Book targetBook = book.get();
         bookRepository.delete(targetBook);
 
-        log.info("삭제된 도서 제목 : {}" , targetBook.getTitle());
+        log.info("삭제된 도서 제목 : {}", targetBook.getTitle());
     }
 
 
@@ -428,8 +419,12 @@ public class BookService {
     }
 
     @Transactional
-    public void updateBooksCount(List<BookCountUpdateRequest> requests) {
+    public void updateBooksCount(List<BookCountUpdateRequest> requests, String sign) {
+
+        boolean isIncrease = "positive".equalsIgnoreCase(sign);
+
         for (BookCountUpdateRequest request : requests) {
+
             Book book = bookRepository.findById(request.getBookId())
                     .orElseThrow(() -> new NotFoundBookException("ID " + request.getBookId() + "에 해당하는 도서를 찾을 수 없습니다."));
 
@@ -438,34 +433,16 @@ public class BookService {
             }
 
             int currentCount = Optional.ofNullable(book.getBookExtraInfo().getCount()).orElse(0);
-
-            int updatedCount = currentCount - request.getBookCount();
+            int changeAmount = isIncrease ? Math.abs(request.getBookCount()) : -Math.abs(request.getBookCount());
+            int updatedCount = currentCount + changeAmount;
 
             if (updatedCount < 0) {
                 throw new IllegalArgumentException("재고 부족: 현재 재고=" + currentCount + ", 요청 차감=" + request.getBookCount());
             }
 
             book.getBookExtraInfo().setCount(updatedCount);
+            bookRepository.save(book);
         }
     }
-
-    @Transactional
-    public void restoreBooksCount(List<BookCountUpdateRequest> requests) {
-        for (BookCountUpdateRequest request : requests) {
-            Book book = bookRepository.findById(request.getBookId())
-                    .orElseThrow(() -> new NotFoundBookException("ID " + request.getBookId() + "에 해당하는 도서를 찾을 수 없습니다."));
-
-            if (book.getBookExtraInfo() == null) {
-                throw new IllegalStateException("도서에 부가 정보가 존재하지 않습니다.");
-            }
-
-            int currentCount = Optional.ofNullable(book.getBookExtraInfo().getCount()).orElse(0);
-
-            int updatedCount = currentCount + request.getBookCount();
-
-            book.getBookExtraInfo().setCount(updatedCount);
-        }
-    }
-
-
 }
+
